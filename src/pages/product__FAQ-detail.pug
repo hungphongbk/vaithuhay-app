@@ -1,0 +1,42 @@
+div
+  div.clearfix.header
+    h2.page-title Metafields
+      small.text-muted &nbsp;({{current.title}})
+    .btn-group(data-toggle="buttons")
+    .btn.btn-default.btn-lg.btn-lang.bold(@click="switchLang") {{lang}}
+    save-button(:fn="save")
+    help.float-right(:docs="$docs")
+  ul.nav.nav-tabs(role="tabList")
+    li.nav-item
+      a.nav-link.active(data-toggle="tab", role="tab", aria-controls="faq-panel", aria-selected="true", href="#faq-panel") FAQ
+    li.nav-item
+      a.nav-link(data-toggle="tab", role="tab", aria-controls="desc-panel", aria-selected="false", href="#desc-panel") Mô tả sơ lược
+    li.nav-item
+      a.nav-link(data-toggle="tab", role="tab", aria-controls="relateds-panel", aria-selected="false", href="#relateds-panel") Sản phẩm liên quan
+  .tab-content
+    .tab-pane.fade.show.active#faq-panel
+      form
+        .form-group(v-ml="lang")
+          label Câu hỏi
+          input.form-control(type="text", v-model="newFAQ[lang].ask")
+        .form-group(v-ml="lang")
+          label Câu trả lời
+          textarea.form-control(rows="6", v-model="newFAQ[lang].answer")
+        .btn.btn-success(@click="add") Thêm FAQ
+      hr
+      .card-columns
+        .card(v-for="(f, index) in faq")
+          .card-body
+            h5.card-title {{f[lang].ask}}
+            .card-text.mb-2 {{f[lang].answer}}
+            button.btn.btn-light(@click="mode='edit';newFAQ=f") Chỉnh sửa
+            button.btn.btn-danger(@click="faq.splice(index, 1)") Xóa
+    .tab-pane.fade#desc-panel
+      .form
+        .form-group
+          label Tiêu đề (tiếng Anh)
+          input.form-control(type="text", v-model="title")
+        .form-group
+          textarea.form-control(rows="8", v-model="desc[lang]")
+    .tab-pane.fade#relateds-panel
+      .row

@@ -1,0 +1,102 @@
+div
+  div.clearfix.header
+    h1.page-title Product > Whole sale
+    .btn.btn-default.btn-lg.btn-lang.bold(@click="switchLang") {{lang}}
+    save-button(:fn="save")
+    help.float-right(:docs="$docs")
+  hr
+  .row
+    .col-sm-4
+      .card.mb-2(v-for="(i, index) in wholesale", @click="current=i", :class="{'current': current===i}")
+        .card-body
+          p.float-left {{i.name}}
+          .btn.btn-danger.float-right(@click="wholesale.splice(index,1)") Xóa
+      .card.bg-light.new-wholesale
+        .card-header Tạo mới chính sách bán sỉ
+        .card-body
+          form.form
+            .form-group
+              input.form-control(type="text", v-model="newWholesale.name")
+            .form-group
+              .btn.btn-success(@click="add") OK
+    .col-sm-8(v-if="current")
+      h3 {{current.name}}
+      br
+      page-tabs
+        page-tab#home-panel(title="Chi tiết")
+          .row
+            .col-sm-6
+              .card.bg-light.mb-3
+                .card-header.clearfix {{currentRule===null?'Thêm mới':'Cập nhật'}}
+                .card-body
+                  form
+                    .form-group
+                      label.control-label Loại khuyến mãi
+                      .form-check
+                        label.form-check-label.mr-2
+                          input.form-check-input(type="radio", value="wholesale", v-model="newRule.type")
+                          | Bán sỉ
+                        label.form-check-label.mr-2
+                          input.form-check-input(type="radio", value="buy1get1", v-model="newRule.type")
+                          | Mua X tặng Y
+                        label.form-check-label.mr-2
+                          input.form-check-input(type="radio", value="buy1and1get1", v-model="newRule.type")
+                          | Mua X & Y tặng Z
+                    hr
+                    .form-group.clearfix
+                      label.control-label Số sản phẩm được áp dụng
+                      input.form-control.count(type="text", v-model="newRule.number")
+                    template(v-if="newRule.type!=='wholesale'")
+                      template(v-if="newRule.type==='buy1and1get1'")
+                        .form-group.clearfix
+                          label.control-label Số sản phẩm mua kèm
+                          input.form-control.count(type="text", v-model="newRule.number")
+                        product-selector-modal.mb-2(v-model="newRule.buy", title="Chọn SP mua kèm")
+                        hr
+                      product-selector-modal.mb-2(v-model="newRule.additional", title="Chọn SP khuyến mãi kèm")
+                    .form-group
+                      label.control-label Chiết khấu
+                      .row
+                        .col-sm-5
+                          select.form-control(v-model="newRule.unit")
+                            option(value="percentage") %
+                            option(value="cash") VND
+                            option(v-if="newRule.type==='buy1get1'", value="gift") Quà tặng
+                        .col-sm-7
+                          input.form-control(type="text", v-model="newRule.amount")
+                    .form-group
+                      label.control-label Tiêu đề
+                      input.form-control(v-model="newRule.title[lang]")
+                    .form-group
+                      label.control-label Mô tả
+                      textarea.form-control(rows="5", v-model="newRule.description[lang]")
+                    .text-right
+                      .btn.btn-success(@click="addRule") OK
+            .col-sm-6
+              ul.list-group
+                li.list-group-item.rule-item(v-for="(rule, rindex) in current.rules", ref="rules", @click="currentRule = rule; newRule = rule", :class="{'current': currentRule===rule}")
+                  .media
+                    img.mr-3(v-if="current.apply.length>0", :src="current.apply[0] | product | thumbnail")
+                    .media-body
+                      h5 {{rule.title[lang]}}
+                      p Loại:&nbsp;
+                        strong {{rule.type | label}}
+                      .float-right
+                        .btn.btn-sm.btn-danger.mr-2(@click="current.rules.splice(rindex,1)") Xóa
+                        .btn.btn-sm.btn-secondary(@click="copyHtml(rule,rindex)") Copy HTML
+              modal(v-if="copy", title="Sao chép HTML", @dismiss="copy=null")
+                .modal-body
+                  .form-group
+                    textarea.form-control(:value="copy", rows="6")
+                  p.mb-4
+                    i Sao chép đoạn mã trên và Paste vào nội dung bài viết dưới dạng embed
+        page-tab#apply-panel(title="Áp dụng cho")
+          .row
+            .col-sm-6
+              input.form-control(type="text", placeholder="Search...", :value="keyword", @input="update_")
+              br
+              ul.list-group(style="height: 500px; overflow: scroll")
+                li.list-group-item(v-for="p in products$search", :class="{'current': p.checked}", @click="toggle(p.id)") {{p.title}}
+            .col-sm-6
+              ul.list-group
+                li.list-group-item(v-for="p in products$checked") {{p.title}}

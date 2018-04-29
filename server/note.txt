@@ -1,0 +1,8 @@
+use vaithuhay
+db.createUser(
+   {
+     user: "hungphongbk",
+     pwd: "hungPhong1*!@",
+     roles:[{role: "userAdmin", db: "vaithuhay"}]
+   }
+)

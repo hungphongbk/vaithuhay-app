@@ -1,0 +1,7 @@
+{
+  "append": true,
+  "watch": true,
+  "script": "bin/www",
+  "sourceDir": "/home/phong/api.v1/vaithuhay",
+  "args": ["--port", "8090"]
+}

@@ -1,0 +1,147 @@
+div
+  div.clearfix.header
+    h1.page-title About Us
+    .btn-group(data-toggle="buttons")
+    .btn.btn-default.btn-lg.btn-lang.bold(@click="switchLang") {{lang}}
+    .btn.btn-default.btn-lg(@click="get") Load
+    save-button(:fn="save")
+  page-tabs
+    page-tab#slide-panel(title="slider")
+      .row
+        .col-sm-4
+          upload(v-model="newSlide.image[lang]", v-ml="lang")
+          p.font-italic Kích thước hình ảnh nên là 870x470px hoặc tỉ lệ tương đương
+        .col-sm-8
+          .form-group
+            label Đường dẫn khi click vào slide (bỏ trống nếu không cần thiết)
+            input.form-control(v-model="newSlide.url")
+        .col-sm-12
+          button.btn.btn-success(@click="addSlide") {{slideMode==='new'?'Thêm Slide':'Cập nhật Slide'}}
+        .col-sm-12
+          hr
+        .col-sm-3(v-for="(slide,index) in slides")
+          .card
+            img.card-img-top(:src="slide.image[lang].thumbnails['600w']")
+            .card-body
+              p.text-secondary(v-if="slide.url.length>0")
+                small
+                  i.fa.fa-link
+                  | {{slide.url}}
+              button.btn.btn-secondary.mr-1(@click="slideMode='update';newSlide=slide") Chỉnh sửa
+              button.btn.btn-danger(@click="slides.splice(index, 1)") Xóa
+    page-tab#about-panel(title="về vaithuhay")
+      .row
+        .col-sm-12
+          p.font-italic Tỉ lệ kích thước hình ảnh nên là 1:1, chú ý viền tròn
+        .col-sm-4(v-for="item in aboutUs[lang]")
+          form.form
+            .form-group
+              input.form-control.bold(v-model="item.title")
+            .form-group
+              upload(v-model="item.image")
+            .form-group
+              textarea.form-control(rows="10", v-model="item.content")
+    page-tab#mission-panel(title="nhiệm vụ & thành viên")
+      h4 Nhiệm vụ của chúng tôi
+      .row
+        .col-sm-5
+          .form-group
+            input.form-control(type="text", v-model="mission[lang].title")
+          .form-group
+            upload(v-model="mission[lang].image")
+        .col-sm-7
+          .form-group
+            textarea.form-control(rows="8", v-model="mission[lang].content")
+      hr
+      h4 Thành viên
+      .row
+        .col-sm-4(v-for="item in member[lang]")
+          form.form
+            .form-group
+              input.form-control.bold(v-model="item.name")
+            .form-group
+              upload(v-model="item.image")
+            .form-group
+              input.form-control(v-model="item.position")
+            .form-group
+              textarea.form-control(rows="5", v-model="item.desc")
+            .form-group
+              .input-group
+                .input-group-addon
+                  i.fa.fa-facebook
+                input.form-control(v-model="item.facebook")
+            .form-group
+              .input-group
+                .input-group-addon
+                  i.fa.fa-envelope
+                input.form-control(v-model="item.email")
+      hr
+      h4 Tham gia cùng chúng tôi
+      textarea.form-control(rows="5", v-model="join[lang]")
+    page-tab#clients-panel(title="các thương hiệu")
+      list-management.row(v-model="clients", :new="newClient")
+        template(slot-scope="client")
+          .col-sm-4
+            upload(v-model="client.current.image")
+            p.font-italic Background logo cần trong suốt
+          .col-sm-8
+            .form-group
+              label Đường dẫn khi click vào Logo
+              input.form-control(v-model="client.current.url")
+          .col-sm-12
+            button.btn.btn-success(@click="client.add") {{client.mode==='new'?'Thêm Logo':'Cập nhật Logo'}}
+          .col-sm-12
+            hr
+          .col-sm-2(v-for="(logo,index) in clients")
+            .card
+              img.card-img-top(:src="logo.image")
+              .card-body
+                p.text-secondary
+                  small
+                    i.fa.fa-link
+                    | {{logo.url}}
+                button.btn.btn-secondary.btn-sm.mr-1(@click="client.update(logo)") Chỉnh sửa
+                button.btn.btn-danger.btn-sm(@click="clients.splice(index, 1)") Xóa
+    page-tab#agencies-panel(title="các đại lý")
+      list-management.row(v-model="agencies", :new="newAgency")
+        template(slot-scope="props")
+          .col-sm-4
+            p Ảnh đại diện của đại lý
+            upload(v-model="props.current.image")
+          .col-sm-4
+            .form-group
+              label Tên đại lý
+              input.form-control(v-model="props.current.title[lang]")
+            .form-group
+              label E-mail
+              input.form-control(v-model="props.current.email")
+            .form-group
+              label Địa chỉ
+              input.form-control(v-model="props.current.address[lang]")
+          .col-sm-4
+            .form-group
+              label Số điện thoại
+              input.form-control(v-model="props.current.phone")
+            .form-group
+              label Các mặt hàng kinh doanh
+              textarea.form-control(rows="6", v-model="props.current.products[lang]")
+          .col-sm-12
+            button.btn.btn-success(@click="props.add") {{props.mode==='new'?'Thêm đại lý':'Cập nhật đại lý'}}
+          .col-sm-12
+            hr
+          draggable.col-sm-12(v-model="agencies")
+            transition-group.row(tag="div")
+              .col-sm-3(v-for="(agency,index) in agencies", :key="index")
+                .card
+                  .card-body
+                    h6 {{agency.title[lang]}}
+                    p.text-secondary
+                      small
+                        i.fa.fa-envelope
+                        | {{agency.email}}
+                    p.text-secondary
+                      small
+                        i.fa.fa-map-marker
+                        | {{agency.address[lang]}}
+                    button.btn.btn-secondary.mr-1.btn-sm(@click="props.update(agency)") Chỉnh sửa
+                    button.btn.btn-danger.btn-sm(@click="agencies.splice(index, 1)") Xóa
