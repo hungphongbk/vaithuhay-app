@@ -1,27 +1,27 @@
-import credentials from '../jobs/hungphongbk-02e62197a93f'
-import {google as googleapis} from 'googleapis'
-import moment from 'moment-timezone'
+import credentials from '../jobs/hungphongbk-02e62197a93f';
+import {google as googleapis} from 'googleapis';
+import moment from 'moment-timezone';
 //import omit from 'lodash/omit'
-import cloneDeep from 'lodash/cloneDeep'
-import zip from 'lodash/zip'
-import clone from 'lodash/clone'
+import cloneDeep from 'lodash/cloneDeep';
+import zip from 'lodash/zip';
+import clone from 'lodash/clone';
 //import flatten from 'lodash/flatten'
-import sortedIndexOf from 'lodash/sortedIndexOf'
-import {apiGet} from '../utils'
-import get from "lodash/get"
-import memoize from 'async-decorators/memoize'
-import {promisify} from 'bluebird'
-import {remove as removeAccents} from 'diacritics'
-import create from 'lodash/create'
-import min from 'lodash/min'
-import max from 'lodash/max'
-import stringHash from 'string-hash'
+import sortedIndexOf from 'lodash/sortedIndexOf';
+import {apiGet} from '../utils';
+import get from "lodash/get";
+import memoize from 'async-decorators/memoize';
+import {promisify} from 'bluebird';
+import {remove as removeAccents} from 'diacritics';
+import create from 'lodash/create';
+import min from 'lodash/min';
+import max from 'lodash/max';
+import stringHash from 'string-hash';
 
 const sheets = googleapis.sheets('v4');
 const joinKeys = (prefix, obj) => {
   const rs = {};
   for (const [key, value] of Object.entries(obj)) {
-    rs[prefix + key] = value
+    rs[prefix + key] = value;
   }
   return rs;
 };
@@ -88,7 +88,7 @@ const _mapHeader = {
 const hash = (number, productId = '') => stringHash(number.trim() + '@' + (typeof productId === 'number' ? productId : productId.trim()));
 const randomlyFn = (fn, probability = 0.4) => {
     if (Math.random() <= probability)
-      fn()
+      fn();
   },
   logger = (isEnable = process.env.NODE_ENV !== 'production') => (target, key, descriptor) => {
     const original = descriptor.value;
@@ -101,11 +101,11 @@ const randomlyFn = (fn, probability = 0.4) => {
             if (isEnable)
               console.log.apply(null, [`{${key}}: ${msg}`, ...args2]);
           }
-        })
-      return original.apply(newThis, args)
-    }
+        });
+      return original.apply(newThis, args);
+    };
     return descriptor;
-  }
+  };
 
 async function getValue(_obj, key) {
   //if key is extra field
@@ -120,13 +120,13 @@ async function getValue(_obj, key) {
     if (typeof val !== 'string') return "";
     const m = moment(val);
     // console.log([val, 'UTC' + m.utcOffset() / 60, 'hour = ' + m.hour()].join(' | '));
-    return m.format('DD-MM-YYYY')
+    return m.format('DD-MM-YYYY');
   }
   if (/_at$/.test(key)) {
     if (typeof val !== 'string') return "";
     const m = moment(val);
     // console.log([val, 'UTC' + m.utcOffset() / 60, 'hour = ' + m.hour()].join(' | '));
-    return m.format('DD-MM-YYYY HH:MM:SS')
+    return m.format('DD-MM-YYYY HH:MM:SS');
   }
   switch (key) {
     case 'financial_status':
@@ -165,13 +165,13 @@ class Spreadsheet {
           if (typeof result.values === 'undefined')
             result.values = result.data.values;
           return result;
-        })
-    }
+        });
+    };
 
     this.spreadsheetId = '1n3H8FNUmAHEtoViNqGevOuESHAwitGdBOuf92YkjuDI'; //for production
     //this.spreadsheetId = '14rY5RLRjDNYKl2WSHten0sIA5xNGNdb6uJcpaHeHXYE'; //for testing
     this.rowOffset = 4000;
-    this.columnLastIndex = 'AT'
+    this.columnLastIndex = 'AT';
     this.spreadsheets = {
       values: {
         get: sheets.spreadsheets.values.get,
@@ -187,7 +187,7 @@ class Spreadsheet {
         spreadSheetFns[fn] = polyfill(promisify(spreadSheetFns[fn]));
       }
     }
-    this.logs = []
+    this.logs = [];
   }
 
   @memoize()
@@ -201,9 +201,9 @@ class Spreadsheet {
         'https://www.googleapis.com/auth/spreadsheets'
       ],
       null
-    )
+    );
     try {
-      await jwt.authorize()
+      await jwt.authorize();
       return jwt;
     } catch (e) {
       throw e;
@@ -226,16 +226,16 @@ class Spreadsheet {
         else if (key === 'ranges' && typeof obj.ranges !== 'undefined') {
           obj.ranges = obj.ranges.map(r => sheet + '!' + r);
         } else if (typeof obj[key] === 'object')
-          deep(obj[key])
+          deep(obj[key]);
       }
-    }
+    };
     deep(params);
 
     return {
       auth: await this._makeAuth(),
       spreadsheetId: this.spreadsheetId,
       ...params
-    }
+    };
   }
 
   @memoize()
@@ -243,7 +243,7 @@ class Spreadsheet {
     const headers = [];
     const result = await this.spreadsheets.values.get(await this._params({
       range: `A1:${this.columnLastIndex}1`
-    }))
+    }));
     const labels = result.values[0].map(removeAccents);
     // console.log(labels.join(', '));
 
@@ -255,7 +255,7 @@ class Spreadsheet {
       let index = labels.indexOf(label);
       //console.log(`${label} has index ${index}`);
       if (index >= 0)
-        headers[key] = index
+        headers[key] = index;
     }
     //console.log(headers);
     return headers;
@@ -269,7 +269,7 @@ class Spreadsheet {
     for (const [path, index] of Object.entries(headers)) {
       Object.defineProperty(row, path, {
         get() {
-          return row[index]
+          return row[index];
         },
         set(value) {
           let v = value;
@@ -280,12 +280,12 @@ class Spreadsheet {
           }
           row[index] = v;
         }
-      })
+      });
     }
     Object.defineProperties(row, {
       rowHash: {
         get() {
-          return hash(this.order_number, this['line_items[0].name'])
+          return hash(this.order_number, this['line_items[0].name']);
         }
       }
     });
@@ -324,7 +324,7 @@ class Spreadsheet {
         if (p1.hash < p2.hash) return -1;
         if (p1.hash > p2.hash) return 1;
         return 0;
-      })
+      });
   }
 
   /**
@@ -364,7 +364,7 @@ class Spreadsheet {
         rows.push(...await this._makeOrderRows(order));
       }
       return rows;
-    })()
+    })();
 
     //split rows into 2 types
     const [rows, sheetData] = await Promise.all([
@@ -377,9 +377,9 @@ class Spreadsheet {
 
     (rs => {
       rs.map(r => {
-        this.log('from sheet data: ' + r.productId + ', hash = ' + r.hash)
-      })
-    })(sheetData.filter(row => row.number === '#113424'))
+        this.log('from sheet data: ' + r.productId + ', hash = ' + r.hash);
+      });
+    })(sheetData.filter(row => row.number === '#113424'));
 
     //define fn: add extra fields!
     let sheetDataLastIndex = sheetData.length + this.rowOffset;
@@ -389,25 +389,25 @@ class Spreadsheet {
         this.log('from haravan: ' + row['line_items[0].name'] + ', hash = ' + row.rowHash);
       }
       if ((index = sortedIndexOf(sheetDataHash, row.rowHash)) >= 0) {
-        const sheetDataRow = sheetData[index]
+        const sheetDataRow = sheetData[index];
 
         //transform extra fields to value
         for (const i in row)
           if (row.hasOwnProperty(i) && (typeof row[i] === 'function'))
-            row[i] = row[i](sheetDataRow.rowIndex, sheetDataRow.hash)
+            row[i] = row[i](sheetDataRow.rowIndex, sheetDataRow.hash);
 
         updateList.push({
           sheetDataRow,
           row
-        })
+        });
       } else {
 
         //transform extra fields to value
         for (const i in row)
           if (row.hasOwnProperty(i) && (typeof row[i] === 'function'))
-            row[i] = row[i](sheetDataLastIndex, row.rowHash)
+            row[i] = row[i](sheetDataLastIndex, row.rowHash);
         sheetDataLastIndex++;
-        appendList.push(row)
+        appendList.push(row);
       }
     });
 
@@ -419,14 +419,14 @@ class Spreadsheet {
       lastGroup = () => updateGroupedList[updateGroupedList.length - 1],
       lastItemInLastGroup = () => {
         const g = lastGroup();
-        return g[g.length - 1]
+        return g[g.length - 1];
       };
     updateList.forEach(item => {
       if (typeof lastGroup() === 'undefined')
-        updateGroupedList.push([item])
+        updateGroupedList.push([item]);
       else if (Math.abs(item.sheetDataRow.rowIndex - lastItemInLastGroup().sheetDataRow.rowIndex) === 1)
-        lastGroup().push(item)
-      else updateGroupedList.push([item])
+        lastGroup().push(item);
+      else updateGroupedList.push([item]);
     });
     //grouped to multiple ranges
     const updateBody = updateGroupedList.map(group => {
@@ -434,12 +434,12 @@ class Spreadsheet {
         fromRow = min(rowIndexes),
         toRow = max(rowIndexes),
         range = `A${fromRow}:${this.columnLastIndex}${toRow}`;
-      this.log(`\tWill be updated in range ${range}`)
+      this.log(`\tWill be updated in range ${range}`);
       return {
         range,
         values: group.map(r => r.row)
-      }
-    })
+      };
+    });
 
     return {
       updateBody,
@@ -458,7 +458,7 @@ class Spreadsheet {
           data: updateBody,
           valueInputOption: 'USER_ENTERED'
         }
-      }))
+      }));
     if (appendBody.length > 0)
       await this.spreadsheets.values.append(await this._params({
         valueInputOption: 'USER_ENTERED',
@@ -466,7 +466,7 @@ class Spreadsheet {
         resource: {
           values: appendBody
         }
-      }))
+      }));
   }
 
   emitLog(): Array<string> {
@@ -477,4 +477,4 @@ class Spreadsheet {
 }
 
 
-export default new Spreadsheet()
+export default new Spreadsheet();

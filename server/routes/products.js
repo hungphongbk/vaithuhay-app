@@ -1,42 +1,63 @@
 import {Router} from 'express';
 import middlewares from "@server/routes/middlewares";
+import {ProductFavorite} from "@server/models";
 
 const router = new Router();
+
+const userFavoriteMiddleware = async (req, res, next) => {
+  if (!(req.body.userId || req.query.userId)) {
+    res.status(403).json({message: 'login required'});
+    return;
+  }
+  const query = {userId: req.body.userId || req.query.userId};
+  if (req.params.id)
+    query.productId = req.params.id;
+  req.favorites = await ProductFavorite.find(query);
+  next();
+};
 
 router.get('/', middlewares.allProducts, async (req, res) => {
   const data = req.products,
     id = req.query.id;
 
-  //patch: add "vote"
-  // if (false) {
-  //   console.log('Add vote to products...');
-  //   const addVote = async ({id}) => {
-  //     const {metafields} = await apiGet(`/admin/products/${id}/metafields.json`),
-  //       metafield = search(metafields, 'vote');
-  //     if (metafield) {
-  //       await apiPut(`/admin/products/${id}/metafields/${metafield.id}.json`, {
-  //         metafield: {
-  //           value: JSON.stringify({
-  //             vote5: rand(1, 3),
-  //             vote4: rand(1, 3),
-  //             vote3: 0,
-  //             vote2: 0,
-  //             vote1: 0
-  //           })
-  //         }
-  //       });
-  //       apiClear(`/admin/products/${id}/metafields.json`);
-  //     }
-  //   };
-  //   const productTasks = chunk(data.products, 8);
-  //   for (const tasks of productTasks) {
-  //     await Promise.all(tasks.map(addVote));
-  //   }
-  //   console.log('completed');
-  // }
-
   if (!id) res.json({products: data});
   else res.json(data.find(p => p.id * 1 === id * 1));
+});
+
+// Get user favorites list
+router.get('/favorites', userFavoriteMiddleware, async (req, res) => {
+  try {
+    const favorites = await Promise.all(req.favorites.map(f => new Promise(resolve => {
+      f.toJSONAsync(resolve);
+    })));
+    res.json(favorites);
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+// Query & Make a favorite-add-or-remove action
+router.get('/:id/favorite', userFavoriteMiddleware, (req, res) => {
+  res.json({value: req.favorites.length > 0});
+});
+router.post('/:id/favorite', userFavoriteMiddleware, async (req, res) => {
+  try {
+    if (req.favorites.length === 0) {
+      //create new
+
+      await (new ProductFavorite({
+        productId: req.params.id,
+        userId: req.body.userId
+      })).save();
+      res.json({status: 'ok', behavior: 'add'});
+    } else {
+      // await req.favorites[0].remove();
+      await Promise.all(req.favorites.map(model => model.remove()));
+      res.json({status: 'ok', behavior: 'remove'});
+    }
+  } catch (e) {
+    res.status(500).json({status: 'error', message: e.message});
+  }
 });
 
 export default router;

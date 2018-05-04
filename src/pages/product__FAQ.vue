@@ -70,7 +70,7 @@
               p
                 span(:class="[$style.productItemStatus]")
                   fa-icon(:icon="faHeart")
-                  | 0
+                  | {{product.favorites.length}}
             .product-item-actions
               router-link.btn.btn-secondary(:to="{name: 'product.faq.item', params: {id: product.id}}")
                 fa-icon(:icon="faEdit")
