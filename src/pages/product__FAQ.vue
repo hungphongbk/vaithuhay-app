@@ -27,12 +27,12 @@
   }
 </style>
 <style lang="scss" module="">
-  .productItemStatus{
+  .productItemStatus {
     margin-right: .4rem;
-    svg{
+    svg {
       margin-right: .3rem;
     }
-    &:global(.text-muted svg){
+    &:global(.text-muted svg) {
       display: none;
     }
   }
@@ -88,8 +88,8 @@
   import chunk from 'lodash/chunk';
   import {functions} from "@client/helpers";
   import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
-  import faCheck from '@fortawesome/fontawesome-free-solid/faCheck'
-  import faHeart from '@fortawesome/fontawesome-free-solid/faHeart'
+  import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
+  import faHeart from '@fortawesome/fontawesome-free-solid/faHeart';
 
   const retry = (fn, params, count) => new Promise(async (resolve, reject) => {
       while (--count >= 0) {
@@ -143,8 +143,8 @@
         const keyword = normalizeVie(kw);
         return products.filter(product => {
           if (normalizeVie(product.title).indexOf(keyword) >= 0) return true;
-          if (normalizeVie(product.tags).indexOf(keyword) >= 0) return true;
-          return false;
+          return normalizeVie(product.tags).indexOf(keyword) >= 0;
+
         });
       }
     },
@@ -162,20 +162,28 @@
         const response = await getXhr('/g');
         if (response.status && response.status === 'login') {
           console.log(window.open(response.url, "_blank", "resizable,scrollbars,status"));
-        } else if (true) {
+        } else {
           this.relateds = 0;
-          $(this.$refs.loadingModal).modal({
-            backdrop: 'static',
-            keyboard: false
-          });
-          for (const products of chunk(this.products, 3)) {
-            await Promise.all(products.map(p =>
-              retry(postXhr, [`/g/relateds?id=${p.id}`], 3)));
-            this.relateds += products.length;
+          {
+            $(this.$refs.loadingModal).modal({
+              backdrop: 'static',
+              keyboard: false
+            });
+            {
+              for (const products of chunk(this.products, 3)) {
+                await Promise.all(products.map(p =>
+                  retry(postXhr, [`/g/relateds?id=${p.id}`], 3)));
+                this.relateds += products.length;
+              }
+              {
+                $(this.$refs.loadingModal).modal('hide');
+                {
+                  $(document.body).removeClass("modal-open");
+                  $(".modal-backdrop").remove();
+                }
+              }
+            }
           }
-          $(this.$refs.loadingModal).modal('hide');
-          $(document.body).removeClass("modal-open");
-          $(".modal-backdrop").remove();
         }
       },
       async updateTops() {

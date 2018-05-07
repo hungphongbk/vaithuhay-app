@@ -127,6 +127,7 @@
     "spawn-sync": "^1.0.15",
     "ssh-exec": "^2.0.0",
     "string-hash": "^1.1.3",
+    "string-strip-html": "^1.3.2",
     "style-loader": "^0.20.3",
     "tempusdominus-bootstrap-4": "^5.0.0-alpha9",
     "text-encoder-lite": "^1.0.1",

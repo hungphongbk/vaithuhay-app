@@ -49,6 +49,9 @@
     .row(v-if="value")
       .col-sm-8.offset-sm-2
         img(:src="(typeof value==='object')?value.thumbnails[thumbnail]:''")
+    .row
+      .col-sm-12
+        p.small.text-warning <b>Lưu ý</b>: chỉ up ảnh định dạng JPEG!
 </template>
 <script>
   import {postForm} from '../plugins/jquery-ajax'

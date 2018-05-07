@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import {promisify} from 'bluebird';
 import {apiGet} from "@server/utils";
+import stripHtml from 'string-strip-html';
 
 const schema = new mongoose.Schema({
   userId: String,
@@ -19,11 +19,37 @@ schema.options.toObject.transform = function (doc, ret, options) {
 schema.methods.toJSONAsync = function (callback) {
   const obj = this.toObject({versionKey: false});
   const fields = [
-    'id', 'images', 'options', 'product_type',
-    'tags', 'title', 'description', 'variants', 'handle'
+    'id', 'images', 'product_type',
+    'tags', 'title', 'body_html', 'variants', 'handle'
   ].join(',');
-  apiGet(`/admin/products/${obj.productId}.json?fields=${fields}`)
-    .then(response=>callback(response.product));
+  // apiGet(`/admin/products/${obj.productId}.json?fields=${fields}`)
+  //   .then(response=>callback(response.product));
+  Promise.all([
+    apiGet(`/admin/products/${obj.productId}.json?fields=${fields}`),
+    apiGet(`/admin/products/${obj.productId}/metafields.json`)
+  ]).then(([{product}, {metafields}]) => {
+    const findMetafield = (key, namespace = 'vaithuhay') => {
+      const rs = metafields.find(m =>
+        m.key === key && m.namespace === namespace);
+      if (!rs) return null;
+      return rs.value;
+    };
+
+    const descObj = JSON.parse(findMetafield('desc'));
+    if (descObj)
+      product.desc = descObj.desc;
+    else {
+      let d: string = stripHtml(product.body_html);
+      if (d.length > 150)
+        d = d.substring(0, 150) + '...';
+      product.desc = {
+        en: d,
+        vi: d
+      };
+    }
+    delete product.body_html;
+    callback(product);
+  });
 };
 
 /**
