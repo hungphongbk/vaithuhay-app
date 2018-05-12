@@ -10,8 +10,8 @@ import chunk from 'lodash/chunk'
 import spreadsheet from "@server/components/Spreadsheet";
 
 const router = new Router(),
-  CARTS_CREATE_ADDRESS = 'https:\/\/api.v1.hungphongbk.com\/vaithuhay\/b\/callback\/createCart',
-  ORDER_PROCESS_ADDRESS = 'https:\/\/api.v1.hungphongbk.com\/vaithuhay\/b\/callback\/processOrder';
+  CARTS_CREATE_ADDRESS = 'https:\/\/server.vaithuhay.com\/b\/callback\/createCart',
+  ORDER_PROCESS_ADDRESS = 'https:\/\/server.vaithuhay.com\/b\/callback\/processOrder';
 
 //check whether webhook already registered
 async function createOrUpdate(topics, address) {

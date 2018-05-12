@@ -46,12 +46,20 @@ module.exports = merge(base, {
           },
           "remove-hashbag-loader"
         ]
+      },
+      {
+        // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
+        test: /\.tsx?$/,
+        loader: 'cache-loader!ts-loader',
       }
     ]
   },
   node: {
     __filename: true,
     __dirname: true
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.json']
   },
   resolveLoader: {
     alias: {

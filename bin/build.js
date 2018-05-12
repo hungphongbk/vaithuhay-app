@@ -2,7 +2,7 @@ var exec = require('ssh-exec'),
   fs = require('fs'),
   host = {
     user: 'root',
-    host: 'hungphongbk.com',
+    host: '188.166.177.127',
     port: 2234,
     key: fs.readFileSync('/Users/hungphongbk/.ssh/id_rsa'),
     password: 'hungPhong1*!@'

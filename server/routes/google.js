@@ -16,7 +16,7 @@ const router = Router(),
   authFn = () => new google.auth.OAuth2(
     key.web.client_id,
     key.web.client_secret,
-    (process.env.NODE_ENV === 'production' ? 'https://api.v1.hungphongbk.com/vaithuhay/b/' : 'https://localhost:8089/') + 'g/login/callback'
+    (process.env.NODE_ENV === 'production' ? 'https://server.vaithuhay.com/b/' : 'https://localhost:8089/') + 'g/login/callback'
   ),
   analytics = (req, res, next) => {
     req.analytics = google.analytics({

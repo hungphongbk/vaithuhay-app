@@ -5,7 +5,7 @@ window.$ = $;
 
 const api = (url, forceCloud = false) => (
   (process.env.NODE_ENV === 'production' || forceCloud) ?
-    'https://api.v1.hungphongbk.com/vaithuhay/b' :
+    'https://server.vaithuhay.com/b' :
     'https://localhost:8089'
 ) + url;
 store.subscribe(({type, payload}) => {

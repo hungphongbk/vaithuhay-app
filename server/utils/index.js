@@ -1,6 +1,6 @@
-import request from 'request-promise-native'
-import LRU from 'lru-cache'
-import './polyfill'
+import request from 'request-promise-native';
+import LRU from 'lru-cache';
+import './polyfill';
 // import 'colors'
 
 const flex = obj => {
@@ -15,12 +15,12 @@ const flex = obj => {
 
 const cache = LRU({
     length: function (n, key) {
-      return n.length + key.length
+      return n.length + key.length;
     }
   }),
   delayFn = ms => new Promise(resolve => {
     console.log(`delay ${ms}ms`);
-    setTimeout(resolve, ms)
+    setTimeout(resolve, ms);
   }),
   _getQueue = [],
   opts = {
@@ -106,7 +106,7 @@ function loop() {
 loop();
 
 const pushQueue = (url, type = 'get', data = {}) => new Promise(resolve => {
-  _getQueue.push({url, type, data, resolve})
+  _getQueue.push({url, type, data, resolve});
 });
 
 export async function apiGet(url, _cache = true) {
@@ -141,12 +141,12 @@ export function apiClear(url) {
 
 export const log = {
   info: (title, message) => console.log(('[' + title + ']') + ' ' + message)
-}
+};
 
 export const regex = {
   email: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g
-}
+};
 
-export {default as createServer} from './createServer'
-export {default as diffArray} from './diffArray'
-export {default as MutexLock} from './mutexLock'
+export {default as createServer} from './createServer';
+export {default as diffArray} from './diffArray';
+export {default as MutexLock} from './mutexLock';

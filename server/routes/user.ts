@@ -1,23 +1,30 @@
-import {Router} from 'express';
-import AppUser from '../models/AppUsers';
-import {apiGet, apiPut} from "@server/utils";
-import {CLIENT_USER_COOKIE_KEY} from "@server/utils/const";
-import pick from 'lodash/pick';
+import {Request, Response, Router} from 'express';
+import AppUser                     from '../models/AppUsers';
+import {apiDel, apiGet, apiPut}    from "@server/utils";
+import {CLIENT_USER_COOKIE_KEY}    from "@server/utils/const";
+import pick                        from 'lodash/pick';
 
+declare global {
+  namespace Express {
+    interface Request {
+      customer: HaravanCustomer
+    }
+  }
+}
 const router = Router();
 
-const UserMiddleware = async (req, res, next) => {
-    if (!req.session[CLIENT_USER_COOKIE_KEY]) {
+const UserMiddleware = async (req: Request, res: Response, next) => {
+    if (!req.headers[CLIENT_USER_COOKIE_KEY]) {
       res.status(403).json({status: 'err', message: 'Authentication required'});
     }
-    const {customer} = await apiGet(`/admin/customers/${req.session[CLIENT_USER_COOKIE_KEY]}.json`);
+    const {customer} = await apiGet(`/admin/customers/${req.headers[CLIENT_USER_COOKIE_KEY]}.json`);
     // console.log(customer);
     req.customer = customer;
     next();
   },
   customerToJSON = async customer => {
     const rs = pick(customer, [
-      'id', 'email', 'first_name', 'last_name', 'birthday', 'gender', 'addresses', 'default_address'
+      'id', 'email', 'first_name', 'last_name', 'birthday', 'gender', 'addresses', 'default_address',
     ]);
 
     //transform name
@@ -27,7 +34,7 @@ const UserMiddleware = async (req, res, next) => {
 
     //transform addresses
     rs.address = {
-      list: rs.addresses
+      list: rs.addresses,
     };
     delete rs.addresses;
 
@@ -40,10 +47,10 @@ const UserMiddleware = async (req, res, next) => {
     return rs;
   };
 
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response) => {
   res.json(await AppUser.find({}));
 });
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request, res: Response) => {
   const {email} = req.body;
   const user = new AppUser({email});
   try {
@@ -53,20 +60,20 @@ router.post('/', async (req, res) => {
     res.status(500).send(e.message);
   }
 });
-router.post('/verify', async (req, res) => {
+router.post('/verify', async (req: Request, res: Response) => {
   const {email, name, avatar} = req.body;
   const user = AppUser.findOne({email});
   if (user) {
     await user.update({
       name,
-      avatar
+      avatar,
     });
     res.json({});
   } else {
     res.status(403).send();
   }
 });
-router.post('/login', async (req, res) => {
+router.post('/login', async (req: Request, res: Response) => {
   //search customer by email
   const email = req.body.email,
     query = /^[a-z0-9](\.?[a-z0-9]){5,}/.exec(email)[0];
@@ -76,25 +83,48 @@ router.post('/login', async (req, res) => {
     res.status(500).json({message: `user ${email} not exists`});
   else {
     const customer = customers.find(c => c.email === email);
-    req.session[CLIENT_USER_COOKIE_KEY] = customer.id;
     res.json(await customerToJSON(customer));
   }
 });
-router.post('/update', UserMiddleware, async (req, res) => {
+router.put('/address/:id', UserMiddleware, async (req: Request, res: Response) => {
+  try {
+    await apiPut(`/admin/customers/${req.customer.id}/addresses/${req.params.id}.json`, {
+      address: {
+        ...req.body,
+      },
+    });
+    res.json({status: 'ok'});
+  } catch (e) {
+    res.status(500).json({status: 'err', message: e.message});
+  } finally {
+
+  }
+});
+router.delete('/address/:id', UserMiddleware, async (req: Request, res: Response) => {
+  try {
+    await apiDel(`/admin/customers/${req.customer.id}/addresses/${req.params.id}.json`);
+    res.json({status: 'ok'});
+  } catch (e) {
+    res.status(500).json({status: 'err', message: e.message});
+  } finally {
+
+  }
+});
+router.post('/update', UserMiddleware, async (req: Request, res: Response) => {
   const {id} = req.customer;
   try {
     await apiPut(`/admin/customers/${id}.json`, {
       customer: {
         id,
-        ...req.body
-      }
+        ...req.body,
+      },
     });
     res.json({status: 'ok'});
   } catch (e) {
     res.status(500).json({status: 'err', message: e.message});
   }
 });
-router.patch('/', async (req, res) => {
+router.patch('/', async (req: Request, res: Response) => {
   const {email} = req.body;
   const user = AppUser.findOne({email});
   if (user) {

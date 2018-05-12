@@ -8,7 +8,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin'),
 
 
 const devMode = process.env.NODE_ENV === 'development',
-  serverName = devMode ? '' : 'https://api.v1.hungphongbk.com/vaithuhay/dist/',
+  serverName = devMode ? '' : 'https://server.vaithuhay.com/dist/',
   cssLoader = (loaders) => {
     if (devMode) {
       loaders.unshift('style-loader');

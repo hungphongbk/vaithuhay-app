@@ -53,7 +53,7 @@ app.use(cors({
   credentials: true,
   origin(origin, callback) {
     if (/vaithuhay.com/.test(origin)) callback(null, true);
-    else if (typeof origin === 'undefined' || ['https://localhost:8081', 'https://api.v1.hungphongbk.com', 'https://accounts.google.com'].indexOf(origin) !== -1) {
+    else if (typeof origin === 'undefined' || ['https://localhost:8081', 'https://server.vaithuhay.com', 'https://accounts.google.com'].indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS.'));

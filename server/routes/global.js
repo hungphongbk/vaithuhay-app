@@ -1,16 +1,14 @@
-import {apiClear, apiGet, apiPost, apiPut, log} from "../utils/index";
-import {Router} from 'express';
-import {SettingsWrapper} from "@server/components";
-import Log from '../models/Logs';
-import apiCache from 'apicache';
-import chunk from 'lodash/chunk';
-import rand from 'lodash/random';
-import pick from 'lodash/pick';
-import middlewares from './middlewares';
-import moment from 'moment-timezone';
-import qs from 'query-string';
-import zip from "lodash/zip";
-import {admin as adminMiddleware} from "@server/routes/middlewares";
+import {apiClear, apiDel, apiGet, apiPost, apiPut, log} from "../utils/index";
+import {Router}                                         from 'express';
+import {SettingsWrapper}                                from "@server/components";
+import Log                                              from '../models/Logs';
+import apiCache                                         from 'apicache';
+import pick                                             from 'lodash/pick';
+import middlewares                                      from './middlewares';
+import moment                                           from 'moment-timezone';
+import qs                                               from 'query-string';
+import zip                                              from "lodash/zip";
+import {admin as adminMiddleware}                       from "@server/routes/middlewares";
 
 moment.tz.setDefault('Asia/Ho_Chi_Minh');
 moment.locale('vi');
@@ -188,7 +186,7 @@ router.get('/meta/:resource/:id/:resource2/:id2', async (req, res) => {
 router.get('/meta', async (req, res) => {
   const {key, raw} = req.query,
     {metafields} = await apiGet(`/admin/metafields.json?namespace=vaithuhay&key=${key}`),
-    metafield = metafields[0];
+    metafield = search(metafields, key);
   res.json(typeof metafield === 'undefined' ? [] : flex(raw ? metafield : metafield.value));
 });
 router.post('/meta', async (req, res) => {
@@ -197,7 +195,7 @@ router.post('/meta', async (req, res) => {
       url = '/admin/metafields.json?namespace=vaithuhay',
       {metafields} = await apiGet(url + '&key=' + key),
       metafield = search(metafields, key);
-    console.log(req.body);
+    // console.log(req.body);
     if (typeof metafield === 'undefined' || metafield === null)
       await apiPost(url, {
         metafield: {
@@ -217,6 +215,22 @@ router.post('/meta', async (req, res) => {
     res.json({});
   } catch (e) {
     console.log(e.message);
+    res.status(500).send(e.message);
+  }
+});
+router.delete('/meta', async (req, res) => {
+  try {
+    const {key} = req.query,
+      url = '/admin/metafields.json?namespace=vaithuhay',
+      {metafields} = await apiGet(url + '&key=' + key),
+      metafield = search(metafields, key);
+
+    if (typeof metafield !== 'undefined' && metafield !== null) {
+      await apiDel(`/admin/metafields/${metafield.id}.json`);
+    }
+    apiClear(url + '&key=' + key);
+    res.json({});
+  } catch (e) {
     res.status(500).send(e.message);
   }
 });

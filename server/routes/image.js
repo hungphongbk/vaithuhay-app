@@ -74,7 +74,7 @@ async function generateSet(image, filename) {
                 fs.writeFileSync(filePath, buf);
                 if (!image.thumbnails)
                   image.thumbnails = {};
-                image.thumbnails[`${w}w`] = 'https://api.v1.hungphongbk.com/vaithuhay/uploads/' + newFilename;
+                image.thumbnails[`${w}w`] = 'https://server.vaithuhay.com/uploads/' + newFilename;
                 // if (process.env.NODE_ENV === 'production')
                 //     imagemin.buffer(data, {
                 //         plugins: [
@@ -121,7 +121,7 @@ const optimize = async (req, res, next) => {
     }).lean(false).exec(),
     image = rs || new Image({
       filename,
-      url: 'https://api.v1.hungphongbk.com/vaithuhay/uploads/' + filename
+      url: 'https://server.vaithuhay.com/uploads/' + filename
     });
   try {
     await generateSet(image, filename);
@@ -158,7 +158,7 @@ router.post('/patch', async (req, res) => {
     }).lean(false).exec(),
     image = rs || new Image({
       filename,
-      url: 'https://api.v1.hungphongbk.com/vaithuhay/uploads/' + filename
+      url: 'https://server.vaithuhay.com/uploads/' + filename
     });
   await generateSet(image, filename);
   res.json(image.toJSON());

@@ -18,7 +18,7 @@
     div.clearfix.header
       h1.page-title Các chương trình khuyến mãi
       .btn.btn-default.btn-lg.btn-lang.bold(@click="switchLang") {{lang}}
-      .btn.btn-success.btn-lg(@click="save") Save
+      save-button(:fn="save")
       help.float-right(:docs="$docs")
     hr
     .row
@@ -94,7 +94,8 @@
       },
       async fetch() {
         const self = this;
-        const {list} = await get('/meta?key=promotions');
+        const {list = []} = await get('/meta?key=promotions');
+        console.log(list);
         //patch
         await Promise.all(list.map(item => new Promise(async resolve => {
           const [vi, en] = await Promise.all([
@@ -105,7 +106,7 @@
           item.img.en = en;
           resolve()
         })));
-        this.list = list || []
+        this.list = list.filter(item => item.title.length > 0) || []
       },
       async save() {
         await post('/meta?key=promotions', {list: this.list});

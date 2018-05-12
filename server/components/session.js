@@ -10,7 +10,8 @@ export default (app) => {
     resave: true,
     saveUninitialized: true,
     cookie: {
-      domain: process.env.NODE_ENV === 'production' ? 'api.v1.hungphongbk.com' : 'localhost',
+      maxAge: 2628000,
+      domain: process.env.NODE_ENV === 'production' ? 'static.vaithuhay.com' : 'localhost',
       secure: true
     },
     proxy: true,
