@@ -6,7 +6,8 @@
         "loose": true
       }
     ],
-    "vue-app"
+    "vue-app",
+    "flow"
   ],
   "plugins": [
     [

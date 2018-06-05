@@ -13,7 +13,8 @@
   import {get, post} from '../plugins/jquery-ajax'
   import pick from 'lodash/pick'
   import extend from 'lodash/extend'
-  import {promiseSerial} from '../plugins/helpers'
+  import fill from 'lodash/fill'
+  import {promiseSerial, defaultI18n} from '../plugins/helpers'
 
   const newSlide = () => ({
     image: d(() => ({
@@ -88,7 +89,7 @@
         this.agency.new = newAgency();
       },
       async get() {
-        const self = this,
+        let self = this,
           {slides, aboutUs, mission, member, join, clients, agencies} = await get('/meta?key=aboutUs');
         //patch slides
         await promiseSerial(slides.map(item => () => new Promise(async resolve => {
@@ -103,16 +104,33 @@
         this.slides = slides || [];
 
         //
-        this.aboutUs = aboutUs;
+        this.aboutUs = defaultI18n(aboutUs, () => fill(Array(3), {
+          title: '',
+          content: '',
+          image: null
+        }));
+
+        mission = defaultI18n(mission, () => ({
+          title: '',
+          content: '',
+          image: null
+        }));
         if (!mission.en.image) mission.en.image = null;
         if (!mission.vi.image) mission.vi.image = null;
         this.mission = mission;
+
         //fix & patch member image
         const add = async obj => {
           obj.facebook = obj.facebook || "";
           obj.email = obj.email || "";
           obj.image = await self.patchImage(obj.image);
         };
+        member = defaultI18n(member, () => fill(Array(3), {
+          name: '',
+          image: null,
+          position: '',
+          desc: ''
+        }))
         member.en.forEach(add);
         member.vi.forEach(add);
         this.member = member;

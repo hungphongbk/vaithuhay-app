@@ -1,16 +1,17 @@
-import {get, post} from '../plugins/jquery-ajax'
-import flatten from 'lodash/flatten'
-import flattenDeep from 'lodash/flattenDeep'
-import chunk from 'lodash/chunk'
-import {patchImage} from '../plugins/patch'
-import {promiseSerial} from "../plugins/helpers"
+import {get, post}     from '../plugins/jquery-ajax';
+import flatten         from 'lodash/flatten';
+import flattenDeep     from 'lodash/flattenDeep';
+import chunk           from 'lodash/chunk';
+import remove          from 'lodash/remove';
+import {patchImage}    from '../plugins/patch';
+import {promiseSerial} from "../plugins/helpers";
 
 export default {
   namespaced: true,
   state() {
     return {
       categories: []
-    }
+    };
   },
   getters: {
     current({categories}, {}, {route}) {
@@ -22,11 +23,20 @@ export default {
         }
       });
       if (route.name !== 'cat.detail') return r();
-      return categories.find(c => c.id === route.params.id * 1) || r()
+      return categories.find(c => c.id === route.params.id * 1) || r();
     }
   },
   mutations: {
     fetch(state, categories) {
+      //refine category
+      categories.forEach((cat, index) => {
+        let slides = cat.meta.slides.list;
+        remove(slides, ({image}) => {
+          return typeof image.vi === "string"
+        });
+        categories[index].meta.slides.list = slides;
+      });
+
       state.categories = categories;
     }
   },
@@ -37,6 +47,10 @@ export default {
       const anotherPromises = [];
       categories.forEach((c, i) => {
         const meta = {};
+        if (!Array.isArray(metaList[i])) {
+          console.log(`something unexpected with collection ${c.id}:${c.title}`);
+          metaList[i] = [];
+        }
         metaList[i].forEach(m => meta[m.key] = JSON.parse(m.value));
 
         //check & patch slides
@@ -55,7 +69,7 @@ export default {
           ]);
           slide.image.vi = vi;
           slide.image.en = en;
-          resolve()
+          resolve();
         })));
 
         //refine meta.settings value
@@ -82,9 +96,9 @@ export default {
     async saveAll({state}) {
       const promises = flatten(state.categories.map(cat => {
         const {id, meta} = cat;
-        return Object.entries(meta).map(([key, value]) => post(`/collections/${id}/${key}`, value))
+        return Object.entries(meta).map(([key, value]) => post(`/collections/${id}/${key}`, value));
       }));
       await Promise.all(promises);
     }
   }
-}
+};

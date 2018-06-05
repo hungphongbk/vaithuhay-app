@@ -53,7 +53,8 @@ module.exports = merge(base, {
         test: /\.js$/,
         include: [
           path.resolve(__dirname, "src"), // your scripts
-          path.resolve(__dirname, "node_modules/query-string")
+          path.resolve(__dirname, "node_modules/query-string"),
+          path.resolve(__dirname, "node_modules/strict-uri-encode"),
         ],
         loader: 'babel-loader?cacheDirectory'
       },
@@ -127,7 +128,7 @@ module.exports.plugins = [
   })
 ];
 if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = false;
+  module.exports.devtool = '#source-map';
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
     new ExtractTextPlugin("styles.css?[contenthash]"),
