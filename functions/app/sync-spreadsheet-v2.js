@@ -1,8 +1,10 @@
-import kue from 'kue'
-import spreadsheet from '../components/Spreadsheet'
+import kue         from 'kue';
+import spreadsheet from './Spreadsheet';
 // import logging from './Logging'
 
-const syncQueue = kue.createQueue();
+const syncQueue = kue.createQueue({
+  redis: 'redis://b840fc02d524045429941cc15f59e41cb7be6c52@206.189.154.142:9836/'
+});
 
 syncQueue
   .on('job enqueue', function (id, type) {
@@ -36,6 +38,6 @@ syncQueue.process('sync', 1, async ({data: order}, done) => {
     // await logging.logOrderErr(order, e);
     done(e);
   }
-})
+});
 
 export default syncQueue;

@@ -1,4 +1,4 @@
-import {FirebaseAdmin as admin} from "@server/components"
+import {FirebaseAdmin as admin} from "../components"
 import {promisify} from 'bluebird'
 import moment from 'moment-timezone'
 

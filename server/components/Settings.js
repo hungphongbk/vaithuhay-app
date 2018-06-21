@@ -1,4 +1,4 @@
-import {Settings} from "@server/models";
+import {Settings} from "../models";
 
 async function _retrieveModel(namespace, key = null, lean = true) {
   if (process.env.NODE_ENV === 'development') {

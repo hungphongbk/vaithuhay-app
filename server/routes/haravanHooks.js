@@ -58,7 +58,7 @@ const orderMiddleware = (req, res, next) => {
       _id: req.headers['x-haravan-order-id'],
       status: req.headers['x-haravan-topic'],
       ...req.body
-    })
+    });
     // console.log(req.order);
     next()
   } catch (e) {
