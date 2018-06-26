@@ -76,4 +76,4 @@ app.post('/do', orderMiddleware, (req, res) => {
   }
 });
 
-export const sync = functions.https.onRequest(app);
+// export const sync = functions.https.onRequest(app);

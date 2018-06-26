@@ -1,12 +1,11 @@
-import {Router} from 'express'
-import {apiGet, apiPost, apiPut, apiDel} from '../utils'
-import syncQueue from '../jobs/sync-spreadsheet-v2'
-import pick from 'lodash/pick'
-import range from 'lodash/range'
-import flatten from 'lodash/flatten'
-import moment from 'moment-timezone'
-import qs from 'query-string'
-import chunk from 'lodash/chunk'
+import {Router} from 'express';
+import {apiDel, apiGet, apiPost, apiPut} from '../utils';
+import syncQueue from '../jobs/sync-spreadsheet-v2';
+import range from 'lodash/range';
+import flatten from 'lodash/flatten';
+import moment from 'moment-timezone';
+import qs from 'query-string';
+import chunk from 'lodash/chunk';
 import spreadsheet from "@server/components/Spreadsheet";
 
 const router = new Router(),
@@ -32,24 +31,24 @@ async function createOrUpdate(topics, address) {
         id,
         address
       }
-    })
-    await Promise.all(webhooks.map(update))
+    });
+    await Promise.all(webhooks.map(update));
   }
 }
 
 if (process.env.NODE_ENV === 'development')
   (async function () {
     if (false) {
-      const {webhooks: $all} = await apiGet('/admin/webhooks.json', false)
+      const {webhooks: $all} = await apiGet('/admin/webhooks.json', false);
       await Promise.all($all.map(webhook => apiDel('/admin/webhooks/' + webhook.id + '.json')));
     }
     await createOrUpdate(['carts\/create', 'carts\/update'], CARTS_CREATE_ADDRESS);
     await createOrUpdate(['orders\/create', 'orders\/cancelled', 'orders\/updated', 'orders\/delete', 'orders\/fulfilled', 'orders\/paid'], ORDER_PROCESS_ADDRESS);
-  })()
+  })();
 
 router.post('/createCart', (req, res) => {
   // console.log(req.body)
-  res.json({})
+  res.json({});
 });
 
 const orderMiddleware = (req, res, next) => {
@@ -60,7 +59,7 @@ const orderMiddleware = (req, res, next) => {
       ...req.body
     });
     // console.log(req.order);
-    next()
+    next();
   } catch (e) {
     console.log(e.message);
     res.status(500).send(e.message);
@@ -77,12 +76,12 @@ router.post('/processOrder', orderMiddleware, (req, res) => {
       .removeOnComplete(true)
       .save(err => {
         if (err)
-          throw err
+          throw err;
       });
-    res.json({})
+    res.json({});
   } catch (e) {
     console.log(e.message);
-    res.json({})
+    res.json({});
   }
 });
 
@@ -104,7 +103,7 @@ router.post('/manual', async (req, res) => {
   res.json({
     status: 'OK',
     logger: spreadsheet.emitLog()
-  })
+  });
 });
 
 if (process.env.NODE_ENV === 'development') {
@@ -138,7 +137,7 @@ if (process.env.NODE_ENV === 'development') {
         }), false).then(({orders}) => orders)
       ))),
       orders = await filterAsync($orders, async order => {
-        return !(await OrderProcess.findOne({number: order.order_number}))
+        return !(await OrderProcess.findOne({number: order.order_number}));
       });
 
     try {
@@ -147,15 +146,15 @@ if (process.env.NODE_ENV === 'development') {
         .attempts(3)
         .removeOnComplete(true)
         .save(err => {
-          if (err) console.log(err.message)
+          if (err) console.log(err.message);
         });
       chunk(orders, 10).map(pushToQueue);
-      res.json({count: orders.length, orders: sortBy(orders, ['order_number']).map(o => o.order_number)})
+      res.json({count: orders.length, orders: sortBy(orders, ['order_number']).map(o => o.order_number)});
     } catch (e) {
       console.log(e.message);
-      res.json({})
+      res.json({});
     }
-  })
+  });
 }
 
 export default router;
