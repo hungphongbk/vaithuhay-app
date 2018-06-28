@@ -1,4 +1,4 @@
-import {get} from '../plugins/jquery-ajax';
+import {get, post} from '../plugins/jquery-ajax';
 
 class Product {
   id;
@@ -13,10 +13,16 @@ class Product {
   }
 
   updateMeta(key, value) {
-    this.context.commit('updateMeta', {
-      id: this.id,
-      meta: {[key]: value}
-    });
+    const id = this.id;
+
+    return post(`/products/${id}/${key}`, {[key]: value})
+      .then(() => {
+        this.context.commit('updateMeta', {
+          id: this.id,
+          meta: {[key]: value}
+        });
+      })
+      .catch(e => console.error(e));
   }
 }
 
@@ -73,10 +79,15 @@ export default {
             case 'vaithuhay-faq':
               meta.faq = JSON.parse(m.value).faq;
               break;
+            case 'relatedArticles':
+              meta.relatedArticles=JSON.parse(m.value).relatedArticles;
+              break;
             default:
               meta[m.key] = m.value;
           }
         });
+
+        if(!meta.relatedArticles) meta.relatedArticles=[];
         p.meta = meta;
       });
       commit('fetch', products.map(p => Product.wrap(context, p)));

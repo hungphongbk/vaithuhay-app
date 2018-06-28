@@ -28,7 +28,7 @@
 </style>
 <style lang="scss" module="">
   .productItemStatus {
-    margin-right: .4rem;
+    margin-right: 1.3rem;
     svg {
       margin-right: .3rem;
     }
@@ -60,7 +60,7 @@
                 span.badge.badge-success(v-if="product.faq") {{product.faq.length}}
                 span.badge.badge-warning(v-if="product.faq && product.newFaq && product.newFaq.length>0") {{product.newFaq.length}}
                   sup *
-              p
+              p.mt-3
                 span(:class="[ctxCls(product.meta.title), $style.productItemStatus]")
                   fa-icon(:icon="faCheck")
                   | Title
@@ -71,6 +71,9 @@
                 span(:class="[$style.productItemStatus]")
                   fa-icon(:icon="faHeart")
                   | {{product.favorites.length}}
+                span(:class="[ctxCls(product.meta.relatedArticles), $style.productItemStatus]")
+                  fa-icon(:icon="faNewspaper")
+                  | {{product.meta.relatedArticles.length}}
             .product-item-actions
               router-link.btn.btn-secondary(:to="{name: 'product.faq.item', params: {id: product.id}}")
                 fa-icon(:icon="faEdit")
@@ -90,6 +93,7 @@
   import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
   import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
   import faHeart from '@fortawesome/fontawesome-free-solid/faHeart';
+  import faNewspaper from '@fortawesome/fontawesome-free-solid/faNewspaper'
 
   const retry = (fn, params, count) => new Promise(async (resolve, reject) => {
       while (--count >= 0) {
@@ -126,7 +130,8 @@
         kw: '',
         faEdit,
         faCheck,
-        faHeart
+        faHeart,
+        faNewspaper
       };
     },
     computed: {
