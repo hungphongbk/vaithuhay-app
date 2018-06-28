@@ -5,14 +5,14 @@
   "author": "Trương Phong <programmingd32@gmail.com>",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --hot --https --cert=/Users/hungphongbk/localhost.pem --key=/Users/hungphongbk/localhost.pem --port 8081",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --hot --https --cert=/etc/pki/tls/certs/MyOwnGrave.crt --key=/etc/pki/tls/certs/MyOwnGrave.key --port 8081",
     "dev:node": "NODE_ENV=development nodemon --trace-warnings $NODE_DEBUG_OPTION --watch server bin/www",
     "dev:test": "NODE_ENV=development nodemon --trace-warnings $NODE_DEBUG_OPTION --watch server server/test.dev.js",
     "build:client": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "server:reload": "node bin/build.js",
     "server:watch": "cross-env NODE_ENV=development webpack --config webpack.backend.config.js --hide-modules --color --watch",
     "server:compile": "cross-env NODE_ENV=production webpack --optimize-minimize --config webpack.backend.config.js",
-    "sync":"node server/test.dev.js run spreadsheet"
+    "sync": "node server/test.dev.js run spreadsheet"
   },
   "dependencies": {
     "@types/es6-promise": "^3.3.0",
@@ -45,10 +45,12 @@
     "mongoose-i18n-localize": "^0.3.0",
     "morgan": "^1.9.0",
     "multer": "^1.3.0",
+    "node-libs-browser": "^2.1.0",
     "node-schedule": "^1.3.0",
     "request": "^2.85.0",
     "request-promise": "^4.2.2",
     "request-promise-native": "^1.0.5",
+    "roboto-fontface": "^0.9.0",
     "socket.io": "^2.1.0"
   },
   "devDependencies": {
@@ -139,7 +141,7 @@
     "typescript": "^2.8.3",
     "utf-8-validate": "^4.0.1",
     "util.promisify": "^1.0.0",
-    "uuid": "latest",
+    "uuid": "^3.3.0",
     "vue": "^2.5.16",
     "vue-async-computed": "^3.3.1",
     "vue-async-data-2": "0.0.2",

@@ -13,8 +13,9 @@ export default function (app) {
 
   function createDev() {
     console.log('SERVER will be initialized on development mode');
-    const key = fs.readFileSync('/Users/hungphongbk/localhost.pem'),
-      credentials = {key: key, cert: key};
+    const key = fs.readFileSync('/etc/pki/tls/certs/MyOwnGrave.key'),
+      cert = fs.readFileSync('/etc/pki/tls/certs/MyOwnGrave.crt'),
+      credentials = {key, cert};
     return https.createServer(credentials, app);
   }
 
