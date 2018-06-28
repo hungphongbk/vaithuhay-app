@@ -17,6 +17,7 @@
   import {mapState, mapGetters} from 'vuex'
   import Help from '../components/help.vue'
   import debounce from 'lodash/debounce'
+  import ArticleSelector from '../components/article-selector.vue'
 
   const fetch = async id => Promise.all([
     get(`/products/${id}/vaithuhay-faq`),
@@ -26,7 +27,7 @@
 
   export default {
     mixins: [multiLang],
-    components: {Help},
+    components: {Help, ArticleSelector},
     data() {
       return {
         mode: 'new',
@@ -36,7 +37,8 @@
         })),
         faq: [],
         desc: d(() => ""),
-        title: ""
+        title: "",
+        relatedArticles:[]
       }
     },
     computed: {

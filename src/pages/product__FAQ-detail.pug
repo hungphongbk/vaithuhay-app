@@ -12,7 +12,7 @@ div
     li.nav-item
       a.nav-link(data-toggle="tab", role="tab", aria-controls="desc-panel", aria-selected="false", href="#desc-panel") MÔ TẢ SƠ LƯỢC
     li.nav-item
-      a.nav-link(data-toggle="tab", role="tab", aria-controls="relateds-panel", aria-selected="false", href="#relateds-panel") SẢN PHẨM LIÊN QUAN
+      a.nav-link(data-toggle="tab", role="tab", aria-controls="relateds-panel", aria-selected="false", href="#relateds-panel") BÀI VIẾT LIÊN QUAN
   .tab-content
     .tab-pane.fade.show.active#faq-panel
       form
@@ -39,4 +39,4 @@ div
         .form-group
           textarea.form-control(rows="8", v-model="desc[lang]")
     .tab-pane.fade#relateds-panel
-      .row
+      article-selector(v-model="relatedArticles" :col="true")

@@ -1,29 +1,29 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import products from './products'
-import categories from './categories'
-import articles from './articles'
-import notifications from './notifications'
-import auth from './auth'
-import qs from 'query-string'
-import {getXhr} from '../plugins/jquery-ajax'
-import VuexPersistence from 'vuex-persist'
-import * as types from './types'
+import Vue from 'vue';
+import Vuex from 'vuex';
+import products from './products';
+import categories from './categories';
+import articles from './articles';
+import notifications from './notifications';
+import auth from './auth';
+import qs from 'query-string';
+import {getXhr} from '../plugins/jquery-ajax';
+import VuexPersistence from 'vuex-persist';
+import * as types from './types';
 
 Vue.use(Vuex);
 const {plugin: vuexLocal} = new VuexPersistence({
-    storage: window.localStorage,
-    reducer: state => ({
-      dev: state.dev
-    })
-  }),
-  {plugin: vuexSession} = new VuexPersistence({
-    storage: window.sessionStorage,
-    reducer: state => ({
-      products: state.products,
-      articles: state.articles
-    })
-  });
+  storage: window.localStorage,
+  reducer: state => ({
+    dev: state.dev
+  })
+});
+// {plugin: vuexSession} = new VuexPersistence({
+//   storage: window.sessionStorage,
+//   reducer: state => ({
+//     products: state.products,
+//     articles: state.articles
+//   })
+// });
 
 const store = new Vuex.Store({
   state() {
@@ -31,14 +31,14 @@ const store = new Vuex.Store({
       appConfig: {},
       isConnected: false,
       dev: false
-    }
+    };
   },
   getters: {
     hash({}, {}, {route}) {
       return qs.parse(route.hash);
     },
     [types.G_APP_DEV_MODE](state) {
-      return state.dev
+      return state.dev;
     }
   },
   mutations: {
@@ -60,7 +60,7 @@ const store = new Vuex.Store({
       $router.push({hash: '#tab=' + id});
     },
     async loadConfig({commit}) {
-      commit('app/configLoaded', await getXhr('/dist/config.json'))
+      commit('app/configLoaded', await getXhr('/dist/config.json'));
     }
   },
   modules: {
@@ -70,13 +70,13 @@ const store = new Vuex.Store({
     auth,
     notifications
   },
-  plugins: [vuexLocal, vuexSession]
-})
+  plugins: [vuexLocal]
+});
 
 Object.defineProperty(Vue.prototype, '$appDevMode', {
   get() {
     return store.state.dev;
   }
-})
+});
 
 export default store;

@@ -1,11 +1,31 @@
-import {get, post} from '../plugins/jquery-ajax'
+import {get} from '../plugins/jquery-ajax';
+
+class Product {
+  id;
+
+  static wrap(context, obj) {
+    return new this(context, obj);
+  }
+
+  constructor(context, product) {
+    this.context = context;
+    Object.assign(this, product);
+  }
+
+  updateMeta(key, value) {
+    this.context.commit('updateMeta', {
+      id: this.id,
+      meta: {[key]: value}
+    });
+  }
+}
 
 export default {
   namespaced: true,
   state() {
     return {
       products: []
-    }
+    };
   },
   getters: {
     current({products}, {}, {route}) {
@@ -14,7 +34,7 @@ export default {
       };
       return products.find(p => p.id === route.params.id * 1) || {
         title: ''
-      }
+      };
     },
     count({products}) {
       return products.length;
@@ -23,10 +43,15 @@ export default {
   mutations: {
     fetch(state, products) {
       state.products = products;
+    },
+    updateMeta(state, {id, meta}) {
+      const index = state.products.findIndex(p => p.id * 1 === id * 1);
+      state.products[index].meta = Object.assign({}, state.products[index].meta, meta);
     }
   },
   actions: {
-    async fetch({commit, state}, {onProgress} = {}) {
+    async fetch(context, {onProgress} = {}) {
+      const {commit, state} = context;
       // console.log(state);
       if (state.products.length > 0) return;
       const {products} = await get('/products'),
@@ -54,7 +79,7 @@ export default {
         });
         p.meta = meta;
       });
-      commit('fetch', products);
+      commit('fetch', products.map(p => Product.wrap(context, p)));
     }
   }
-}
+};
