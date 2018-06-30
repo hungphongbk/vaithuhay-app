@@ -1,11 +1,11 @@
-import {Router} from 'express'
-import {google} from 'googleapis'
-import key from '../client_secret_1926697148-8vofkikihlmnjhpl0m93h3j9cvmirhp3.apps.googleusercontent.com.json'
-import fs from 'fs'
-import path from 'path'
-import {apiGet, apiPost, apiDel, diffArray} from '../utils'
-import middlewares from './middlewares'
-import Logging from '@server/jobs/Logging'
+import {Router} from 'express';
+import {google} from 'googleapis';
+import key from '../client_secret_1926697148-8vofkikihlmnjhpl0m93h3j9cvmirhp3.apps.googleusercontent.com.json';
+import path from 'path';
+import {apiDel, apiGet, apiPost, diffArray} from '../utils';
+import middlewares from './middlewares';
+import Logging from '@server/jobs/Logging';
+import {FirebaseAdmin} from "@server/components";
 
 const VTH_TOP_PRODUCTS = 'vaithuhayTopProducts';
 
@@ -22,8 +22,8 @@ const router = Router(),
     req.analytics = google.analytics({
       version: 'v3',
       auth: req.auth
-    })
-    next()
+    });
+    next();
   },
   viewId = 'ga:118256072';
 
@@ -38,13 +38,13 @@ const googleAuth = async (req, res, next) => {
       auth.credentials = {
         access_token: token
       };
-      next()
+      next();
     } catch (e) {
       await Logging.log(
         Logging.TYPES.ERROR,
         ['analytics'],
         e.toString()
-      )
+      );
       res.status(500).json({message: e.message});
     }
   } else res.json({
@@ -56,7 +56,7 @@ const googleAuth = async (req, res, next) => {
         'https://www.googleapis.com/auth/analytics'
       ]
     })
-  })
+  });
 };
 const updateFeaturedProducts = async (arr, namespace, resources = '') => {
   const {metafields} = await apiGet(`/admin${resources}/metafields.json?namespace=${namespace}`);
@@ -65,7 +65,7 @@ const updateFeaturedProducts = async (arr, namespace, resources = '') => {
       if (namespace === _namespace)
         await apiDel(`/admin${resources}/metafields/${id}.json`);
       resolve();
-    })))
+    })));
   }
   // await timeout(11000);
   await Promise.all(arr.map(([id, handle]) => new Promise(async resolve => {
@@ -82,16 +82,20 @@ const updateFeaturedProducts = async (arr, namespace, resources = '') => {
       throw e;
     }
     resolve();
-  })))
+  })));
 };
 const getFeaturedProducts = async (namespace, resources = '') => {
   const {metafields} = await apiGet(`/admin${resources}/metafields.json?namespace=${namespace}`);
   if (metafields.length === 0) return [];
-  return metafields.map(({key: id, value: handle}) => [id * 1, handle])
-}
+  return metafields.map(({key: id, value: handle}) => [id * 1, handle]);
+};
+const updateLastTime = async ref => {
+  const db = FirebaseAdmin.database();
+  await db.ref(ref).set(Date.now());
+};
 
 router.get('/login/status', googleAuth, (req, res) => {
-  res.json({status: 'ok'})
+  res.json({status: 'ok'});
 });
 router.get('/login/callback', (req, res) => {
   const auth = req.auth || authFn();
@@ -105,11 +109,21 @@ router.get('/login/callback', (req, res) => {
       await req.session.save();
       res.sendFile(path.join(global.APP_PATH, '../server/callback.html'));
     }
-  })
+  });
+});
+
+router.get('/lastUpdated', (req, res) => {
+  const db = FirebaseAdmin.database();
+  // noinspection JSIgnoredPromiseFromCall
+  db.ref(`server/${req.query.q}/lastUpdated`).once('value', snapshot => {
+    res.json({
+      diff: Date.now() - snapshot.val() * 1
+    });
+  });
 });
 
 router.get('/', googleAuth, (req, res) => {
-  res.json({status: 'OK'})
+  res.json({status: 'OK'});
 });
 
 router.post('/top', googleAuth, analytics, middlewares.allProducts, async (req, res) => {
@@ -138,9 +152,10 @@ router.post('/top', googleAuth, analytics, middlewares.allProducts, async (req, 
         Logging.TYPES.ERROR,
         ['analytics', 'top-products'],
         err.toString()
-      )
-      res.status(500).send(err.message)
-    } else {
+      );
+      res.status(500).send(err.message);
+    }
+    else {
       const products = req.products,
         {rows} = body.data,
         rs = rows
@@ -153,11 +168,14 @@ router.post('/top', googleAuth, analytics, middlewares.allProducts, async (req, 
           })
           .filter(r => r !== null);
 
+      //update last updated time into Firebase database
+      await updateLastTime('server/topProduct/lastUpdated');
+
       //update into vaithuhay shop metafields
       await updateFeaturedProducts(rs, VTH_TOP_PRODUCTS);
       res.json(diffArray(oldTop, rs, (old, current) => old[0] === current[0]));
     }
-  })
+  });
 });
 
 router.post('/relateds', googleAuth, analytics, middlewares.allProducts, async (req, res) => {
@@ -183,7 +201,7 @@ router.post('/relateds', googleAuth, analytics, middlewares.allProducts, async (
         Logging.TYPES.ERROR,
         ['analytics', 'related-products'],
         err.toString()
-      )
+      );
       res.status(500).send(err.message);
     }
     else {
@@ -208,11 +226,11 @@ router.post('/relateds', googleAuth, analytics, middlewares.allProducts, async (
           Logging.TYPES.ERROR,
           ['analytics', 'related-products'],
           err.toString()
-        )
+        );
         res.status(500).send(e.message);
       }
     }
-  })
+  });
 });
 
 export default router;

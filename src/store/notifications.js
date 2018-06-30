@@ -1,4 +1,41 @@
-import uuid from 'uuid/v4'
+import uuid from 'uuid/v4';
+
+class NotificationItem {
+  label;
+  title;
+  message;
+  callback;
+
+  constructor(context, obj) {
+    this.context = context;
+    this.id = uuid();
+    Object.assign(this, obj);
+
+    if (!this.callback) {
+      setTimeout(() => {
+        this.remove();
+      }, 3000);
+    } else {
+      this.callback(this).then(() => {
+        setTimeout(() => {
+          this.remove();
+        }, 1500);
+      });
+    }
+  }
+
+  remove() {
+    this.context.commit('removeNoti', this.id);
+  }
+
+  updateMessage(message) {
+    const obj = {
+      id: this.id,
+      message
+    };
+    this.context.commit('update', obj);
+  }
+}
 
 export default {
   namespaced: true,
@@ -10,31 +47,38 @@ export default {
       state.list.unshift(noti);
     },
     removeNoti({list}, id) {
-      const index = list.findIndex(item => item.id === id)
+      const index = list.findIndex(item => item.id === id);
       list.splice(index, 1);
+    },
+    update({list}, obj) {
+      const index = list.findIndex(item => item.id === obj.id);
+      list[index] = obj;
     }
   },
   actions: {
     pushNoti({commit}, noti) {
-      noti.id = uuid();
       commit('pushNoti', noti);
-      setTimeout(() => {
-        commit('removeNoti', noti.id)
-      }, 3000)
     },
-    pushDanger({dispatch}, {title = '', message}) {
-      dispatch('pushNoti', {
+    pushDanger(context, obj) {
+      obj.title = obj.title || '';
+      context.dispatch('pushNoti', new NotificationItem(context, {
         label: 'danger',
-        title,
-        message
-      })
+        ...obj
+      }));
     },
-    pushSuccess({dispatch}, {title = '', message}) {
-      dispatch('pushNoti', {
+    pushSuccess(context, obj) {
+      obj.title = obj.title || '';
+      context.dispatch('pushNoti', new NotificationItem(context, {
         label: 'success',
-        title,
-        message
-      })
+        ...obj
+      }));
+    },
+    pushInfo(context, obj) {
+      obj.title = obj.title || '';
+      context.dispatch('pushNoti', new NotificationItem(context, {
+        label: 'info',
+        ...obj
+      }));
     }
   }
-}
+};

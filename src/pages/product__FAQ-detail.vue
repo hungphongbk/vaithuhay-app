@@ -23,7 +23,7 @@
     get(`/products/${id}/vaithuhay-faq`),
     get(`/products/${id}/desc`),
     get(`/products/${id}/title`),
-    get(`/products/${id}/relatedArticles`)
+    get(`/products/${id}/relatedArticles?id=true`)
   ]);
 
   export default {
@@ -51,20 +51,23 @@
       })
     },
     async beforeRouteEnter({params}, {}, next) {
-      const [{faq}, {desc}, title, {relatedArticles}] = await fetch(params.id);
+      const [{faq}, {desc}, title, relatedArticles] = await fetch(params.id);
       next(vm => {
         vm.faq = faq || [];
         vm.desc = desc || d(() => "");
         vm.title = title || "";
-        vm.relatedArticles = relatedArticles || []
+        vm.relatedArticles.push(...(relatedArticles || []));
+        // debugger;
+        console.log('fetch related articles before');
       })
     },
     async beforeRouteUpdate({params}, {}, next) {
-      const [{faq}, {desc}, title, {relatedArticles}] = await fetch(params.id);
+      const [{faq}, {desc}, title, relatedArticles] = await fetch(params.id);
       this.faq = faq || [];
       this.desc = desc || d(() => "");
       this.title = title || "";
-      this.relatedArticles = relatedArticles || [];
+      this.relatedArticles.push(...(relatedArticles || []));
+      console.log('fetch related articles');
       next();
     },
     methods: {

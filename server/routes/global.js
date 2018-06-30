@@ -1,14 +1,14 @@
 import {apiClear, apiDel, apiGet, apiPost, apiPut, log} from "../utils/index";
-import {Router}                                         from 'express';
-import {SettingsWrapper}                                from "@server/components";
-import Log                                              from '../models/Logs';
-import apiCache                                         from 'apicache';
-import pick                                             from 'lodash/pick';
-import middlewares                                      from './middlewares';
-import moment                                           from 'moment-timezone';
-import qs                                               from 'query-string';
-import zip                                              from "lodash/zip";
-import {admin as adminMiddleware}                       from "@server/routes/middlewares";
+import {Router} from 'express';
+import {SettingsWrapper} from "@server/components";
+import Log from '../models/Logs';
+import apiCache from 'apicache';
+import pick from 'lodash/pick';
+import middlewares from './middlewares';
+import moment from 'moment-timezone';
+import qs from 'query-string';
+import zip from "lodash/zip";
+import {admin as adminMiddleware} from "@server/routes/middlewares";
 
 moment.tz.setDefault('Asia/Ho_Chi_Minh');
 moment.locale('vi');
@@ -57,6 +57,28 @@ router.get('/logs', adminMiddleware, async (req, res) => {
     pages
   } = await Log.paginate({}, {page, limit, sort: sortString});
   res.json({logs, total, pages, page});
+});
+router.get('/products/:id/relatedArticles', async (req, res) => {
+  const {blogs} = await apiGet('/admin/blogs.json'),
+    blog = blogs.find(({handle}) => handle === 'news'),
+    blogId = blog.id;
+
+  const id = req.params.id,
+    {metafields} = await apiGet(`/admin/products/${id}/metafields.json?namespace=vaithuhay`),
+    metafield = search(metafields, 'relatedArticles');
+  if (typeof metafield === "undefined" || metafield === null) {
+    res.json([]);
+    return;
+  }
+  const meta = JSON.parse(metafield.value).relatedArticles,
+    articles = await Promise.all(meta.map(async articleId => {
+      const {article} = await apiGet(`/admin/blogs/${blogId}/articles/${articleId}.json`);
+      // console.log(`/admin/blogs/${blogId}/articles/${articleId}.json`);
+      delete article.body_html;
+      return article;
+    }));
+  console.log(meta);
+  res.json(req.query.id ? articles.map(a => a.id) : articles);
 });
 router.get('/products/:id/wholesale', middlewares.allProducts, async (req, res) => {
   res.apicacheGroup = 'products/wholesale';
@@ -110,7 +132,7 @@ router.get('/articles', async (req, res) => {
   if (!id) res.json(data);
   else res.json(data.articles.find(p => p.id * 1 === id * 1));
 });
-router.get('/articles/:id/related', cache4hours, async (req, res) => {
+router.get('/articles/:id/related', async (req, res) => {
   const {blogs} = await apiGet('/admin/blogs.json');
   const id = req.params.id,
     {metafields} = await apiGet(`/admin/blogs/${blogs[0].id}/articles/${id}/metafields.json?namespace=vaithuhay&key=relatedProduct`);
@@ -298,6 +320,7 @@ router.post('/:resource/:id/:meta', async (req, res) => {
         }
       });
     apiClear(url);
+    apiClear(url + '?namespace=vaithuhay');
     res.json({});
   } catch (e) {
     console.log(e.message);

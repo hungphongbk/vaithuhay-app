@@ -158,11 +158,11 @@
       },
       permissions() {
         const user = this.$store.getters['auth/currentUser'],
-          perm = {}
+          perm = {};
         if (!user) return perm;
         Object.keys(pages).forEach(p => {
           perm[p] = !!user.permissions.find(up => up === p)
-        })
+        });
         return perm
       }
     },
@@ -190,6 +190,18 @@
         });
         this.preloadStatus.articles = true;
       },
+      async autoSyncTopProduct() {
+        const {diff} = await get('/g/lastUpdated?q=topProduct');
+        if (diff > 1000 * 3600) {
+          await this.$store.dispatch('notifications/pushInfo', {
+            message: 'Tự động cập nhật sản phẩm Top...',
+            async callback(noti) {
+              await post('/g/top');
+              noti.updateMessage.call(noti, 'Cập nhật hoàn tất :)')
+            }
+          })
+        }
+      },
       async clearCache() {
         await post('/c/reset');
         location.reload(true);
@@ -213,6 +225,8 @@
           $(this.$refs.loadingModal).modal('hide');
           $(document.body).removeClass("modal-open");
           $(".modal-backdrop").remove();
+          await delay(100);
+          await this.autoSyncTopProduct();
         }
       })
       await this.checkLogin();

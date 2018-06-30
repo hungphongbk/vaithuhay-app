@@ -32,6 +32,9 @@ module.exports = merge(base, {
               presets: [
                 ['env', {
                   loose: true
+                }],
+                ['es2015', {
+                  loose: true
                 }]
               ],
               plugins: [
