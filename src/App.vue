@@ -1,3 +1,5 @@
+<!--suppress ALL -->
+
 <style lang="scss" scoped>
   @import "./scss/inc";
 
@@ -123,6 +125,10 @@
   import {get, post} from './plugins/jquery-ajax'
   import Notifications from './components/notifications.vue'
   import {pages} from './router'
+  import faSync from '@fortawesome/fontawesome-free-solid/faSync'
+  import faCheckCircle from '@fortawesome/fontawesome-free-solid/faCheckCircle'
+  import chunk from 'lodash/chunk'
+  import {retry} from "@client/helpers";
 
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms)),
     preload = (label, percentage = 0) => ({label, percentage}),
@@ -192,15 +198,71 @@
       },
       async autoSyncTopProduct() {
         const {diff} = await get('/g/lastUpdated?q=topProduct');
-        if (diff > 1000 * 3600) {
+        if (diff > 2000 * 3600) {
           await this.$store.dispatch('notifications/pushInfo', {
-            message: 'Tự động cập nhật sản phẩm Top...',
+            message: {
+              render(h) {
+                return (<p>
+                  <fa-icon class="mr-1" icon={faSync} spin/>
+                  Tự động cập nhật sản phẩm Top...
+                </p>)
+              }
+            },
             async callback(noti) {
               await post('/g/top');
-              noti.updateMessage.call(noti, 'Cập nhật hoàn tất :)')
+              noti.updateMessage.call(noti, {
+                render(h) {
+                  return (<p>
+                    <fa-icon class="mr-1" icon={faCheckCircle}></fa-icon>
+                    Cập nhật hoàn tất :)
+                  </p>)
+                }
+              })
             }
           })
         }
+      },
+      async autoSyncRelatedProducts() {
+        const self = this,
+          allProducts = self.$store.state.products.products,
+          {diff} = await get('/g/lastUpdated?q=relatedProduct');
+        if (diff < 2000 * 3600) return;
+
+        await self.$store.dispatch('notifications/pushInfo', {
+          metadata: {
+            count: ''
+          },
+          message: {
+            functional: true,
+            render(h, {props}) {
+              return (<p>
+                <fa-icon class="mr-1" icon={faSync} spin/>
+                Tự động cập nhật sản phẩm liên quan (<span>{props.metadata.count}</span>)...
+              </p>)
+            }
+          },
+          async callback(noti) {
+            let done = 0;
+            noti.updateMeta({count: `0/${allProducts.length}`})
+            for (const products of chunk(allProducts, 2)) {
+              await Promise.all(products.map(p =>
+                retry(post, [`/g/relateds?id=${p.id}`], 3)));
+              done += 2;
+              noti.updateMeta({count: `${done}/${allProducts.length}`})
+            }
+            await post('/g/lastUpdated?q=relatedProduct')
+
+            noti.updateMessage({
+              functional: true,
+              render(h) {
+                return (<p>
+                  <fa-icon class="mr-1" icon={faCheckCircle}></fa-icon>
+                  Cập nhật hoàn tất :)
+                </p>)
+              }
+            })
+          }
+        })
       },
       async clearCache() {
         await post('/c/reset');
@@ -227,6 +289,7 @@
           $(".modal-backdrop").remove();
           await delay(100);
           await this.autoSyncTopProduct();
+          await this.autoSyncRelatedProducts();
         }
       })
       await this.checkLogin();

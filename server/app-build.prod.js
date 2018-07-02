@@ -43022,6 +43022,11 @@ router.get('/lastUpdated', function (req, res) {
     });
   });
 });
+router.post('/lastUpdated', function (req, res) {
+  updateLastTime('server/' + req.query.q + '/lastUpdated').then(function () {
+    res.json({ status: 'ok' });
+  });
+});
 
 router.get('/', googleAuth, function (req, res) {
   res.json({ status: 'OK' });

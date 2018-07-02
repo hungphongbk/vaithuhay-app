@@ -11,7 +11,8 @@
   .wrapper
     .alert(v-for="alert in list", :key="alert.id", :class="[`alert-${alert.label}`]", role="alert")
       h6(v-if="alert.title.length>0") {{alert.title}}
-      p(v-html="alert.message")
+      component(v-if="alert.message.render" :is="alert.message" :metadata="alert.metadata")
+      p(v-else v-html="alert.message")
 </template>
 <script>
   export default {

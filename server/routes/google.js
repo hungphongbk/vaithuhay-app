@@ -121,6 +121,12 @@ router.get('/lastUpdated', (req, res) => {
     });
   });
 });
+router.post('/lastUpdated', (req, res) => {
+  updateLastTime(`server/${req.query.q}/lastUpdated`)
+    .then(() => {
+      res.json({status: 'ok'});
+    });
+});
 
 router.get('/', googleAuth, (req, res) => {
   res.json({status: 'OK'});

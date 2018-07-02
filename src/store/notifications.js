@@ -1,10 +1,12 @@
 import uuid from 'uuid/v4';
+import Vue from 'vue'
 
 class NotificationItem {
   label;
   title;
   message;
   callback;
+  metadata;
 
   constructor(context, obj) {
     this.context = context;
@@ -16,11 +18,13 @@ class NotificationItem {
         this.remove();
       }, 3000);
     } else {
-      this.callback(this).then(() => {
-        setTimeout(() => {
-          this.remove();
-        }, 1500);
-      });
+      Vue.nextTick(()=>{
+        this.callback(this).then(() => {
+          setTimeout(() => {
+            this.remove();
+          }, 1500);
+        });
+      })
     }
   }
 
@@ -32,6 +36,14 @@ class NotificationItem {
     const obj = {
       id: this.id,
       message
+    };
+    this.context.commit('update', obj);
+  }
+
+  updateMeta(metadata) {
+    const obj = {
+      id: this.id,
+      metadata
     };
     this.context.commit('update', obj);
   }
@@ -52,7 +64,7 @@ export default {
     },
     update({list}, obj) {
       const index = list.findIndex(item => item.id === obj.id);
-      list[index] = obj;
+      Object.assign(list[index], obj);
     }
   },
   actions: {

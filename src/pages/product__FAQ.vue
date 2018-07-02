@@ -42,8 +42,8 @@
     div.clearfix.header
       h1.page-title Danh sách sản phẩm
         span.badge.badge-secondary.ml-2 {{products.length}}
-      .btn.btn-success.btn-lg(@click="updateRelateds") Cập nhật sản phẩm liên quan
-      save-button(:fn="updateTops", title="Cập nhật sản phẩm top")
+      //.btn.btn-success.btn-lg(@click="updateRelateds") Cập nhật sản phẩm liên quan
+      //save-button(:fn="updateTops", title="Cập nhật sản phẩm top")
     .row
       .col-sm-12
         .form-inline.mb-4.mt-4
@@ -89,24 +89,13 @@
   import {mapState} from 'vuex';
   import {getXhr, postXhr} from '../plugins/jquery-ajax';
   import chunk from 'lodash/chunk';
-  import {functions} from "@client/helpers";
+  import {functions, retry} from "@client/helpers";
   import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
   import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
   import faHeart from '@fortawesome/fontawesome-free-solid/faHeart';
   import faNewspaper from '@fortawesome/fontawesome-free-solid/faNewspaper'
 
-  const retry = (fn, params, count) => new Promise(async (resolve, reject) => {
-      while (--count >= 0) {
-        try {
-          const rs = await fn(...params);
-          resolve(rs);
-          break;
-        } catch (e) {
-        }
-      }
-      if (count < 0) resolve(null);
-    }),
-    {normalizeVie} = functions;
+  const {normalizeVie} = functions;
 
   class Product {
     constructor(p) {
