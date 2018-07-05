@@ -117,13 +117,14 @@
               dd(v-for="(value, key) in preloadStatus", :class="value===false?'text-muted':'text-success'") {{preloadLabels[key].label}}
                 span(v-if="value===false") &nbsp;(...{{preloadLabels[key].percentage}}%)
     notifications
-
+    modal-manager
 </template>
 <script>
   import {mapActions} from 'vuex'
   import * as types from '@client/store/types'
   import {get, post} from './plugins/jquery-ajax'
   import Notifications from './components/notifications.vue'
+  import ModalManager from './components/modal-manager'
   import {pages} from './router'
   import faSync from '@fortawesome/fontawesome-free-solid/faSync'
   import faCheckCircle from '@fortawesome/fontawesome-free-solid/faCheckCircle'
@@ -135,7 +136,7 @@
     progressCb = (preloadLabel) => ({percentage}) => preloadLabel.percentage = percentage
 
   export default {
-    components: {Notifications},
+    components: {Notifications,ModalManager},
     data() {
       return {
         preloadStatus: {

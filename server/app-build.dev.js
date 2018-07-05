@@ -46079,8 +46079,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
                 case 0: case 1: t = op; break;
                 case 4: _.label++; return { value: op[1], done: false };
@@ -46208,6 +46208,28 @@ router.post('/verify', function (req, res) { return __awaiter(_this, void 0, voi
                 res.status(403).send();
                 _b.label = 3;
             case 3: return [2 /*return*/];
+        }
+    });
+}); });
+router.delete('/:_id', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+    var _id, user;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _id = req.params._id;
+                return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_1__models_AppUsers___default.a.findOne({ _id: _id })];
+            case 1:
+                user = _a.sent();
+                if (!user) return [3 /*break*/, 3];
+                return [4 /*yield*/, user.remove()];
+            case 2:
+                _a.sent();
+                res.json({});
+                return [3 /*break*/, 4];
+            case 3:
+                res.status(403).send();
+                _a.label = 4;
+            case 4: return [2 /*return*/];
         }
     });
 }); });

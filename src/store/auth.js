@@ -1,5 +1,6 @@
-import {get, post, patch} from '../plugins/jquery-ajax'
-import {pages} from '../router'
+import {get, patch, post} from '../plugins/jquery-ajax';
+import {pages} from '../router';
+import {del} from "@client/plugins/jquery-ajax";
 
 let GoogleAuth;
 const SCOPE = [
@@ -25,16 +26,16 @@ export default {
           if (!user) return false;
           return user.email === u.email;
         }
-      }))
+      }));
     },
     currentUser({users, user}) {
       if (!user) return null;
-      return users.find(u => u.email === user.email)
+      return users.find(u => u.email === user.email);
     }
   },
   mutations: {
     fetchUsers(state, users) {
-      state.users = users
+      state.users = users;
     },
     updateUserStatus(state, obj) {
       Object.assign(state, obj);
@@ -53,11 +54,11 @@ export default {
             name: user.getName(),
             email: user.getEmail(),
             avatar: user.getImageUrl()
-          }
+          };
           await post('/u/verify', info);
           const users = await dispatch('fetchUsers');
           if (!users.find(u => u.email === info.email)) return null;
-          return info
+          return info;
         } catch (e) {
           return null;
         }
@@ -83,29 +84,33 @@ export default {
           gapi.auth2.init({
             client_id: '1926697148-8vofkikihlmnjhpl0m93h3j9cvmirhp3.apps.googleusercontent.com',
             scope: 'profile email'
-          }).then(auth2Loaded)
-        })
-      })
+          }).then(auth2Loaded);
+        });
+      });
     },
     async login() {
-      await GoogleAuth.signIn()
+      await GoogleAuth.signIn();
     },
     async logout({dispatch}) {
       await GoogleAuth.signOut();
-      window.location.reload(true)
+      window.location.reload(true);
     },
     async fetchUsers({commit}) {
-      const users = await get('/u')
+      const users = await get('/u');
       commit('fetchUsers', users);
-      return users
+      return users;
     },
     async createUser({dispatch}, email) {
-      await post('/u', {email})
-      await dispatch('fetchUsers')
+      await post('/u', {email});
+      await dispatch('fetchUsers');
     },
     async updateUser({dispatch}, user) {
-      await patch('/u', user)
-      await dispatch('fetchUsers')
+      await patch('/u', user);
+      await dispatch('fetchUsers');
+    },
+    async deleteUser({dispatch}, user) {
+      await del('/u/' + user._id);
+      await dispatch('fetchUsers');
     }
   }
-}
+};

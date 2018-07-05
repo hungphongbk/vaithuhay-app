@@ -35,9 +35,11 @@
           td
             i {{user.permissions.join(', ')}}
           td
-            .btn-group.btn-group-sm(role="group")
+            .btn-group(role="group")
               .btn.btn-primary(@click="currentUser=user")
-                i.fa.fa-pencil
+                fa-icon(:icon="faPencilAlt")
+              .btn.btn-danger(@click="deleteUser(user)")
+                fa-icon(:icon="faTrash")
     modal(v-if="newUser", title="Tạo người dùng mới", @dismiss="newUser=null")
       .modal-body
         form
@@ -64,14 +66,20 @@
 <script>
   import {pages} from '../router'
   import pick from 'lodash/pick'
+  import faPencilAlt from '@fortawesome/fontawesome-free-solid/faPencilAlt'
+  import faTrash from '@fortawesome/fontawesome-free-solid/faTrash'
+  import {ModalManager} from "@client/components/modal-manager";
 
-  const newUser = () => ({email: ''})
+  const newUser = () => ({email: ''});
   export default {
     data() {
       return {
         newUser: null,
         currentUser: null,
-        pages
+        pages,
+        faPencilAlt,
+        faTrash,
+        isDeleteUser: false
       }
     },
     computed: {
@@ -89,14 +97,42 @@
       },
       checkAll(value) {
         if (value)
-          this.currentUser.permissions = Object.keys(this.pages)
+          this.currentUser.permissions = Object.keys(this.pages);
         else this.currentUser.permissions = []
       },
       async updateCurrentUser() {
         await this.$store.dispatch('auth/updateUser', pick(this.currentUser, [
           'email', 'permissions'
-        ]))
+        ]));
         this.currentUser = null;
+      },
+      deleteUser(user) {
+        return new Promise(resolve => {
+          ModalManager({
+            title: 'Xóa người dùng',
+            body: {
+              render(h) {
+                return (<div>
+                  <div class="modal-body">
+                    <p>Bạn có chắc chắn xóa người dùng <strong>{user.name}</strong> khỏi ứng dụng không?</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" onClick={() => this.$emit('modal-dismiss')}>Không</button>
+                    <save-button class="btn btn-danger" fn={() => this.doRemove()} title="Có"/>
+                  </div>
+                </div>)
+              },
+              methods: {
+                doRemove() {
+                  return this.$store.dispatch('auth/deleteUser', user)
+                    .then(() => {
+                      this.$emit('modal-dismiss')
+                    })
+                }
+              }
+            }
+          })
+        })
       }
     }
   }

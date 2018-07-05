@@ -1,8 +1,8 @@
 import {Request, Response, Router} from 'express';
-import AppUser                     from '../models/AppUsers';
-import {apiDel, apiGet, apiPut}    from "@server/utils";
-import {CLIENT_USER_COOKIE_KEY}    from "@server/utils/const";
-import pick                        from 'lodash/pick';
+import AppUser from '../models/AppUsers';
+import {apiDel, apiGet, apiPut} from "@server/utils";
+import {CLIENT_USER_COOKIE_KEY} from "@server/utils/const";
+import pick from 'lodash/pick';
 
 declare global {
   namespace Express {
@@ -73,6 +73,18 @@ router.post('/verify', async (req: Request, res: Response) => {
     res.status(403).send();
   }
 });
+router.delete('/:_id', async (req: Request, res: Response) => {
+  const {_id} = req.params,
+    user = await AppUser.findOne({_id});
+  if (user) {
+    await user.remove();
+    res.json({});
+  } else {
+    res.status(403).send();
+  }
+})
+
+
 router.post('/login', async (req: Request, res: Response) => {
   //search customer by email
   const email = req.body.email,

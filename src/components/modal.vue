@@ -18,7 +18,7 @@
             template(v-if="title")
               .modal-header
                 h5.modal-title {{title}}
-                button.close(type="button", aria-label="Close", @click="$emit('dismiss')")
+                button.close(v-if="dismissable" type="button", aria-label="Close", @click="$emit('dismiss')")
                   span(aria-hidden="true") ×
             slot
 </template>
@@ -26,7 +26,11 @@
   export default {
     props: {
       title: String,
-      size:String
+      size:String,
+      dismissable:{
+        type:Boolean,
+        default:true
+      }
     },
     computed:{
       classes(){
