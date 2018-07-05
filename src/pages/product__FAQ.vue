@@ -46,9 +46,7 @@
       //save-button(:fn="updateTops", title="Cập nhật sản phẩm top")
     .row
       .col-sm-12
-        .form-inline.mb-4.mt-4
-          label.sr-only Tìm kiếm
-          input.form-control.form-control-lg.w-50(placeholder="Tìm kiếm sản phẩm", v-model="keyword", @keyup.enter="doSearch")
+        page-search.mb-4.mt-4(v-model="kw" title="Tìm kiếm sản phẩm")
     .row
       .col-sm-4(v-for="product in searchedProducts")
         .card.mb-3
@@ -94,6 +92,7 @@
   import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
   import faHeart from '@fortawesome/fontawesome-free-solid/faHeart';
   import faNewspaper from '@fortawesome/fontawesome-free-solid/faNewspaper'
+  import PageSearch from '@client/components/page-search.vue'
 
   const {normalizeVie} = functions;
 
@@ -112,10 +111,10 @@
   }
 
   export default {
+    components: {PageSearch},
     data() {
       return {
         relateds: 0,
-        keyword: '',
         kw: '',
         faEdit,
         faCheck,
@@ -192,9 +191,6 @@
         await this.$store.dispatch('notifications/pushSuccess', {
           message: 'Cập nhật danh sách sản phẩm hàng đầu thành công :)<br/>' + message
         });
-      },
-      doSearch() {
-        this.kw = this.keyword;
       }
     }
   };

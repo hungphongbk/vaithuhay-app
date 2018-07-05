@@ -9,16 +9,19 @@
   div
     div.clearfix.header
       h1.page-title Danh sách bài viết
-    hr
-    .card-columns
-      .card.mb-3(v-for="article in articles")
-        .card-body
-          h5.card-title {{article.title}}
-          p.text-primary(v-for="item in article.relatedProduct")
-            i.fa.fa-paperclip.mr-2
-            | {{item?item.title:'undefined'}}
-        .card-footer
-          .btn.btn-secondary(@click="selected=article") Chỉnh sửa
+    .row
+      .col-sm-12
+        page-search.mb-4.mt-4(v-model="kw" title="Tìm kiếm bài viết")
+    .row
+      .col-sm-3(v-for="article in searchedArticles")
+        .card.mb-3
+          .card-body
+            h6.card-title {{article.title}}
+            p.text-primary.small.mb-1(v-for="item in article.relatedProduct")
+              i.fa.fa-paperclip.mr-2
+              | {{item?item.title:'undefined'}}
+          .card-footer
+            .btn.btn-secondary(@click="selected=article") Chỉnh sửa
     modal(v-if="selected")
       .modal-header
         h5.modal-title Gắn bài viết với sản phẩm
@@ -32,12 +35,17 @@
 <script>
   import ProductSelector from '../components/product-selector.vue'
   import {findProduct} from "../plugins"
+  import PageSearch from '@client/components/page-search.vue'
+  import {functions} from "@client/helpers";
+
+  const {normalizeVie}=functions;
 
   export default {
-    components: {ProductSelector},
+    components: {ProductSelector, PageSearch},
     data() {
       return {
-        selected: null
+        selected: null,
+        kw:''
       }
     },
     computed: {
@@ -58,6 +66,17 @@
             return products;
           }
         }));
+      },
+      searchedArticles() {
+        const {kw, articles} = this;
+        if (kw.length === 0) return articles;
+
+        const keyword = normalizeVie(kw);
+        return articles.filter(article => {
+          if (normalizeVie(article.title).indexOf(keyword) >= 0) return true;
+          if (normalizeVie(article.meta_description).indexOf(keyword) >= 0) return true;
+          return normalizeVie(article.tags).indexOf(keyword) >= 0;
+        });
       }
     },
     watch: {
