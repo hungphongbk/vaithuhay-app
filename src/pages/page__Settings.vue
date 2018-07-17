@@ -12,6 +12,15 @@
       .btn.btn-default.btn-lg.btn-lang.bold(@click="switchLang") {{lang}}
       save-button(:fn="save")
     page-tabs
+      page-tab#general(title="cài đặt chung")
+        h5.mb-3 Cập nhật tự động
+        table
+          tr
+            td(width="200px") <p>Sản phẩm mới</p>
+            td
+              p
+                time-diff-selector.d-inline-block.mr-2(v-model="generalSettings.autoUpdateNewProducts")
+                | mỗi lần
       page-tab#footer-panel(title="footer")
         .alert.alert-light(role="alert")
           h5.alert-heading Quy ước
@@ -60,16 +69,18 @@
   import {multiLang, d} from "../helpers/mixins"
   import debounce from "lodash/debounce"
   import {get, post} from '../plugins/jquery-ajax'
+  import {TimeDiffSelector} from "@client/components";
 
   const mdToList = text => text.split(/\r?\n/)
-      .map(line => {
-        const [, title, url] = /^\((.*)\)\[(.*)]$/.exec(line.trim());
-        return {title, url}
-      }),
+    .map(line => {
+      const [, title, url] = /^\((.*)\)\[(.*)]$/.exec(line.trim());
+      return {title, url}
+    }),
     listToMd = list => list.map(({title, url}) => `(${title})[${url}]`).join('\n');
 
   export default {
     mixins: [multiLang],
+    components: {TimeDiffSelector},
     data() {
       return {
         about$raw: d(() => ""),
@@ -79,6 +90,9 @@
           google: '',
           insta: '',
           twitter: ''
+        },
+        generalSettings: {
+          autoUpdateNewProducts: 300
         }
       }
     },
@@ -92,7 +106,8 @@
             en: mdToList(this.policy$raw.en),
             vi: mdToList(this.policy$raw.vi)
           };
-        await post('/meta?key=footer', {about, policy, socials: this.socials})
+        await post('/meta?key=footer', {about, policy, socials: this.socials});
+        await post('/meta?key=generalSettings', this.generalSettings);
       },
       async fetch() {
         const {about, policy, socials} = await get('/meta?key=footer');
@@ -101,6 +116,8 @@
         this.policy$raw.en = listToMd(policy.en || []);
         this.policy$raw.vi = listToMd(policy.vi || []);
         if (socials) this.socials = socials;
+
+        Object.assign(this.generalSettings, (await get('/meta?key=generalSettings'))||{});
       }
     },
     async mounted() {

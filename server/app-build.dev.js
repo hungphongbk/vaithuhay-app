@@ -30562,15 +30562,21 @@ var _zip = __webpack_require__(143);
 
 var _zip2 = _interopRequireDefault(_zip);
 
+var _range = __webpack_require__(406);
+
+var _range2 = _interopRequireDefault(_range);
+
+var _flatten = __webpack_require__(140);
+
+var _flatten2 = _interopRequireDefault(_flatten);
+
 var _middlewares3 = __webpack_require__(110);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _momentTimezone2.default.tz.setDefault('Asia/Ho_Chi_Minh');
 _momentTimezone2.default.locale('vi');
-var router = (0, _express.Router)(),
-    clientCache = _apicache2.default.middleware,
-    cache4hours = clientCache('4 hours');
+var router = (0, _express.Router)();
 var flex = function flex(obj) {
   var rs = void 0;
   try {
@@ -30673,7 +30679,7 @@ router.get('/products/:id/relatedArticles', function () {
             return _context3.abrupt("return");
 
           case 15:
-            meta = JSON.parse(metafield.value).relatedArticles;
+            meta = JSON.parse(metafield.value).relatedArticles || [];
             _context3.next = 18;
             return _promise2.default.all(meta.map(function () {
               var _ref8 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(articleId) {
@@ -30710,12 +30716,11 @@ router.get('/products/:id/relatedArticles', function () {
           case 18:
             articles = _context3.sent;
 
-            console.log(meta);
             res.json(req.query.id ? articles.map(function (a) {
               return a.id;
             }) : articles);
 
-          case 21:
+          case 20:
           case "end":
             return _context3.stop();
         }
@@ -30835,7 +30840,7 @@ router.post('/products/:id/ask', function () {
 //================================================================================
 router.get('/articles', function () {
   var _ref16 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(req, res) {
-    var _ref17, blogs, blog, data, id;
+    var _ref17, blogs, blog, _ref19, count, pages, data, id;
 
     return _regenerator2.default.wrap(function _callee6$(_context6) {
       while (1) {
@@ -30852,18 +30857,38 @@ router.get('/articles', function () {
               return handle === 'news';
             });
             _context6.next = 7;
-            return (0, _index.apiGet)("/admin/blogs/" + blog.id + "/articles.json?limit=250");
+            return (0, _index.apiGet)("/admin/blogs/" + blog.id + "/articles/count.json?limit=200");
 
           case 7:
-            data = _context6.sent;
+            _ref19 = _context6.sent;
+            count = _ref19.count;
+            pages = Math.ceil(count / 200);
+
+            console.log(pages, (0, _range2.default)(1, pages + 1));
+            _context6.t0 = _flatten2.default;
+            _context6.next = 14;
+            return _promise2.default.all((0, _range2.default)(1, pages + 1).map(function (page) {
+              console.log(page);
+              return (0, _index.apiGet)("/admin/blogs/" + blog.id + "/articles.json?page=" + page + "&limit=200");
+            }));
+
+          case 14:
+            _context6.t1 = function (i) {
+              return i.articles;
+            };
+
+            _context6.t2 = _context6.sent.map(_context6.t1);
+            _context6.t3 = (0, _context6.t0)(_context6.t2);
+            data = {
+              articles: _context6.t3
+            };
             id = req.query.id;
 
-            req.apicacheGroup = 'article' + (id ? id : '');
             if (!id) res.json(data);else res.json(data.articles.find(function (p) {
               return p.id * 1 === id * 1;
             }));
 
-          case 11:
+          case 20:
           case "end":
             return _context6.stop();
         }
@@ -30876,8 +30901,8 @@ router.get('/articles', function () {
   };
 }());
 router.get('/articles/:id/related', function () {
-  var _ref19 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(req, res) {
-    var _ref20, blogs, id, _ref21, metafields;
+  var _ref20 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(req, res) {
+    var _ref21, blogs, id, _ref22, metafields;
 
     return _regenerator2.default.wrap(function _callee7$(_context7) {
       while (1) {
@@ -30887,15 +30912,15 @@ router.get('/articles/:id/related', function () {
             return (0, _index.apiGet)('/admin/blogs.json');
 
           case 2:
-            _ref20 = _context7.sent;
-            blogs = _ref20.blogs;
+            _ref21 = _context7.sent;
+            blogs = _ref21.blogs;
             id = req.params.id;
             _context7.next = 7;
             return (0, _index.apiGet)("/admin/blogs/" + blogs[0].id + "/articles/" + id + "/metafields.json?namespace=vaithuhay&key=relatedProduct");
 
           case 7:
-            _ref21 = _context7.sent;
-            metafields = _ref21.metafields;
+            _ref22 = _context7.sent;
+            metafields = _ref22.metafields;
 
             req.apicacheGroup = 'article' + id;
             res.json(metafields.length === 0 ? {} : JSON.parse(metafields[0].value));
@@ -30909,12 +30934,12 @@ router.get('/articles/:id/related', function () {
   }));
 
   return function (_x13, _x14) {
-    return _ref19.apply(this, arguments);
+    return _ref20.apply(this, arguments);
   };
 }());
 router.get('/order-tracking', function () {
-  var _ref22 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8(req, res) {
-    var fields, optimizeOrder, _req$query2, customerId, kw, _ref24, orders, _ref25, _orders;
+  var _ref23 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8(req, res) {
+    var fields, optimizeOrder, _req$query2, customerId, kw, _ref25, orders, _ref26, _orders;
 
     return _regenerator2.default.wrap(function _callee8$(_context8) {
       while (1) {
@@ -30922,18 +30947,18 @@ router.get('/order-tracking', function () {
           case 0:
             fields = ['order_number', 'created_at', 'line_items'].join(','), optimizeOrder = function optimizeOrder(order) {
               for (var _iterator = (0, _keys2.default)(order), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : (0, _getIterator3.default)(_iterator);;) {
-                var _ref23;
+                var _ref24;
 
                 if (_isArray) {
                   if (_i >= _iterator.length) break;
-                  _ref23 = _iterator[_i++];
+                  _ref24 = _iterator[_i++];
                 } else {
                   _i = _iterator.next();
                   if (_i.done) break;
-                  _ref23 = _i.value;
+                  _ref24 = _i.value;
                 }
 
-                var key = _ref23;
+                var key = _ref24;
 
                 if (/_at$/.test(key)) {
                   order[key] = (0, _momentTimezone2.default)(order[key]).format('dddd DD/MM/YYYY');
@@ -30957,8 +30982,8 @@ router.get('/order-tracking', function () {
             return (0, _index.apiGet)("/admin/orders.json?customer_id=" + customerId + "&fields=" + fields, false);
 
           case 5:
-            _ref24 = _context8.sent;
-            orders = _ref24.orders;
+            _ref25 = _context8.sent;
+            orders = _ref25.orders;
 
             res.json(orders.map(optimizeOrder));
             _context8.next = 20;
@@ -30979,8 +31004,8 @@ router.get('/order-tracking', function () {
             return (0, _index.apiGet)("/admin/orders/search.json?" + _queryString2.default.stringify({ fields: fields, name: kw.substr(1) }), false);
 
           case 14:
-            _ref25 = _context8.sent;
-            _orders = _ref25.orders;
+            _ref26 = _context8.sent;
+            _orders = _ref26.orders;
 
             res.json(_orders.map(optimizeOrder));
 
@@ -31000,12 +31025,12 @@ router.get('/order-tracking', function () {
   }));
 
   return function (_x15, _x16) {
-    return _ref22.apply(this, arguments);
+    return _ref23.apply(this, arguments);
   };
 }());
 
 var getSettings = function () {
-  var _ref26 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9(req, res) {
+  var _ref27 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9(req, res) {
     var _req$params, namespace, key;
 
     return _regenerator2.default.wrap(function _callee9$(_context9) {
@@ -31031,13 +31056,13 @@ var getSettings = function () {
   }));
 
   return function getSettings(_x17, _x18) {
-    return _ref26.apply(this, arguments);
+    return _ref27.apply(this, arguments);
   };
 }();
 router.get('/settings/:namespace/:key', getSettings);
 router.get('/settings/:namespace', getSettings);
 router.post('/settings/:namespace/:key', function () {
-  var _ref27 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee10(req, res) {
+  var _ref28 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee10(req, res) {
     var _req$params2, namespace, key;
 
     return _regenerator2.default.wrap(function _callee10$(_context10) {
@@ -31069,14 +31094,14 @@ router.post('/settings/:namespace/:key', function () {
   }));
 
   return function (_x19, _x20) {
-    return _ref27.apply(this, arguments);
+    return _ref28.apply(this, arguments);
   };
 }());
 
 // METAFIELDS
 router.get('/meta/:resource/:id', function () {
-  var _ref28 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee11(req, res) {
-    var _req$params3, resource, id, _ref29, metafields;
+  var _ref29 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee11(req, res) {
+    var _req$params3, resource, id, _ref30, metafields;
 
     return _regenerator2.default.wrap(function _callee11$(_context11) {
       while (1) {
@@ -31091,8 +31116,8 @@ router.get('/meta/:resource/:id', function () {
             return (0, _index.apiGet)("/admin/" + resource + "/" + id + "/metafields.json");
 
           case 7:
-            _ref29 = _context11.sent;
-            metafields = _ref29.metafields;
+            _ref30 = _context11.sent;
+            metafields = _ref30.metafields;
 
             res.json(metafields);
             _context11.next = 15;
@@ -31113,12 +31138,12 @@ router.get('/meta/:resource/:id', function () {
   }));
 
   return function (_x21, _x22) {
-    return _ref28.apply(this, arguments);
+    return _ref29.apply(this, arguments);
   };
 }());
 router.get('/meta/:resource/:id/:resource2/:id2', function () {
-  var _ref30 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee12(req, res) {
-    var _req$params4, resource, id, resource2, id2, _ref31, metafields;
+  var _ref31 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee12(req, res) {
+    var _req$params4, resource, id, resource2, id2, _ref32, metafields;
 
     return _regenerator2.default.wrap(function _callee12$(_context12) {
       while (1) {
@@ -31133,8 +31158,8 @@ router.get('/meta/:resource/:id/:resource2/:id2', function () {
             return (0, _index.apiGet)("/admin/" + resource + "/" + id + "/" + resource2 + "/" + id2 + "/metafields.json");
 
           case 7:
-            _ref31 = _context12.sent;
-            metafields = _ref31.metafields;
+            _ref32 = _context12.sent;
+            metafields = _ref32.metafields;
 
             res.json(metafields);
 
@@ -31147,14 +31172,14 @@ router.get('/meta/:resource/:id/:resource2/:id2', function () {
   }));
 
   return function (_x23, _x24) {
-    return _ref30.apply(this, arguments);
+    return _ref31.apply(this, arguments);
   };
 }());
 
 // Shop metafields
 router.get('/meta', function () {
-  var _ref32 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee13(req, res) {
-    var _req$query3, key, raw, _ref33, metafields, metafield;
+  var _ref33 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee13(req, res) {
+    var _req$query3, key, raw, _ref34, metafields, metafield;
 
     return _regenerator2.default.wrap(function _callee13$(_context13) {
       while (1) {
@@ -31167,8 +31192,8 @@ router.get('/meta', function () {
             return (0, _index.apiGet)("/admin/metafields.json?namespace=vaithuhay&key=" + key);
 
           case 5:
-            _ref33 = _context13.sent;
-            metafields = _ref33.metafields;
+            _ref34 = _context13.sent;
+            metafields = _ref34.metafields;
             metafield = search(metafields, key);
 
             res.json(typeof metafield === 'undefined' ? [] : flex(raw ? metafield : metafield.value));
@@ -31182,12 +31207,12 @@ router.get('/meta', function () {
   }));
 
   return function (_x25, _x26) {
-    return _ref32.apply(this, arguments);
+    return _ref33.apply(this, arguments);
   };
 }());
 router.post('/meta', function () {
-  var _ref34 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee14(req, res) {
-    var key, url, _ref35, metafields, metafield;
+  var _ref35 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee14(req, res) {
+    var key, url, _ref36, metafields, metafield;
 
     return _regenerator2.default.wrap(function _callee14$(_context14) {
       while (1) {
@@ -31200,8 +31225,8 @@ router.post('/meta', function () {
             return (0, _index.apiGet)(url + '&key=' + key);
 
           case 5:
-            _ref35 = _context14.sent;
-            metafields = _ref35.metafields;
+            _ref36 = _context14.sent;
+            metafields = _ref36.metafields;
             metafield = search(metafields, key);
 
             if (!(typeof metafield === 'undefined' || metafield === null)) {
@@ -31253,12 +31278,12 @@ router.post('/meta', function () {
   }));
 
   return function (_x27, _x28) {
-    return _ref34.apply(this, arguments);
+    return _ref35.apply(this, arguments);
   };
 }());
 router.delete('/meta', function () {
-  var _ref36 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee15(req, res) {
-    var key, url, _ref37, metafields, metafield;
+  var _ref37 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee15(req, res) {
+    var key, url, _ref38, metafields, metafield;
 
     return _regenerator2.default.wrap(function _callee15$(_context15) {
       while (1) {
@@ -31271,8 +31296,8 @@ router.delete('/meta', function () {
             return (0, _index.apiGet)(url + '&key=' + key);
 
           case 5:
-            _ref37 = _context15.sent;
-            metafields = _ref37.metafields;
+            _ref38 = _context15.sent;
+            metafields = _ref38.metafields;
             metafield = search(metafields, key);
 
             if (!(typeof metafield !== 'undefined' && metafield !== null)) {
@@ -31304,14 +31329,14 @@ router.delete('/meta', function () {
   }));
 
   return function (_x29, _x30) {
-    return _ref36.apply(this, arguments);
+    return _ref37.apply(this, arguments);
   };
 }());
 
 // General resource metafields
 router.get('/:resource/:id/:meta', function () {
-  var _ref38 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee16(req, res) {
-    var _req$params5, resource, id, meta, _ref39, metafields, metafield;
+  var _ref39 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee16(req, res) {
+    var _req$params5, resource, id, meta, _ref40, metafields, metafield;
 
     return _regenerator2.default.wrap(function _callee16$(_context16) {
       while (1) {
@@ -31325,8 +31350,8 @@ router.get('/:resource/:id/:meta', function () {
             return (0, _index.apiGet)("/admin/" + resource + "/" + id + "/metafields.json");
 
           case 6:
-            _ref39 = _context16.sent;
-            metafields = _ref39.metafields;
+            _ref40 = _context16.sent;
+            metafields = _ref40.metafields;
             metafield = search(metafields, meta);
 
             res.json(typeof metafield === 'undefined' ? [] : flex(metafield.value));
@@ -31340,12 +31365,12 @@ router.get('/:resource/:id/:meta', function () {
   }));
 
   return function (_x31, _x32) {
-    return _ref38.apply(this, arguments);
+    return _ref39.apply(this, arguments);
   };
 }());
 router.post('/:resource/:id/:meta', function () {
-  var _ref40 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee17(req, res) {
-    var _req$params6, id, meta, resource, url, _ref41, metafields, metafield;
+  var _ref41 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee17(req, res) {
+    var _req$params6, id, meta, resource, url, _ref42, metafields, metafield;
 
     return _regenerator2.default.wrap(function _callee17$(_context17) {
       while (1) {
@@ -31361,8 +31386,8 @@ router.post('/:resource/:id/:meta', function () {
             return (0, _index.apiGet)(url);
 
           case 8:
-            _ref41 = _context17.sent;
-            metafields = _ref41.metafields;
+            _ref42 = _context17.sent;
+            metafields = _ref42.metafields;
             metafield = search(metafields, meta);
 
             if (!(typeof metafield === 'undefined' || metafield === null)) {
@@ -31413,13 +31438,13 @@ router.post('/:resource/:id/:meta', function () {
   }));
 
   return function (_x33, _x34) {
-    return _ref40.apply(this, arguments);
+    return _ref41.apply(this, arguments);
   };
 }());
 // General resource metafields
 router.get('/:resource/:id/:meta', function () {
-  var _ref42 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee18(req, res) {
-    var _req$params7, resource, id, meta, _ref43, metafields, metafield;
+  var _ref43 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee18(req, res) {
+    var _req$params7, resource, id, meta, _ref44, metafields, metafield;
 
     return _regenerator2.default.wrap(function _callee18$(_context18) {
       while (1) {
@@ -31433,8 +31458,8 @@ router.get('/:resource/:id/:meta', function () {
             return (0, _index.apiGet)("/admin/" + resource + "/" + id + "/metafields.json");
 
           case 6:
-            _ref43 = _context18.sent;
-            metafields = _ref43.metafields;
+            _ref44 = _context18.sent;
+            metafields = _ref44.metafields;
             metafield = search(metafields, meta);
 
             res.json(typeof metafield === 'undefined' ? [] : flex(metafield.value));
@@ -31448,12 +31473,12 @@ router.get('/:resource/:id/:meta', function () {
   }));
 
   return function (_x35, _x36) {
-    return _ref42.apply(this, arguments);
+    return _ref43.apply(this, arguments);
   };
 }());
 router.post('/:resource/:id/:meta', function () {
-  var _ref44 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee19(req, res) {
-    var _req$params8, id, meta, resource, url, _ref45, metafields, metafield;
+  var _ref45 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee19(req, res) {
+    var _req$params8, id, meta, resource, url, _ref46, metafields, metafield;
 
     return _regenerator2.default.wrap(function _callee19$(_context19) {
       while (1) {
@@ -31469,8 +31494,8 @@ router.post('/:resource/:id/:meta', function () {
             return (0, _index.apiGet)(url);
 
           case 8:
-            _ref45 = _context19.sent;
-            metafields = _ref45.metafields;
+            _ref46 = _context19.sent;
+            metafields = _ref46.metafields;
             metafield = search(metafields, meta);
 
             if (!(typeof metafield === 'undefined' || metafield === null)) {
@@ -31522,12 +31547,12 @@ router.post('/:resource/:id/:meta', function () {
   }));
 
   return function (_x37, _x38) {
-    return _ref44.apply(this, arguments);
+    return _ref45.apply(this, arguments);
   };
 }());
 router.get('/:resource/:id/:resource2/:id2/:meta', function () {
-  var _ref46 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee20(req, res) {
-    var _req$params9, resource, id, resource2, id2, meta, _ref47, metafields, metafield;
+  var _ref47 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee20(req, res) {
+    var _req$params9, resource, id, resource2, id2, meta, _ref48, metafields, metafield;
 
     return _regenerator2.default.wrap(function _callee20$(_context20) {
       while (1) {
@@ -31543,8 +31568,8 @@ router.get('/:resource/:id/:resource2/:id2/:meta', function () {
             return (0, _index.apiGet)("/admin/" + resource + "/" + id + "/" + resource2 + "/" + id2 + "/metafields.json");
 
           case 8:
-            _ref47 = _context20.sent;
-            metafields = _ref47.metafields;
+            _ref48 = _context20.sent;
+            metafields = _ref48.metafields;
             metafield = search(metafields, meta);
 
             res.json(typeof metafield === 'undefined' ? [] : flex(metafield.value));
@@ -31558,12 +31583,12 @@ router.get('/:resource/:id/:resource2/:id2/:meta', function () {
   }));
 
   return function (_x39, _x40) {
-    return _ref46.apply(this, arguments);
+    return _ref47.apply(this, arguments);
   };
 }());
 router.post('/:resource/:id/:resource2/:id2/:meta', function () {
-  var _ref48 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee21(req, res) {
-    var _req$params10, resource, id, resource2, id2, meta, url, _ref49, metafields, metafield;
+  var _ref49 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee21(req, res) {
+    var _req$params10, resource, id, resource2, id2, meta, url, _ref50, metafields, metafield;
 
     return _regenerator2.default.wrap(function _callee21$(_context21) {
       while (1) {
@@ -31581,8 +31606,8 @@ router.post('/:resource/:id/:resource2/:id2/:meta', function () {
             return (0, _index.apiGet)(url);
 
           case 10:
-            _ref49 = _context21.sent;
-            metafields = _ref49.metafields;
+            _ref50 = _context21.sent;
+            metafields = _ref50.metafields;
             metafield = search(metafields, meta);
 
             if (!(typeof metafield === 'undefined' || metafield === null)) {
@@ -31639,7 +31664,7 @@ router.post('/:resource/:id/:resource2/:id2/:meta', function () {
   }));
 
   return function (_x41, _x42) {
-    return _ref48.apply(this, arguments);
+    return _ref49.apply(this, arguments);
   };
 }());
 

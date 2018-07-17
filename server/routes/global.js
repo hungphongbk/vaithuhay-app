@@ -8,13 +8,13 @@ import middlewares from './middlewares';
 import moment from 'moment-timezone';
 import qs from 'query-string';
 import zip from "lodash/zip";
+import range from 'lodash/range';
+import flatten from 'lodash/flatten';
 import {admin as adminMiddleware} from "@server/routes/middlewares";
 
 moment.tz.setDefault('Asia/Ho_Chi_Minh');
 moment.locale('vi');
-const router = Router(),
-  clientCache = apiCache.middleware,
-  cache4hours = clientCache('4 hours');
+const router = Router();
 const flex = obj => {
   let rs;
   try {
@@ -70,14 +70,13 @@ router.get('/products/:id/relatedArticles', async (req, res) => {
     res.json([]);
     return;
   }
-  const meta = JSON.parse(metafield.value).relatedArticles,
+  const meta = JSON.parse(metafield.value).relatedArticles || [],
     articles = await Promise.all(meta.map(async articleId => {
       const {article} = await apiGet(`/admin/blogs/${blogId}/articles/${articleId}.json`);
       // console.log(`/admin/blogs/${blogId}/articles/${articleId}.json`);
       delete article.body_html;
       return article;
     }));
-  console.log(meta);
   res.json(req.query.id ? articles.map(a => a.id) : articles);
 });
 router.get('/products/:id/wholesale', middlewares.allProducts, async (req, res) => {
@@ -126,9 +125,17 @@ router.get('/articles', async (req, res) => {
   const {blogs} = await apiGet('/admin/blogs.json'),
     blog = blogs.find(({handle}) => handle === 'news');
   // console.log(blogs);
-  const data = await apiGet(`/admin/blogs/${blog.id}/articles.json?limit=250`),
+
+  const {count} = await apiGet(`/admin/blogs/${blog.id}/articles/count.json?limit=200`),
+    pages = Math.ceil(count / 200);
+  console.log(pages, range(1, pages + 1));
+  const data = {
+      articles: flatten((await Promise.all(range(1, pages + 1).map(page => {
+        console.log(page);
+        return apiGet(`/admin/blogs/${blog.id}/articles.json?page=${page}&limit=200`);
+      }))).map(i => i.articles))
+    },
     id = req.query.id;
-  req.apicacheGroup = 'article' + (id ? id : '');
   if (!id) res.json(data);
   else res.json(data.articles.find(p => p.id * 1 === id * 1));
 });

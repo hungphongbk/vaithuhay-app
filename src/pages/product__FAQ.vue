@@ -65,7 +65,7 @@
                 span(:class="[ctxCls(product.meta.desc), $style.productItemStatus]")
                   fa-icon(:icon="faCheck")
                   | Description
-              p
+              p nhi
                 span(:class="[$style.productItemStatus]")
                   fa-icon(:icon="faHeart")
                   | {{product.favorites.length}}
