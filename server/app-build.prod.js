@@ -31572,7 +31572,7 @@ router.post('/:resource/:id/:resource2/:id2/:meta', function () {
             });
 
           case 16:
-            _context21.next = 20;
+            _context21.next = 21;
             break;
 
           case 18:
@@ -31584,7 +31584,11 @@ router.post('/:resource/:id/:resource2/:id2/:meta', function () {
             });
 
           case 20:
-            (0, _index.apiClear)(url);
+            (0, _index.apiClear)("/admin/" + resource + "/" + id + "/" + resource2 + "/" + id2 + "/metafields/" + metafield.id + ".json");
+
+          case 21:
+            (0, _index.apiClear)("/admin/" + resource + "/" + id + "/" + resource2 + "/" + id2 + "/metafields.json");
+
             res.json({});
 
             //if resource2 is article
@@ -31592,21 +31596,21 @@ router.post('/:resource/:id/:resource2/:id2/:meta', function () {
               _apicache2.default.clear('articles');
               _apicache2.default.clear('articles' + id2);
             }
-            _context21.next = 28;
+            _context21.next = 29;
             break;
 
-          case 25:
-            _context21.prev = 25;
+          case 26:
+            _context21.prev = 26;
             _context21.t0 = _context21["catch"](0);
 
             console.log(_context21.t0.message);
 
-          case 28:
+          case 29:
           case "end":
             return _context21.stop();
         }
       }
-    }, _callee21, undefined, [[0, 25]]);
+    }, _callee21, undefined, [[0, 26]]);
   }));
 
   return function (_x41, _x42) {
@@ -46493,7 +46497,7 @@ router.post('/broadcast', _middlewares.admin, function (req, res) {
 //store message to send later
 router.post('/store', _middlewares.admin, function (req, res) {
   var payload = (0, _assign2.default)({}, {
-    topics: _pushNotification2.default.topics.ALL,
+    // topics: PushNotification.topics.ALL,
     content_available: "true",
     priority: "high"
   }, req.body),
@@ -46535,9 +46539,9 @@ router.post('/test', function (req, res) {
 
   _pushNotification2.default.sendNotification('device', token, {
     title: 'Welcome to Vaithuhay.com',
-    body: 'Ahihi bạn ngu vê lờ',
-    content_available: "true",
-    priority: "high"
+    body: 'Ahihi bạn ngu vê lờ'
+    // content_available: "true",
+    // priority: "high"
   }).then(function () {
     res.json({ status: 'ok' });
   }).catch(function (err) {
@@ -46634,12 +46638,12 @@ var Wrapper = function () {
   function Wrapper() {
     (0, _classCallCheck3.default)(this, Wrapper);
 
-    this.messaging = _components.FirebaseAdmin.messaging();
+    this.messaging = _components.FirebaseAdmin.messaging;
     this.topics = topicList;
 
-    if (true)
-      // noinspection JSIgnoredPromiseFromCall
-      this.init();
+    //if (process.env.NODE_ENV === 'production')
+    // noinspection JSIgnoredPromiseFromCall
+    this.init();
   }
 
   Wrapper.prototype.init = function () {
@@ -46660,7 +46664,8 @@ var Wrapper = function () {
               register = function register(_ref2) {
                 var token = _ref2.token,
                     topics = _ref2.topics;
-                return _this.messaging.subscribeToTopic(token, topics[0]);
+
+                return _this.messaging().subscribeToTopic(token, topics[0]);
               };
 
               _context.next = 6;
@@ -46815,7 +46820,7 @@ var Wrapper = function () {
           switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return this.messaging.subscribeToTopic(token, topic);
+              return this.messaging().subscribeToTopic(token, topic);
 
             case 2:
             case "end":
@@ -46868,10 +46873,12 @@ var Wrapper = function () {
           switch (_context6.prev = _context6.next) {
             case 0:
               payload = _definePayload(notification, _id);
-              _context6.next = 3;
-              return this.messaging.sendToDevice(token, payload);
 
-            case 3:
+              payload.token = token;
+              _context6.next = 4;
+              return this.messaging().send(payload);
+
+            case 4:
             case "end":
               return _context6.stop();
           }
@@ -46896,10 +46903,12 @@ var Wrapper = function () {
           switch (_context7.prev = _context7.next) {
             case 0:
               payload = _definePayload(notification, _id);
-              _context7.next = 3;
-              return this.messaging.sendToTopic(topic, payload);
 
-            case 3:
+              payload.topic = topic;
+              _context7.next = 4;
+              return this.messaging().send(payload);
+
+            case 4:
             case "end":
               return _context7.stop();
           }
@@ -47144,30 +47153,42 @@ var Wrapper = function () {
             case 0:
               //add ALL as default
               topics.push(topicList.ALL);
-              _context11.next = 3;
+              _context11.prev = 1;
+              _context11.next = 4;
               return _models.PushNotiToken.findOrCreate({ token: token }, { topics: topics });
 
-            case 3:
+            case 4:
               obj = _context11.sent;
 
+              console.log(obj);
               obj.topics = topics;
-              _context11.next = 7;
+              _context11.next = 9;
               return obj.save();
 
-            case 7:
+            case 9:
               sub = function sub(topic) {
                 return _this2.subscribe(token, topic);
               };
 
-              _context11.next = 10;
+              _context11.next = 12;
               return _promise2.default.all(topics.map(sub));
 
-            case 10:
+            case 12:
+              _context11.next = 17;
+              break;
+
+            case 14:
+              _context11.prev = 14;
+              _context11.t0 = _context11["catch"](1);
+
+              console.error(_context11.t0);
+
+            case 17:
             case "end":
               return _context11.stop();
           }
         }
-      }, _callee11, this);
+      }, _callee11, this, [[1, 14]]);
     }));
 
     function registerNewToken(_x26) {

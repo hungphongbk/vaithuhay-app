@@ -27,17 +27,19 @@ function _definePayload(notification, _id = null) {
 
 class Wrapper {
   constructor() {
-    this.messaging = admin.messaging();
+    this.messaging = admin.messaging;
     this.topics = topicList;
 
-    if (process.env.NODE_ENV === 'production')
+    //if (process.env.NODE_ENV === 'production')
     // noinspection JSIgnoredPromiseFromCall
-      this.init();
+    this.init();
   }
 
   async init() {
     const list = await PushNotiToken.find({}),
-      register = ({token, topics}) => this.messaging.subscribeToTopic(token, topics[0]);
+      register = ({token, topics}) => {
+        return this.messaging().subscribeToTopic(token, topics[0]);
+      };
     await Promise.all(list.map(register));
     console.log('[jobs/push-notifications] re-init completed with ' + list.length + ' tokens');
   }
@@ -74,7 +76,7 @@ class Wrapper {
   }
 
   async subscribe(token, topic) {
-    await this.messaging.subscribeToTopic(token, topic);
+    await this.messaging().subscribeToTopic(token, topic);
   }
 
   async log(type, identifier, notification) {
@@ -85,12 +87,14 @@ class Wrapper {
 
   async sendToDevice(token, notification, _id = null) {
     const payload = _definePayload(notification, _id);
-    await this.messaging.sendToDevice(token, payload);
+    payload.token=token;
+    await this.messaging().send(payload);
   }
 
   async sendToTopic(topic, notification, _id = null) {
     const payload = _definePayload(notification, _id);
-    await this.messaging.sendToTopic(topic, payload);
+    payload.topic = topic;
+    await this.messaging().send(payload);
   }
 
   /**
@@ -203,11 +207,16 @@ class Wrapper {
   async registerNewToken(token, topics = [], debug = false) {
     //add ALL as default
     topics.push(topicList.ALL);
-    const obj = await PushNotiToken.findOrCreate({token}, {topics});
-    obj.topics = topics;
-    await obj.save();
-    const sub = topic => this.subscribe(token, topic);
-    await Promise.all(topics.map(sub));
+    try {
+      const obj = await PushNotiToken.findOrCreate({token}, {topics});
+      console.log(obj);
+      obj.topics = topics;
+      await obj.save();
+      const sub = topic => this.subscribe(token, topic);
+      await Promise.all(topics.map(sub));
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   //stat include

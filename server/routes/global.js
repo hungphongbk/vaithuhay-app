@@ -345,7 +345,7 @@ router.post('/:resource/:id/:resource2/:id2/:meta', async (req, res) => {
       url = `/admin/${resource}/${id}/${resource2}/${id2}/metafields.json`,
       {metafields} = await apiGet(url),
       metafield = search(metafields, meta);
-    if (typeof metafield === 'undefined' || metafield === null)
+    if (typeof metafield === 'undefined' || metafield === null) {
       await apiPost(`/admin/${resource}/${id}/${resource2}/${id2}/metafields.json`, {
         metafield: {
           namespace: 'vaithuhay',
@@ -354,13 +354,16 @@ router.post('/:resource/:id/:resource2/:id2/:meta', async (req, res) => {
           value: JSON.stringify(req.body)
         }
       });
-    else
+    } else {
       await apiPut(`/admin/${resource}/${id}/${resource2}/${id2}/metafields/${metafield.id}.json`, {
         metafield: {
           value: JSON.stringify(req.body)
         }
       });
-    apiClear(url);
+      apiClear(`/admin/${resource}/${id}/${resource2}/${id2}/metafields/${metafield.id}.json`);
+    }
+    apiClear(`/admin/${resource}/${id}/${resource2}/${id2}/metafields.json`);
+
     res.json({});
 
     //if resource2 is article
