@@ -25,6 +25,7 @@ import social from '@server/routes/social';
 import user from '@server/routes/user';
 import pushNoti from '@server/routes/push-notification';
 import HaravanHooks from '@server/routes/haravanHooks';
+import FacebookHooks from '@server/routes/facebookHooks';
 import {socketMiddleware} from "./routes/middlewares";
 import {createServer} from "./utils";
 //passport with social
@@ -76,6 +77,7 @@ app.use('/collections', collections);
 app.use('/social', social);
 app.use('/u', user);
 app.use('/callback', HaravanHooks);
+app.use('/fb-callback', FacebookHooks);
 app.use('/noti', pushNoti);
 app.use('/products', products);
 app.use('/', index);

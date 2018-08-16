@@ -27884,6 +27884,10 @@ var _haravanHooks = __webpack_require__(611);
 
 var _haravanHooks2 = _interopRequireDefault(_haravanHooks);
 
+var _facebookHooks = __webpack_require__(644);
+
+var _facebookHooks2 = _interopRequireDefault(_facebookHooks);
+
 var _middlewares = __webpack_require__(111);
 
 var _utils = __webpack_require__(27);
@@ -27954,6 +27958,7 @@ app.use('/collections', _collections2.default);
 app.use('/social', _social2.default);
 app.use('/u', _user2.default);
 app.use('/callback', _haravanHooks2.default);
+app.use('/fb-callback', _facebookHooks2.default);
 app.use('/noti', _pushNotification2.default);
 app.use('/products', _products2.default);
 app.use('/', _global2.default);
@@ -50694,6 +50699,39 @@ module.exports = require("cookie-parser");
 /***/ (function(module, exports) {
 
 module.exports = require("body-parser");
+
+/***/ }),
+/* 639 */,
+/* 640 */,
+/* 641 */,
+/* 642 */,
+/* 643 */,
+/* 644 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+var _express = __webpack_require__(38);
+
+var router = new _express.Router();
+
+router.get('/ads', function (req, res) {
+  if (req.query['hub.verify_token'] === 'vaithuhay0803') {
+    res.status(200).send(req.query['hub.challenge']);
+    return;
+  }
+  res.status(404).send({});
+});
+
+router.post('/ads', function (req, res) {
+  console.log(req.body);
+  res.json({});
+});
+
+exports.default = router;
 
 /***/ })
 /******/ ]);
