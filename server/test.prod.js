@@ -10443,9 +10443,9 @@ var getValue = function () {
  */
 
 
-var _hungphongbk02e62197a93f = __webpack_require__(398);
+var _WebsiteForBrandA419f52bcc3a = __webpack_require__(398);
 
-var _hungphongbk02e62197a93f2 = _interopRequireDefault(_hungphongbk02e62197a93f);
+var _WebsiteForBrandA419f52bcc3a2 = _interopRequireDefault(_WebsiteForBrandA419f52bcc3a);
 
 var _googleapis = __webpack_require__(182);
 
@@ -10715,7 +10715,7 @@ var Spreadsheet = (_dec = (0, _memoize2.default)(), _dec2 = (0, _memoize2.defaul
           switch (_context2.prev = _context2.next) {
             case 0:
               console.log('create auth');
-              jwt = new _googleapis.google.auth.JWT(_hungphongbk02e62197a93f2.default.client_email, null, _hungphongbk02e62197a93f2.default.private_key, ['https://www.googleapis.com/auth/spreadsheets'], null);
+              jwt = new _googleapis.google.auth.JWT(_WebsiteForBrandA419f52bcc3a2.default.client_email, null, _WebsiteForBrandA419f52bcc3a2.default.private_key, ['https://www.googleapis.com/auth/spreadsheets'], null);
               _context2.prev = 2;
               _context2.next = 5;
               return jwt.authorize();
@@ -23232,7 +23232,7 @@ module.exports = function (isEntries) {
 /* 398 */
 /***/ (function(module, exports) {
 
-module.exports = {"type":"service_account","project_id":"hungphongbk-1812","private_key_id":"02e62197a93f2e1f8df5621685dd672d1d5ef897","private_key":"-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDBJnIYSAMr9qON\n1F5f+W+DB+Pjx+paKPOGOB7muatnmzbW/K0UUBEKd/Z+4ea7akbCBw4DMF05xm18\nI0zRhwWULuXdOG/Qaje/xc2zP6eYdP9lCsunVVVlmv4yaIfg4Uhh7vqOdfSrFLeu\nOdmCdp7CpYsUTcO+O4NwT2U0u6YVGzNr2tMfLMuUr8ElQBx5IMW33rD4amj/iFWC\nfY/chFlhG+Te2txUY9WVqhBf8GLZOZ1nfl8oItCQxFEtoOX4biX7isBueMpw5V3p\nk1TISQvSteVKQKvq/1qe1hiDq3qo98Xg7V9CSa1FQN5dU7jPPsMHoNF+SY632tEM\nRzIAjgF9AgMBAAECggEAPehCKokuRxGK04MtaoqK1M8bGl9xvEsi3rKvKNl62D7W\nAWtEWF3fUGEp5vol140VN8xGD/yY7NMuNVslHIUv4xJzB4g2wnDBBJz0NM8iuwlI\n8IxYwP3nXKUkc2iwoIHkjssnkLC65njB9LxC/H9jnFSt8qiIJDl0A/PWpuO8NEgQ\nKta6d5h3I+Wp20lPDRAzu3JJY6i0kmjrmCk4eWlDZKPDOiVBprYolUhhunEMXtzn\nLOiggBdZ0qnmnHvK25OeUVZ9w6IfwQu0mMwJRlg3lix76TyzpYtfD7qVCtGOJEuM\n1LFe7M8hLULipLBONqQH+9oCP31/M345+xGzEALyKwKBgQDv7N8FoqcxnSjj04lI\ndYSv7kY4fBTbUa+C/5PNtYTMMB41eoTN8HNTz4qWWzpezIHU5EB5YxRmE2UcW/9z\n9TceUTiajYEYUrK1P6OJV1rUnZboLSgctbX3gjNrXoYcTSkwtkrLPh7qz2suwLML\ns4dC1YxCn6kFLWoX2dzZPBkPbwKBgQDOF00ypJzexAtFKuuHKaMVRhg1I7BW/Lw/\nyaTvZvEpJarFQ10YyumDkPAlra8v6B28SoZKhoTiLk3d1vIKs9oGIud6PmWKiBZs\n3euA/x6i9nQDJMdVI4qxAXMw/pP/x/FBBDfiF4gucOLLaP2hO3+Ns1hGiDKvUkzs\ncNxhrgnH0wKBgCyuc1ZMVVDDEPNk2MM6x4wwFrm8OfIiQ0plKHR94o5YQ7f36jWk\nGwY3t3qK4NL4yREJtQwmLI1Z/VGLvIYu26X0wFLgGXObKxbgFCemsg64jnsMtdSq\n7ol6oPLU9qrcn9gnisRQ/FcEa9SYJIAAXidPN8DMlSCWtZRdiWiXbZ9XAoGBAKUU\nFxr8rkblw51IztY6bM4qklNmXeaflO6HR10YGQ37hPlzhwvH5Rokq6eSouP9ymu7\nSixB6gj+TBLpDIG0JGyL4tyRRGadsVDMxcpTECg6vxyRhjVVPc+guLNDCCt27XFF\nvrmUXdnNRGzokVhnvzkysf/1MpwqkUFG+dAoRt9PAoGAbpE8dR5FKR4T8yCH3VNx\nPRIF1IS72n5kSwwSiasTKMbpPAk+dH728lnJR5iVZilrmpyzkryF/aWXSnCW/fJV\nRzfSUlvv1QR5O56nJ/JtNTz1cTYlF4UdOaHLyIwXUdvSiF//ECsMYIC1N+POnEJO\nYaHuwsrDC/4ZqURJqeHjTkY=\n-----END PRIVATE KEY-----\n","client_email":"vaithuhay@hungphongbk-1812.iam.gserviceaccount.com","client_id":"106911279680590168877","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://accounts.google.com/o/oauth2/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/vaithuhay%40hungphongbk-1812.iam.gserviceaccount.com"}
+module.exports = {"type":"service_account","project_id":"website-for-brand","private_key_id":"a419f52bcc3adf118e2ecac034a6c79442af756c","private_key":"-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCj1EO22QWm3ynd\nGNbSL8V+f0Ptr2dR4UEH60KrXl/pscRWdvUQjBWuyk1vPN7tzgatyU+efFQ4GHs3\n8/gUOtOybGXSeH2o/bDwYvnoW0q0JJoxsVnIVygu+EiUh1BsgoWvjywgXWFOgyZO\nJmwwlDiUG0Bl87TwIvFq/kyT4v9x4VITMdK0govlJuoOh4s/aUPaii/y2Xg4vNjR\nta+TAui/L4910Etfvu+oZrzqjh6FBal4yz1XmlnGDlC0MrRNAsIreYKpIHu7YSWk\ne/6Iy3fdxGs2Q178BOGhOZKHyFrFM8meppYe+7qN92ttPg/B1mxNdsiB9wXdeHhI\nsSU5r9KlAgMBAAECggEANuY3KMtR5wkKhNJBjp6+jjTEhR5Nv7T9r1MpfLa76lqN\nQjJLzhc7Xt7hEwExbTwopcz7ls7wA/pENExXmiPadAR6HI0PAvW8eNmaCECraHGJ\nkFRvk0CNsSu3Wrp7e1lDxkByl4fjR0WQrQiYIbFRwmPdcSy5Oe1jvChqbfZYBodj\nUAD09gliSD+ajQC3XK2Mk9h/r7vIJg8kvRg9HrISHMmmGQaeSNNUjpl4Fu4cGEer\nDAWCWFLkp7TyTbp+1ZQnv0znpJMlK86WYuJkwF2tSaMDk51aPNv5Q+IycRXoWglp\n4EtgMjM7eOP1gFPMR6eTgSDWlBhHQltmzy2XqVUUwwKBgQDO50EVizxt2VfAIHjt\nZWalhz+uCh4EHIqEIsOGONlENigXXGUHo3ydtVQ1g0uY05AFQVoGkfUuXKWZookZ\nMGFn7jwLaaSlvUDfPcJrxgsbABnGbcJERpN/1opb9JLypHQsezf8uEnFf3XieJmD\nh/FOAjEvw3DWm9gQ0dmAcJlcVwKBgQDKtGKvJl4KBisvQvq1W9Ope2sm33cp7ajO\ngWQ+Z7Mkbdkv8p3wUfunAP7+7Vnh0WDmeK28x7eiVrXdgs4vIOiPUxs+Afe3HU4O\nABb0O0h+ldKK0/O7msaM+dMnLFPpyWg336mZnC7bgmpzNOQvxWYjrVSUOl+D1hRU\nJ2QZEAWrYwKBgQDAW9v0raiW8FRW+Vm0TGvsRRv9MMbLR8W4J6HkrgHBGyCW532+\nZk67SRRrVA/6m+bwG9wY86YhXl1Pwv73fjVxLNqCOcurk5I2evLAxDUa+zL7epv8\nYilL1yh3aaEdGawwlrZsrOFZTrFIxpri4IaF4h/cqjXEMMvmh1NRyF2srQKBgQDB\n/EsMj00jjq+5NQI0mUJASYpL00N47qXDqnRCfH8l97IHfsnC+NI6Cmv9jyubPgLb\nzNWHeiG0zAKTj+C9nWKx9rh1aPClXvgZ0eAlrq475iltDlWMThyBQXvfWz6a11JT\nVko6ZQs6qt4wjodpaCHNNs1gZVSPGEqwFlpm2bxzPQKBgGgSo2kbIgDbExEZzM9S\nQmYACmP6o00Fp+uNpSCoSzLT2+aJosZ5VUDmSHUaT+2wc5xMsXH6ymKS4G1ToN/J\ngvg0TCt1PpEIj+iz+NO3B1n65znSMa+VWjEbpMuzKOG52DBm/+jhP8X8E3zkjFq+\ngBMGQ9KESgP6pkzmff0u61jQ\n-----END PRIVATE KEY-----\n","client_email":"764771183033-compute@developer.gserviceaccount.com","client_id":"109564934671720451020","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/764771183033-compute%40developer.gserviceaccount.com"}
 
 /***/ }),
 /* 399 */

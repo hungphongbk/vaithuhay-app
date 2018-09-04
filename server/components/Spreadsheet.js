@@ -1,4 +1,4 @@
-import credentials from '../jobs/hungphongbk-02e62197a93f';
+import credentials from '../jobs/Website-for-Brand-a419f52bcc3a.json';
 import {google as googleapis} from 'googleapis';
 import moment from 'moment-timezone';
 //import omit from 'lodash/omit'
