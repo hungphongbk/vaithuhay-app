@@ -82,7 +82,7 @@ export default {
 
         gapi.load('client:auth2', () => {
           gapi.auth2.init({
-            client_id: '1926697148-8vofkikihlmnjhpl0m93h3j9cvmirhp3.apps.googleusercontent.com',
+            client_id: '764771183033-i9qmsuhhb4vsqh8gcd97o3f21fpm6034.apps.googleusercontent.com',
             scope: 'profile email'
           }).then(auth2Loaded);
         });
