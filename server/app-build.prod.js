@@ -40778,15 +40778,15 @@ var _firebaseAdmin = __webpack_require__(529);
 
 var _firebaseAdmin2 = _interopRequireDefault(_firebaseAdmin);
 
-var _hungphongbk956498bd = __webpack_require__(530);
+var _websiteForBrandFirebaseAdminsdkAwzsyBc565cf = __webpack_require__(530);
 
-var _hungphongbk956498bd2 = _interopRequireDefault(_hungphongbk956498bd);
+var _websiteForBrandFirebaseAdminsdkAwzsyBc565cf2 = _interopRequireDefault(_websiteForBrandFirebaseAdminsdkAwzsyBc565cf);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _firebaseAdmin2.default.initializeApp({
-  credential: _firebaseAdmin2.default.credential.cert(_hungphongbk956498bd2.default),
-  databaseURL: "https://hungphongbk-1812.firebaseio.com"
+  credential: _firebaseAdmin2.default.credential.cert(_websiteForBrandFirebaseAdminsdkAwzsyBc565cf2.default),
+  databaseURL: "https://website-for-brand.firebaseio.com"
 });
 
 exports.default = _firebaseAdmin2.default;
@@ -40801,7 +40801,7 @@ module.exports = require("firebase-admin");
 /* 530 */
 /***/ (function(module, exports) {
 
-module.exports = {"type":"service_account","project_id":"hungphongbk-1812","private_key_id":"956498bd8112f221d7b3079856370c8596712967","private_key":"-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDZnMkH59RZOYAO\nUxzngHjT5FFX5Lo/ZTSCG/McTUd6pNijH/4WJXXOfWqGwuZuqepruvVhBeJzB7f2\nWvOTDg9V+QSdU+rNs3+dgwfj38VGJvY5w+A5VdkS4nJiaYC8XVkELQ7BYf2wv7XM\nOID9G6hJfULTb820OdE23s9oXIlu8rajHVVvXLG+B/5p+z0fbKuBcVD35O+CvD8y\nnDBaXFWojmOQ9m9jQuw9WgSkqKxVSrLNjyNnabHbFlwXas+si4iTzvKo1LECH3gA\nmVPYFlrXDjS/e/EgNVxsUzFOupl3G9tVXxf07j5mUu5DX5KRyrE1lNuAiAvNsWpn\ngN8W23XVAgMBAAECggEABjzKvFnGSepug7qZJP+XNwef10OcnQ2TFDml3cVPS7Im\n7YIQv+TB/DG3GHbEsR5YtE7PEsFe7MonWT3hJnFsOhwhqDrMC6pd+Y9UbhEvb+PV\nAfHd3vbZeoOYIL8CbCPG1epOtndPFL5iASELfXXJ/JVFEZduT4CqwQZg7o5ceBwa\nWXkAOg/NF1u4qdU9j+t3uogn4W/6AiwiA26QxRrizDOBzP/rXKJBVkcqm2ma/Gp5\nfa4egk04Oigrg73Szh6NMrns52j8lwADTL6f/9/ctmo60aYRY0r2o+Fw7j9QSVSV\nEzb16/TziiJGJ11qs7ngsA2pV2qSVjEqCciuGPMxnwKBgQD3No6MoumLmJrVcl2s\nojHU3kPS7xzCZDBkCUUwQxXv5Qv2zr4xZhwb5PTQjeobJ+lJWbHAWxntxCQen1hm\nTag4UJR7486ml2dENx4vmuHnBGg5VWBsHAh0FaIFldyAVodm8i8kx0m3VTI/9MWn\nEBlSmECPzrLXO6BDkJ6HSw/kKwKBgQDhWOLF7aFCMqvG+aw6iyBP24t39Qp7u2JV\ndof3EsGs0kEULSstoM6CUjG0qELoZJQwQzK9aW1VpwHSF+GMm0dvbsCuU2HBpU40\nXX1+QFuwXG8qg/KhhICXi+XeSj5xWSdO3smV+YiF1CsRKJHe0C28YkXdTFEd2B0/\nyRcZXNMN/wKBgB6swltpC5mqweuiWUVGivBi8/+EdAka7XY8QD2Q1XQC880YMjlm\n9i3v5wDJ2zaraSMU4h2AMGN0Zxb1pr5q/Gigdww4ZDf/qWypejFmAonr3hLfKSvA\n/ruIw6X1xnqWQg7gFkF2CQuaorWU5cGpGbtJ8RjnCQH0ABriIwmeosYpAoGBAJhe\neo9sWsIg8udKQHshQUrd3tLQfDMng5jX2Z1lMFGDpP9Yfz6N4bRakUNfFkZ+Y3iy\npydNluD4WJHPFfH1uHqPP3df59SAyn07zbPFHnoENiJgL3mo1y4hKN+CAfCwYJTC\nrTlcDUS4Lhqe/OrUhmg/Zo/4n0x3qWdMt/KtQgPPAoGBALsEB7EYkEOHWRFkZxRE\netTx8lqsLTxCcorQqghKty8TcOfQi4tj7iIG0dmZR3i22sKxoQXp8uQuQqJr0O5p\nbgs3orWfuMmvaLQU7iD3URT9L05j35Tl7d7SFnTvSaD/bwijS8zEkQuij4BnceYO\nuMfxA74iWiW1rcb15IBDGca+\n-----END PRIVATE KEY-----\n","client_email":"firebase-adminsdk-25w58@hungphongbk-1812.iam.gserviceaccount.com","client_id":"102888827670895106681","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://accounts.google.com/o/oauth2/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-25w58%40hungphongbk-1812.iam.gserviceaccount.com"}
+module.exports = {"type":"service_account","project_id":"website-for-brand","private_key_id":"bc565cf32134403e2fe2ed0028deb4418c39c7d0","private_key":"-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDWuZVz48wk60Om\nKnfBBZkfs0SCffMgi8KGO93FCt/cfpJ+0fqqV9jRGg0FwEKChxBZaLxOBlUBbGPX\nEwLXSKpdbgkGkE2Nji29x1sb8/Z/pBlOMdpMA2zwOZYDSyh8lBxVFYQxDVFJ1ZpV\n2qLSB5yyEyj2ByZ/qYIMuZH9mRQaGd7msXSQYEeaRlIPFF/W07uQxAKor3T49Aqd\n4N1VyxlHxIttN1zK8D6fnevhG71ID6IpWKC+PvcgPdbOyXG+bHuskpL+ZCYRyYW0\n9tYBNizDmthmPvM4CknExB7wSgEi8XYkcL484Li5a59PRMnBndZ+r4QV78YXSiOA\nD9EbEi9bAgMBAAECggEAGnUZMa45YA6EXOFHCoe744M4Ef4elX2IX/guGL0rco8+\np2q3FgMnVN3UCfKJH20wpLD6NtZNO2oqw9GfXCh4zsn5SbpBHAvknfQw8+Oeaqwt\nGWHyJxiVn+SbPoJQavKS/8wxaBvfJBeyNxmZTgN1xB6xQYiwWTLpMn6GZbbVb8D+\nLYbhSdYmAns9NCae0bY5IRwvEHw76bbM3r+OyN28ak81ym+CAaIPN0n/Avg8q5IE\n8HYP3Q9OeSgriwWsORZ673UvKXK7pQP6X6N0fCPCQknT16jtEJ6K+mJunIlmiqia\nFKKGLYr1p0vLK4KWTT6G3sBLMmGzRBidVrV8PK1S8QKBgQDvazaVWM9jGWReCL5A\nFA2IEvdvXLrajqdezHOgpQ2EhYouTB4mUKSsDah3vz+el0ptm9mFAdrSx3Zp5ywl\nb5IfOsLUaAQ7GvnhKM3nsEJtnjHV7ftTf3ld0bSgYLjx1V73UzJmeV9pitCvhFEy\n9SlguTaYPZQPSSbEW0/vAB2BSwKBgQDlmI8/FS0sUgz6S3EsFnS4m9D/YTfYvOyh\n1ezn4mKr7R3zQWIHdtp631DbcgAPdV13DG6LVC5OMIHpgliAgKqbPObyV5uYGkrf\nWew3qVBo8PYoxDACTtCfwBopir4EJbPHwwGF31BoZ0+60G2G1jFioV0cDaG1LHoY\nS31meO9QMQKBgEJe/mq4jAV07JYE5njtFjM6zs1Yb5RXJ57oHsXR+8VZH81l3JXS\nlVP9FU7c/c4BMujf45Uzxm3YTcNeCqb2HxP5PjmT/FhGSi9ZGHu6KTAqQraDmsCy\n/fo8QE6Vga/I7uKxda9ixkiD6wY9MCVoQWhG8BOUPo9eQBj/F1GyPnuxAoGBAMgl\nrUJVyJJpWKzdFWRUkx3Xn2LxMgj78ODHp4Uhodi0lTZYmgddwen5QPh8MbdIHdlI\n+hj1ooRA3w9btKEZCSDY/47ldlsrGHgKYNTJAbLp0/0Hwb5RTKbmhSgPrcPZxhZv\nVaWJXgQVg7icN86ibFzJxGxPKdfRVQJW1JN++0gRAoGAGkpKIvzzar4eMGRvCkc+\nDWZuKOcV+8YmtoVPof+jNNz+3hemESrJebxoiFpn2SSluGCGJsmvGa/4+iqKik8u\npIod/VkxmZ5n7XKQ7trke86N1dLo3Buz3qprd7NDWEx7RXVX49ItAvkn89W8mKsE\n0+05Oe8AYlDMBpD65ktT1+0=\n-----END PRIVATE KEY-----\n","client_email":"firebase-adminsdk-awzsy@website-for-brand.iam.gserviceaccount.com","client_id":"111868059247816284520","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-awzsy%40website-for-brand.iam.gserviceaccount.com"}
 
 /***/ }),
 /* 531 */
@@ -42044,7 +42044,12 @@ var gm = _gm2.default.subClass({ imageMagick: true }),
   }
 }),
     upload = (0, _multer2.default)({ storage: storage }),
-    plugins = [(0, _imageminJpegtran2.default)({ progressive: true })].concat( true ? [require('imagemin-mozjpeg')({ quality: 90 })] : [], [(0, _imageminPngquant2.default)({ quality: '65-80' })]);
+    plugins = [(0, _imageminJpegtran2.default)({ progressive: true }),
+// mozjpeg({quality: 90}),
+// ...((process.env.NODE_ENV === 'production') ? [
+//   __non_webpack_require__('imagemin-mozjpeg')({quality: 90})
+// ] : []),
+(0, _imageminPngquant2.default)({ quality: '65-80' })];
 
 //Process images middleware
 var widths = [80, 150, 300, 400, 600, 1200, 1920];
@@ -46878,12 +46883,10 @@ var Wrapper = function () {
           switch (_context6.prev = _context6.next) {
             case 0:
               payload = _definePayload(notification, _id);
+              _context6.next = 3;
+              return this.messaging().sendToDevice(token, payload);
 
-              payload.token = token;
-              _context6.next = 4;
-              return this.messaging().send(payload);
-
-            case 4:
+            case 3:
             case "end":
               return _context6.stop();
           }
@@ -46908,12 +46911,10 @@ var Wrapper = function () {
           switch (_context7.prev = _context7.next) {
             case 0:
               payload = _definePayload(notification, _id);
+              _context7.next = 3;
+              return this.messaging().sendToTopic(topic, payload);
 
-              payload.topic = topic;
-              _context7.next = 4;
-              return this.messaging().send(payload);
-
-            case 4:
+            case 3:
             case "end":
               return _context7.stop();
           }

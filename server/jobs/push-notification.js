@@ -87,14 +87,12 @@ class Wrapper {
 
   async sendToDevice(token, notification, _id = null) {
     const payload = _definePayload(notification, _id);
-    payload.token=token;
-    await this.messaging().send(payload);
+    await this.messaging().sendToDevice(token, payload);
   }
 
   async sendToTopic(topic, notification, _id = null) {
     const payload = _definePayload(notification, _id);
-    payload.topic = topic;
-    await this.messaging().send(payload);
+    await this.messaging().sendToTopic(topic, payload);
   }
 
   /**

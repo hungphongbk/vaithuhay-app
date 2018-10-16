@@ -36,9 +36,9 @@ const gm = gm$
   plugins = [
     jpegtran({progressive: true}),
     // mozjpeg({quality: 90}),
-    ...((process.env.NODE_ENV === 'production') ? [
-      __non_webpack_require__('imagemin-mozjpeg')({quality: 90})
-    ] : []),
+    // ...((process.env.NODE_ENV === 'production') ? [
+    //   __non_webpack_require__('imagemin-mozjpeg')({quality: 90})
+    // ] : []),
     pngquant({quality: '65-80'})
   ];
 
