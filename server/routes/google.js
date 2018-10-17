@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {google} from 'googleapis';
-import key from '../client_secret_1926697148-8vofkikihlmnjhpl0m93h3j9cvmirhp3.apps.googleusercontent.com.json';
+import key from '../creds/google-cloud/client_secret_764771183033-i9qmsuhhb4vsqh8gcd97o3f21fpm6034.apps.googleusercontent.com';
 import path from 'path';
 import {apiDel, apiGet, apiPost, diffArray} from '../utils';
 import middlewares from './middlewares';

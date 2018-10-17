@@ -1,12 +1,18 @@
-import http from 'http'
-import https from 'https'
-import fs from 'fs'
-import socketIO from 'socket.io'
+import http from 'http';
+import https from 'https';
+import fs from 'fs';
+import socketIO from 'socket.io';
+import requestStats from 'request-stats';
+import {FirebaseAdmin} from "@server/components";
+import omit from 'lodash/omit';
 
 const dev = process.env.NODE_ENV === 'development',
   port = global.APP_PORT;
 
 export default function (app) {
+  //firebase db ref to 'requestLogging/[dev/prod]'
+  const dbRef = FirebaseAdmin.database().ref('server');
+
   global.APP_INSTANCE = app;
   app.set('port', port);
   console.log('SERVER port = ' + port);
@@ -27,6 +33,21 @@ export default function (app) {
     io = socketIO(server, (dev ? {} : {
       resource: '/vaithuhay/b/socket.io'
     }));
+
+  requestStats(server, requestInfo => {
+    const env = dev ? 'dev' : 'prod';
+    if (requestInfo.req.method.toLowerCase() === 'options') return Promise.resolve();
+
+    const obj = omit(requestInfo, ['req.raw', 'res.raw']);
+    obj.timestamp = Date.now();
+
+    return dbRef.child(`requestLogging/${env}`).push()
+      .set(obj, err => {
+        if (err)
+          console.error(err);
+      });
+  });
+
   server.listen(port);
 
   return {server, io};
