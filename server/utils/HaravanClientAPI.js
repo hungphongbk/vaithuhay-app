@@ -13,10 +13,13 @@ const flex = obj => {
   }
   return rs
 }
-const pickFields = (req, type = 'product') => obj => {
-  if (!req.query.fields) return obj
-  let fields = req.query.fields.split(',')
-  fields.push(...['id', 'handle', 'thumbnail', 'price'])
+const pickFields = (_fields = null, type = 'product') => obj => {
+  if (_fields === null) return obj
+  let fields = _fields.split(',')
+  const defaults = {
+    product: ['id', 'handle', 'url', 'thumbnail', 'price']
+  }
+  fields.push(...defaults[type])
   return pick(obj, uniq(fields))
 }
 const compressMetafields = metafields =>
@@ -85,10 +88,29 @@ function getProduct(handle) {
   return promise.then(postProcessProduct)
 }
 
+function postProcessCollection(_collection) {
+  const collection = pick(_collection, [
+    'id',
+    'handle',
+    'title',
+    'image',
+    'products'
+  ])
+  collection.url = '/collections/' + collection.handle
+  return collection
+}
 async function _getCollectionById(id, type) {
   let collection = await apiGet(`/admin/${type}_collections/${id}.json`)
   collection = emitTopProp(`${type}_collection`)(collection)
-  // TODO: them danh sach san pham vao collection
+
+  // pick all collects, map them to products
+  const { collects } = await apiGet(`/admin/collects.json?collection_id=${id}`)
+  // then attach to collection
+  collection.products = await Promise.all(
+    collects.map(collect =>
+      getProduct(collect.product_id).then(pickFields('', 'product'))
+    )
+  )
   return collection
 }
 function _getCollectionByHandle(handle) {
@@ -101,8 +123,7 @@ function _getCollectionByHandle(handle) {
   return _getCollectionById(id, type)
 }
 function getCollection(handle) {
-  return _getCollectionByHandle(handle)
-  // return promise.then(postProcessProduct)
+  return _getCollectionByHandle(handle).then(postProcessCollection)
 }
 
 const HaravanClientApi = {
