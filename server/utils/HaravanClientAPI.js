@@ -1,5 +1,6 @@
 import { apiGet, cache } from '@server/utils/index'
 import pick from 'lodash/pick'
+import uniq from 'lodash/uniq'
 
 const emitTopProp = key => obj => obj[key]
 // trying to convert str to JSON
@@ -12,11 +13,11 @@ const flex = obj => {
   }
   return rs
 }
-const pickFields = req => obj => {
+const pickFields = (req, type = 'product') => obj => {
   if (!req.query.fields) return obj
-  const fields = req.query.fields.split(',')
-  if (fields.indexOf('id') === -1) fields.push('id')
-  return pick(obj, req.query.fields.split(','))
+  let fields = req.query.fields.split(',')
+  fields.push(...['id', 'handle', 'thumbnail', 'price'])
+  return pick(obj, uniq(fields))
 }
 const compressMetafields = metafields =>
   (metafields.metafields || metafields)
@@ -42,6 +43,29 @@ function postProcessProduct(product) {
     delete product.metafields.title
   }
 
+  // assign url to product
+  product.url = '/products/' + product.handle
+
+  // omit unneeded fields in images
+  if (product.images) {
+    // set feature image (which position = 1)
+    product.thumbnail = product.images.filter(
+      img => img.position * 1 === 1
+    )[0].src
+
+    product.images = product.images.map(img =>
+      pick(img, ['src', 'variant_ids'])
+    )
+  }
+
+  // pick variant with position=1
+  let variant = product.variants.filter(
+    variant => variant.position * 1 === 1
+  )[0]
+  product.price = {
+    current: variant.price
+  }
+  if (variant.compare_at_price > 0) product.price.old = variant.compare_at_price
   return product
 }
 function _getProductById(id) {
@@ -61,8 +85,29 @@ function getProduct(handle) {
   return promise.then(postProcessProduct)
 }
 
+async function _getCollectionById(id, type) {
+  let collection = await apiGet(`/admin/${type}_collections/${id}.json`)
+  collection = emitTopProp(`${type}_collection`)(collection)
+  // TODO: them danh sach san pham vao collection
+  return collection
+}
+function _getCollectionByHandle(handle) {
+  let type = 'custom',
+    id = cache.get('collection:custom:' + handle)
+  if (!id) {
+    id = cache.get('collection:smart:' + handle)
+    type = 'smart'
+  }
+  return _getCollectionById(id, type)
+}
+function getCollection(handle) {
+  return _getCollectionByHandle(handle)
+  // return promise.then(postProcessProduct)
+}
+
 const HaravanClientApi = {
-  getProduct
+  getProduct,
+  getCollection
 }
 export default HaravanClientApi
 export { pickFields }

@@ -3,7 +3,7 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="607b02dd-7f92-48a8-afe4-4983b823c88a" name="api.v1.hungphongbk.com" url="http://188.166.177.127">
-        <fileTransfer host="188.166.177.127" port="2234" rootFolder="/home/phong" accessType="SFTP">
+        <fileTransfer host="188.166.177.127" port="2234" privateKey="$USER_HOME$/.ssh/private.ppk" rootFolder="/home/phong" accessType="SFTP" keyPair="true">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>

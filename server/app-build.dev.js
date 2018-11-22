@@ -44211,6 +44211,7 @@ exports.default = new Logging();
 
 
 exports.__esModule = true;
+exports.getCollections = undefined;
 
 var _getIterator2 = __webpack_require__(74);
 
@@ -44627,6 +44628,7 @@ router.post('/promo', function () {
 }());
 
 exports.default = router;
+exports.getCollections = getCollections;
 
 /***/ }),
 /* 578 */
@@ -48828,6 +48830,11 @@ ssr.get('/product/:id', function (req, res) {
     return res.json(product);
   });
 });
+ssr.get('/collection/:id', function (req, res) {
+  _HaravanClientAPI2.default.getCollection(req.params.id).then(function (collection) {
+    return res.json(collection);
+  });
+});
 
 exports.default = ssr;
 
@@ -48841,6 +48848,14 @@ exports.default = ssr;
 exports.__esModule = true;
 exports.pickFields = undefined;
 
+var _regenerator = __webpack_require__(7);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = __webpack_require__(8);
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
 var _extends2 = __webpack_require__(52);
 
 var _extends3 = _interopRequireDefault(_extends2);
@@ -48849,11 +48864,45 @@ var _assign = __webpack_require__(51);
 
 var _assign2 = _interopRequireDefault(_assign);
 
+var _getCollectionById = function () {
+  var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(id, type) {
+    var collection;
+    return _regenerator2.default.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.next = 2;
+            return (0, _index.apiGet)('/admin/' + type + '_collections/' + id + '.json');
+
+          case 2:
+            collection = _context.sent;
+
+            collection = emitTopProp(type + '_collection')(collection);
+            // TODO: them danh sach san pham vao collection
+            return _context.abrupt('return', collection);
+
+          case 5:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, this);
+  }));
+
+  return function _getCollectionById(_x2, _x3) {
+    return _ref3.apply(this, arguments);
+  };
+}();
+
 var _index = __webpack_require__(25);
 
 var _pick = __webpack_require__(376);
 
 var _pick2 = _interopRequireDefault(_pick);
+
+var _uniq = __webpack_require__(658);
+
+var _uniq2 = _interopRequireDefault(_uniq);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -48873,11 +48922,12 @@ var flex = function flex(obj) {
   return rs;
 };
 var pickFields = function pickFields(req) {
+  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'product';
   return function (obj) {
     if (!req.query.fields) return obj;
     var fields = req.query.fields.split(',');
-    if (fields.indexOf('id') === -1) fields.push('id');
-    return (0, _pick2.default)(obj, req.query.fields.split(','));
+    fields.push.apply(fields, ['id', 'handle', 'thumbnail', 'price']);
+    return (0, _pick2.default)(obj, (0, _uniq2.default)(fields));
   };
 };
 var compressMetafields = function compressMetafields(metafields) {
@@ -48911,6 +48961,29 @@ function postProcessProduct(product) {
     delete product.metafields.title;
   }
 
+  // assign url to product
+  product.url = '/products/' + product.handle;
+
+  // omit unneeded fields in images
+  if (product.images) {
+    // set feature image (which position = 1)
+    product.thumbnail = product.images.filter(function (img) {
+      return img.position * 1 === 1;
+    })[0].src;
+
+    product.images = product.images.map(function (img) {
+      return (0, _pick2.default)(img, ['src', 'variant_ids']);
+    });
+  }
+
+  // pick variant with position=1
+  var variant = product.variants.filter(function (variant) {
+    return variant.position * 1 === 1;
+  })[0];
+  product.price = {
+    current: variant.price
+  };
+  if (variant.compare_at_price > 0) product.price.old = variant.compare_at_price;
   return product;
 }
 function _getProductById(id) {
@@ -48927,8 +49000,23 @@ function getProduct(handle) {
   return promise.then(postProcessProduct);
 }
 
+function _getCollectionByHandle(handle) {
+  var type = 'custom',
+      id = _index.cache.get('collection:custom:' + handle);
+  if (!id) {
+    id = _index.cache.get('collection:smart:' + handle);
+    type = 'smart';
+  }
+  return _getCollectionById(id, type);
+}
+function getCollection(handle) {
+  return _getCollectionByHandle(handle);
+  // return promise.then(postProcessProduct)
+}
+
 var HaravanClientApi = {
-  getProduct: getProduct
+  getProduct: getProduct,
+  getCollection: getCollection
 };
 exports.default = HaravanClientApi;
 exports.pickFields = pickFields;
@@ -51414,24 +51502,27 @@ var _flatten = __webpack_require__(108);
 
 var _flatten2 = _interopRequireDefault(_flatten);
 
+var _collections = __webpack_require__(577);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = function () {
   return new _promise2.default(function () {
     var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(resolve) {
-      var _ref2, products$1, products$2, products;
+      var _ref2, products$1, products$2, collections, products;
 
       return _regenerator2.default.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return _promise2.default.all([(0, _index.apiGet)('/admin/products.json'), (0, _index.apiGet)('/admin/products.json?page=2')]);
+              return _promise2.default.all([(0, _index.apiGet)('/admin/products.json'), (0, _index.apiGet)('/admin/products.json?page=2'), (0, _collections.getCollections)()]);
 
             case 2:
               _ref2 = _context.sent;
               products$1 = _ref2[0];
               products$2 = _ref2[1];
+              collections = _ref2[2];
               products = (0, _flatten2.default)([products$1, products$2].map(function (_ref3) {
                 var products = _ref3.products;
                 return products;
@@ -51443,10 +51534,17 @@ exports.default = function () {
 
                 _index.cache.set('product:' + handle, id);
               });
+              collections.forEach(function (_ref5) {
+                var id = _ref5.id,
+                    collectionType = _ref5.collectionType,
+                    handle = _ref5.handle;
+
+                _index.cache.set('collection:' + collectionType + ':' + handle, id);
+              });
               console.log('fetch all products completed');
               resolve();
 
-            case 9:
+            case 11:
             case 'end':
               return _context.stop();
           }
@@ -51459,6 +51557,318 @@ exports.default = function () {
     };
   }());
 };
+
+/***/ }),
+/* 657 */,
+/* 658 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseUniq = __webpack_require__(659);
+
+/**
+ * Creates a duplicate-free version of an array, using
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * for equality comparisons, in which only the first occurrence of each element
+ * is kept. The order of result values is determined by the order they occur
+ * in the array.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Array
+ * @param {Array} array The array to inspect.
+ * @returns {Array} Returns the new duplicate free array.
+ * @example
+ *
+ * _.uniq([2, 1, 2]);
+ * // => [2, 1]
+ */
+function uniq(array) {
+  return (array && array.length) ? baseUniq(array) : [];
+}
+
+module.exports = uniq;
+
+
+/***/ }),
+/* 659 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var SetCache = __webpack_require__(582),
+    arrayIncludes = __webpack_require__(660),
+    arrayIncludesWith = __webpack_require__(665),
+    cacheHas = __webpack_require__(586),
+    createSet = __webpack_require__(666),
+    setToArray = __webpack_require__(589);
+
+/** Used as the size to enable large array optimizations. */
+var LARGE_ARRAY_SIZE = 200;
+
+/**
+ * The base implementation of `_.uniqBy` without support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {Function} [iteratee] The iteratee invoked per element.
+ * @param {Function} [comparator] The comparator invoked per element.
+ * @returns {Array} Returns the new duplicate free array.
+ */
+function baseUniq(array, iteratee, comparator) {
+  var index = -1,
+      includes = arrayIncludes,
+      length = array.length,
+      isCommon = true,
+      result = [],
+      seen = result;
+
+  if (comparator) {
+    isCommon = false;
+    includes = arrayIncludesWith;
+  }
+  else if (length >= LARGE_ARRAY_SIZE) {
+    var set = iteratee ? null : createSet(array);
+    if (set) {
+      return setToArray(set);
+    }
+    isCommon = false;
+    includes = cacheHas;
+    seen = new SetCache;
+  }
+  else {
+    seen = iteratee ? [] : result;
+  }
+  outer:
+  while (++index < length) {
+    var value = array[index],
+        computed = iteratee ? iteratee(value) : value;
+
+    value = (comparator || value !== 0) ? value : 0;
+    if (isCommon && computed === computed) {
+      var seenIndex = seen.length;
+      while (seenIndex--) {
+        if (seen[seenIndex] === computed) {
+          continue outer;
+        }
+      }
+      if (iteratee) {
+        seen.push(computed);
+      }
+      result.push(value);
+    }
+    else if (!includes(seen, computed, comparator)) {
+      if (seen !== result) {
+        seen.push(computed);
+      }
+      result.push(value);
+    }
+  }
+  return result;
+}
+
+module.exports = baseUniq;
+
+
+/***/ }),
+/* 660 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseIndexOf = __webpack_require__(661);
+
+/**
+ * A specialized version of `_.includes` for arrays without support for
+ * specifying an index to search from.
+ *
+ * @private
+ * @param {Array} [array] The array to inspect.
+ * @param {*} target The value to search for.
+ * @returns {boolean} Returns `true` if `target` is found, else `false`.
+ */
+function arrayIncludes(array, value) {
+  var length = array == null ? 0 : array.length;
+  return !!length && baseIndexOf(array, value, 0) > -1;
+}
+
+module.exports = arrayIncludes;
+
+
+/***/ }),
+/* 661 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseFindIndex = __webpack_require__(662),
+    baseIsNaN = __webpack_require__(663),
+    strictIndexOf = __webpack_require__(664);
+
+/**
+ * The base implementation of `_.indexOf` without `fromIndex` bounds checks.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} value The value to search for.
+ * @param {number} fromIndex The index to search from.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function baseIndexOf(array, value, fromIndex) {
+  return value === value
+    ? strictIndexOf(array, value, fromIndex)
+    : baseFindIndex(array, baseIsNaN, fromIndex);
+}
+
+module.exports = baseIndexOf;
+
+
+/***/ }),
+/* 662 */
+/***/ (function(module, exports) {
+
+/**
+ * The base implementation of `_.findIndex` and `_.findLastIndex` without
+ * support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {Function} predicate The function invoked per iteration.
+ * @param {number} fromIndex The index to search from.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function baseFindIndex(array, predicate, fromIndex, fromRight) {
+  var length = array.length,
+      index = fromIndex + (fromRight ? 1 : -1);
+
+  while ((fromRight ? index-- : ++index < length)) {
+    if (predicate(array[index], index, array)) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+module.exports = baseFindIndex;
+
+
+/***/ }),
+/* 663 */
+/***/ (function(module, exports) {
+
+/**
+ * The base implementation of `_.isNaN` without support for number objects.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is `NaN`, else `false`.
+ */
+function baseIsNaN(value) {
+  return value !== value;
+}
+
+module.exports = baseIsNaN;
+
+
+/***/ }),
+/* 664 */
+/***/ (function(module, exports) {
+
+/**
+ * A specialized version of `_.indexOf` which performs strict equality
+ * comparisons of values, i.e. `===`.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} value The value to search for.
+ * @param {number} fromIndex The index to search from.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function strictIndexOf(array, value, fromIndex) {
+  var index = fromIndex - 1,
+      length = array.length;
+
+  while (++index < length) {
+    if (array[index] === value) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+module.exports = strictIndexOf;
+
+
+/***/ }),
+/* 665 */
+/***/ (function(module, exports) {
+
+/**
+ * This function is like `arrayIncludes` except that it accepts a comparator.
+ *
+ * @private
+ * @param {Array} [array] The array to inspect.
+ * @param {*} target The value to search for.
+ * @param {Function} comparator The comparator invoked per element.
+ * @returns {boolean} Returns `true` if `target` is found, else `false`.
+ */
+function arrayIncludesWith(array, value, comparator) {
+  var index = -1,
+      length = array == null ? 0 : array.length;
+
+  while (++index < length) {
+    if (comparator(value, array[index])) {
+      return true;
+    }
+  }
+  return false;
+}
+
+module.exports = arrayIncludesWith;
+
+
+/***/ }),
+/* 666 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Set = __webpack_require__(338),
+    noop = __webpack_require__(667),
+    setToArray = __webpack_require__(589);
+
+/** Used as references for various `Number` constants. */
+var INFINITY = 1 / 0;
+
+/**
+ * Creates a set object of `values`.
+ *
+ * @private
+ * @param {Array} values The values to add to the set.
+ * @returns {Object} Returns the new set.
+ */
+var createSet = !(Set && (1 / setToArray(new Set([,-0]))[1]) == INFINITY) ? noop : function(values) {
+  return new Set(values);
+};
+
+module.exports = createSet;
+
+
+/***/ }),
+/* 667 */
+/***/ (function(module, exports) {
+
+/**
+ * This method returns `undefined`.
+ *
+ * @static
+ * @memberOf _
+ * @since 2.3.0
+ * @category Util
+ * @example
+ *
+ * _.times(2, _.noop);
+ * // => [undefined, undefined]
+ */
+function noop() {
+  // No operation performed.
+}
+
+module.exports = noop;
+
 
 /***/ })
 /******/ ]);

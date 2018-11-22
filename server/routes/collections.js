@@ -148,3 +148,4 @@ router.post('/promo', async (req, res) => {
 })
 
 export default router
+export { getCollections }
