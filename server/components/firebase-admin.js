@@ -3,7 +3,7 @@ import serviceAccount from '@server/creds/firebase/website-for-brand-firebase-ad
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://website-for-brand.firebaseio.com"
-});
+  databaseURL: 'https://website-for-brand.firebaseio.com'
+})
 
-export default admin;
+export default admin

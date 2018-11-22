@@ -1,27 +1,27 @@
-import {Document, Model} from 'mongoose';
+import { Document, Model } from 'mongoose'
 
 interface IPushNotiMessage extends Document {
-  status: string,
-  sendFrom: string,
-  sendType: string,
-  sendTo: string,
-  sendCount: number,
-  message: Object,
-  options: Object,
+  status: string
+  sendFrom: string
+  sendType: string
+  sendTo: string
+  sendCount: number
+  message: Object
+  options: Object
 }
 
-export const PushNotiMessage: Model<IPushNotiMessage>;
+export const PushNotiMessage: Model<IPushNotiMessage>
 
 interface IPushNotiToken extends Document {
-  token: string,
+  token: string
   topics: Array<string>
 }
 
-export const PushNotiToken: Model<IPushNotiToken>;
+export const PushNotiToken: Model<IPushNotiToken>
 
 interface IProductFavorite extends Document {
-  userId: string,
+  userId: string
   productId: string
 }
 
-export const ProductFavorite: Model<IProductFavorite>;
+export const ProductFavorite: Model<IProductFavorite>

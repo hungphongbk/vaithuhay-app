@@ -11,4 +11,4 @@ const schema = new mongoose.Schema({
   wish: String
 })
 
-export default mongoose.model('RecruitRegistration', schema);
+export default mongoose.model('RecruitRegistration', schema)

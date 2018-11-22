@@ -1,4 +1,4 @@
-export default function (srcArr, destArr, compareFn) {
+export default function(srcArr, destArr, compareFn) {
   const rs = []
   srcArr.forEach(item => {
     if (!destArr.find(compareFn.bind(null, item))) {
@@ -16,5 +16,5 @@ export default function (srcArr, destArr, compareFn) {
       })
     }
   })
-  return rs;
+  return rs
 }

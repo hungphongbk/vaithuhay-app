@@ -1,12 +1,15 @@
 import mongoose from 'mongoose'
 
-const schema = new mongoose.Schema({
-  number: {
-    type: String
+const schema = new mongoose.Schema(
+  {
+    number: {
+      type: String
+    },
+    processed: Boolean
   },
-  processed: Boolean
-}, {
-  timestamps: true
-})
+  {
+    timestamps: true
+  }
+)
 
-export default mongoose.model('OrderProcess', schema);
+export default mongoose.model('OrderProcess', schema)

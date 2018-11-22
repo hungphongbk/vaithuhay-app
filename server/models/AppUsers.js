@@ -12,4 +12,4 @@ const schema = new mongoose.Schema({
   permissions: Array
 })
 
-export default mongoose.model('AppUser', schema);
+export default mongoose.model('AppUser', schema)

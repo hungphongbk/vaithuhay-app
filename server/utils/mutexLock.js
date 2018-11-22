@@ -1,9 +1,9 @@
-import {EventEmitter} from 'events';
+import { EventEmitter } from 'events'
 
 export default class MutexLock {
   constructor() {
-    this._locked = false;
-    this._ee = new EventEmitter();
+    this._locked = false
+    this._ee = new EventEmitter()
   }
 
   acquire() {
@@ -12,25 +12,25 @@ export default class MutexLock {
       if (!this._locked) {
         // Safe because JS doesn't interrupt you on synchronous operations,
         // so no need for compare-and-swap or anything like that.
-        this._locked = true;
-        return resolve();
+        this._locked = true
+        return resolve()
       }
 
       // Otherwise, wait until somebody releases the lock and try again
       const tryAcquire = () => {
         if (!this._locked) {
-          this._locked = true;
-          this._ee.removeListener('release', tryAcquire);
-          return resolve();
+          this._locked = true
+          this._ee.removeListener('release', tryAcquire)
+          return resolve()
         }
-      };
-      this._ee.on('release', tryAcquire);
-    });
+      }
+      this._ee.on('release', tryAcquire)
+    })
   }
 
   release() {
     // Release the lock immediately
-    this._locked = false;
-    setImmediate(() => this._ee.emit('release'));
+    this._locked = false
+    setImmediate(() => this._ee.emit('release'))
   }
 }

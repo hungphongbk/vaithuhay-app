@@ -1,4 +1,4 @@
-import {Router} from 'express'
+import { Router } from 'express'
 import multer from 'multer'
 import path from 'path'
 import crypto from 'crypto'
@@ -17,64 +17,64 @@ const awsUploader = Uploader.select('aws', {
   widthSet: [80, 150, 300, 400, 600, 1200, 1920]
 })
 
-const gm = gm$
-    .subClass({imageMagick: true})
-  ,
+const gm = gm$.subClass({ imageMagick: true }),
   router = Router(),
   imageUrl = url => path.join(global.APP_PATH, url),
   storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function(req, file, cb) {
       cb(null, imageUrl('../uploads'))
     },
-    filename: function (req, file, cb) {
-      crypto.randomBytes(8, function (err, raw) {
-        cb(null, raw.toString('hex') + Date.now() + '.' + mime.extension(file.mimetype));
-      });
+    filename: function(req, file, cb) {
+      crypto.randomBytes(8, function(err, raw) {
+        cb(
+          null,
+          raw.toString('hex') + Date.now() + '.' + mime.extension(file.mimetype)
+        )
+      })
     }
   }),
-  upload = multer({storage}),
+  upload = multer({ storage }),
   plugins = [
-    jpegtran({progressive: true}),
+    jpegtran({ progressive: true }),
     // mozjpeg({quality: 90}),
     // ...((process.env.NODE_ENV === 'production') ? [
     //   __non_webpack_require__('imagemin-mozjpeg')({quality: 90})
     // ] : []),
-    pngquant({quality: '65-80'})
-  ];
+    pngquant({ quality: '65-80' })
+  ]
 
 //Process images middleware
-const widths = [80, 150, 300, 400, 600, 1200, 1920];
+const widths = [80, 150, 300, 400, 600, 1200, 1920]
 
 async function generateSet(image, filename) {
   const [filenameWithoutExt, ext] = filename.split('.'),
-    transform = w => new Promise((resolve, reject) => {
-      const newFilename = `${filenameWithoutExt}-${w}w.${ext}`,
-        filePath = imageUrl('../uploads/' + newFilename),
-        format = (ext => {
-          const rs = ext.toLowerCase();
-          if (rs === 'jpg') return 'jpeg';
-          return rs;
-        })(ext);
+    transform = w =>
+      new Promise((resolve, reject) => {
+        const newFilename = `${filenameWithoutExt}-${w}w.${ext}`,
+          filePath = imageUrl('../uploads/' + newFilename),
+          format = (ext => {
+            const rs = ext.toLowerCase()
+            if (rs === 'jpg') return 'jpeg'
+            return rs
+          })(ext)
 
-      gm(imageUrl('../uploads/' + filename))
-        .resize(w)
-        .noProfile()
-        .sharpen(3, 0.8)
-        .compress(format)
-        // .quality(70)
-        .toBuffer(format, (err, data) => {
-          if (err) {
-            console.log('error when resizing image to ' + w + 'w');
-            reject(err)
-          }
-          else {
-            // console.log(data);
-            imagemin.buffer(data, {plugins})
-              .then(buf => {
-                fs.writeFileSync(filePath, buf);
-                if (!image.thumbnails)
-                  image.thumbnails = {};
-                image.thumbnails[`${w}w`] = 'https://server.vaithuhay.com/uploads/' + newFilename;
+        gm(imageUrl('../uploads/' + filename))
+          .resize(w)
+          .noProfile()
+          .sharpen(3, 0.8)
+          .compress(format)
+          // .quality(70)
+          .toBuffer(format, (err, data) => {
+            if (err) {
+              console.log('error when resizing image to ' + w + 'w')
+              reject(err)
+            } else {
+              // console.log(data);
+              imagemin.buffer(data, { plugins }).then(buf => {
+                fs.writeFileSync(filePath, buf)
+                if (!image.thumbnails) image.thumbnails = {}
+                image.thumbnails[`${w}w`] =
+                  'https://server.vaithuhay.com/uploads/' + newFilename
                 // if (process.env.NODE_ENV === 'production')
                 //     imagemin.buffer(data, {
                 //         plugins: [
@@ -88,20 +88,20 @@ async function generateSet(image, filename) {
                 // else
                 resolve()
               })
-          }
-        })
-    })
+            }
+          })
+      })
   try {
-    await Promise.all(widths.map(transform));
+    await Promise.all(widths.map(transform))
     // await transform(widths[0])
     await image.save()
   } catch (e) {
-    throw e;
+    throw e
   }
 }
 
 const optimize = async (req, res, next) => {
-  const {filename} = req.file;
+  const { filename } = req.file
   if (filename.length === 0 || filename === '#') {
     res.json({
       filename,
@@ -113,32 +113,36 @@ const optimize = async (req, res, next) => {
         )
       }
     })
-    return;
+    return
   }
 
   const rs = await Image.findOne({
       filename
-    }).lean(false).exec(),
-    image = rs || new Image({
-      filename,
-      url: 'https://server.vaithuhay.com/uploads/' + filename
-    });
+    })
+      .lean(false)
+      .exec(),
+    image =
+      rs ||
+      new Image({
+        filename,
+        url: 'https://server.vaithuhay.com/uploads/' + filename
+      })
   try {
-    await generateSet(image, filename);
-    req.images = image;
+    await generateSet(image, filename)
+    req.images = image
     next()
   } catch (e) {
-    res.status(500).send({error: e.message});
+    res.status(500).send({ error: e.message })
   }
 }
 
 router.post('/', upload.single('img'), optimize, (req, res) => {
   res.json(req.images.toJSON())
-});
+})
 
 router.post('/patch', async (req, res) => {
-  const {filename} = req.body,
-    widths = [80, 150, 300, 400, 600, 1200, 1920];
+  const { filename } = req.body,
+    widths = [80, 150, 300, 400, 600, 1200, 1920]
   if (filename.length === 0 || filename === '#') {
     res.json({
       filename,
@@ -150,18 +154,22 @@ router.post('/patch', async (req, res) => {
         )
       }
     })
-    return;
+    return
   }
 
   const rs = await Image.findOne({
       filename
-    }).lean(false).exec(),
-    image = rs || new Image({
-      filename,
-      url: 'https://server.vaithuhay.com/uploads/' + filename
-    });
-  await generateSet(image, filename);
-  res.json(image.toJSON());
+    })
+      .lean(false)
+      .exec(),
+    image =
+      rs ||
+      new Image({
+        filename,
+        url: 'https://server.vaithuhay.com/uploads/' + filename
+      })
+  await generateSet(image, filename)
+  res.json(image.toJSON())
   // let image = await Image.findOne({
   //   filename
   // }).lean(false).exec();
@@ -177,6 +185,6 @@ router.post('/patch', async (req, res) => {
   // });
   // await awsUploader.moveFromLocalToS3(image, filename);
   // res.json(image.toJSON());
-});
+})
 
-export default router;
+export default router

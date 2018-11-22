@@ -4,21 +4,21 @@ import path from 'path'
 
 import BaseUploader from './classes/BaseUploader'
 
-class LocalUploader extends BaseUploader {
-
-}
+class LocalUploader extends BaseUploader {}
 
 class AwsUploader extends BaseUploader {
-  async upload(filename: String, buf: Buffer) {
-
-  }
+  async upload(filename: String, buf: Buffer) {}
 
   constructor(...args) {
-    super(...args);
+    super(...args)
   }
 
-  async moveFromLocalToS3(image, filename: String, localPathFn: (_filename: String) => String) {
-    image.storage = 's3';
+  async moveFromLocalToS3(
+    image,
+    filename: String,
+    localPathFn: (_filename: String) => String
+  ) {
+    image.storage = 's3'
   }
 }
 

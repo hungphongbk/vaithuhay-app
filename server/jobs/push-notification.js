@@ -1,98 +1,115 @@
-import {Log, PushNotiMessage, PushNotiToken} from "@server/models";
-import {FirebaseAdmin as admin} from "@server/components";
-import omit from 'lodash/omit';
-import mapKeys from 'lodash/mapKeys';
-import zip from 'lodash/zip';
-import qs from 'query-string';
+import { Log, PushNotiMessage, PushNotiToken } from '@server/models'
+import { FirebaseAdmin as admin } from '@server/components'
+import omit from 'lodash/omit'
+import mapKeys from 'lodash/mapKeys'
+import zip from 'lodash/zip'
+import qs from 'query-string'
 
 const topicList = {
   ALL: '/topics/all',
   DEV: '/topics/dev'
-};
-export {topicList};
+}
+export { topicList }
 
 function _definePayload(notification, _id = null) {
-  let payload = {notification};
+  let payload = { notification }
   if (typeof _id === 'string' && _id.length > 0) {
-    payload.notification.tag = _id;
-    payload = Object.assign({}, {
-      data: {
-        _id
-      }
-    }, payload);
+    payload.notification.tag = _id
+    payload = Object.assign(
+      {},
+      {
+        data: {
+          _id
+        }
+      },
+      payload
+    )
   }
-  console.log(payload);
-  return payload;
+  console.log(payload)
+  return payload
 }
 
 class Wrapper {
   constructor() {
-    this.messaging = admin.messaging;
-    this.topics = topicList;
+    this.messaging = admin.messaging
+    this.topics = topicList
 
     //if (process.env.NODE_ENV === 'production')
     // noinspection JSIgnoredPromiseFromCall
-    this.init();
+    this.init()
   }
 
   async init() {
     const list = await PushNotiToken.find({}),
-      register = ({token, topics}) => {
-        return this.messaging().subscribeToTopic(token, topics[0]);
-      };
-    await Promise.all(list.map(register));
-    console.log('[jobs/push-notifications] re-init completed with ' + list.length + ' tokens');
+      register = ({ token, topics }) => {
+        return this.messaging().subscribeToTopic(token, topics[0])
+      }
+    await Promise.all(list.map(register))
+    console.log(
+      '[jobs/push-notifications] re-init completed with ' +
+        list.length +
+        ' tokens'
+    )
   }
 
   async _mergingAnalyticsParameter(message) {
-    if (!message.options) message.options = {};
-    let click_action = message.click_action;
-    if (typeof click_action === 'undefined' || click_action === null || (typeof click_action === 'string' && click_action.length === 0)) return message;
+    if (!message.options) message.options = {}
+    let click_action = message.click_action
+    if (
+      typeof click_action === 'undefined' ||
+      click_action === null ||
+      (typeof click_action === 'string' && click_action.length === 0)
+    )
+      return message
 
-    const parameters = Object.assign({}, {
-        utm_source: 'browser',
-        utm_medium: 'push_notification'
-      }, mapKeys(message.options.utmParams || {}, (_, key) => 'utm_' + key)),
-      concat = qs.extract(click_action).length === 0 ? '?' : '&';
+    const parameters = Object.assign(
+        {},
+        {
+          utm_source: 'browser',
+          utm_medium: 'push_notification'
+        },
+        mapKeys(message.options.utmParams || {}, (_, key) => 'utm_' + key)
+      ),
+      concat = qs.extract(click_action).length === 0 ? '?' : '&'
 
     //remove "empty string" value
     Object.keys(parameters).forEach(key => {
-      if (typeof parameters[key] !== 'string') delete parameters[key];
-      if (parameters[key].length === 0) delete parameters[key];
-    });
+      if (typeof parameters[key] !== 'string') delete parameters[key]
+      if (parameters[key].length === 0) delete parameters[key]
+    })
 
-    click_action += concat + qs.stringify(parameters);
-    message.click_action = click_action;
+    click_action += concat + qs.stringify(parameters)
+    message.click_action = click_action
 
-    return message;
+    return message
   }
 
   async _preprocessMessage(message, methods) {
-    let rs = message;
+    let rs = message
     for (const method of methods) {
-      rs = await this['_' + method](rs);
+      rs = await this['_' + method](rs)
     }
-    return rs;
+    return rs
   }
 
   async subscribe(token, topic) {
-    await this.messaging().subscribeToTopic(token, topic);
+    await this.messaging().subscribeToTopic(token, topic)
   }
 
   async log(type, identifier, notification) {
     await Log.create({
       category: 'pushnoti'
-    });
+    })
   }
 
   async sendToDevice(token, notification, _id = null) {
-    const payload = _definePayload(notification, _id);
-    await this.messaging().sendToDevice(token, payload);
+    const payload = _definePayload(notification, _id)
+    await this.messaging().sendToDevice(token, payload)
   }
 
   async sendToTopic(topic, notification, _id = null) {
-    const payload = _definePayload(notification, _id);
-    await this.messaging().sendToTopic(topic, payload);
+    const payload = _definePayload(notification, _id)
+    await this.messaging().sendToTopic(topic, payload)
   }
 
   /**
@@ -108,27 +125,34 @@ class Wrapper {
     const sender = {
       device: this.sendToDevice,
       topic: this.sendToTopic
-    };
+    }
 
-    const processedNotification = await this._preprocessMessage(rawNotification, [
-        'mergingAnalyticsParameter'
-      ]),
-      notification = omit(processedNotification, ['options']);
+    const processedNotification = await this._preprocessMessage(
+        rawNotification,
+        ['mergingAnalyticsParameter']
+      ),
+      notification = omit(processedNotification, ['options'])
 
     //before successfully, save message into database
-    let msg = {};
+    let msg = {}
     if (save) {
-      msg = await this.storeNotification(null, type, identifier, rawNotification, 'delivered');
+      msg = await this.storeNotification(
+        null,
+        type,
+        identifier,
+        rawNotification,
+        'delivered'
+      )
     }
 
     //remove "options" parameter when send message to FCM
-    await sender[type].call(this, identifier, notification, msg._id);
+    await sender[type].call(this, identifier, notification, msg._id)
 
     //if send success & have returned message, increase sendCount
     if (msg._id) {
-      msg.sendCount = 1;
-      await msg.save();
-      return msg;
+      msg.sendCount = 1
+      await msg.save()
+      return msg
     }
   }
 
@@ -142,14 +166,20 @@ class Wrapper {
    * @param status
    * @returns {Promise<PushNotiMessage>}
    */
-  async storeNotification(_id = null, type, identifier, rawNotification, status = 'stored') {
-
-    let msg;
-    const processedNotification = await this._preprocessMessage(rawNotification, [
-        'mergingAnalyticsParameter'
-      ]),
+  async storeNotification(
+    _id = null,
+    type,
+    identifier,
+    rawNotification,
+    status = 'stored'
+  ) {
+    let msg
+    const processedNotification = await this._preprocessMessage(
+        rawNotification,
+        ['mergingAnalyticsParameter']
+      ),
       options = processedNotification.options,
-      notification = omit(processedNotification, ['options']);
+      notification = omit(processedNotification, ['options'])
 
     const body = {
       sendFrom: 'server',
@@ -158,20 +188,20 @@ class Wrapper {
       message: notification,
       options,
       status
-    };
+    }
 
     if (_id === null) {
       //create new message
-      msg = new PushNotiMessage(body);
+      msg = new PushNotiMessage(body)
     } else {
       //find existing message by id
-      msg = await PushNotiMessage.findById(_id);
-      Object.assign(msg, body);
+      msg = await PushNotiMessage.findById(_id)
+      Object.assign(msg, body)
     }
 
     // ... then update
-    await msg.save();
-    return msg;
+    await msg.save()
+    return msg
   }
 
   /**
@@ -185,57 +215,53 @@ class Wrapper {
     const sender = {
       device: this.sendToDevice,
       topic: this.sendToTopic
-    };
+    }
     const msg = await PushNotiMessage.findById(_id),
-      {
-        sendType: type,
-        sendTo: $identifier,
-        message: notification
-      } = msg;
+      { sendType: type, sendTo: $identifier, message: notification } = msg
 
-    const identifier = forceDev ? topicList.DEV : $identifier;
+    const identifier = forceDev ? topicList.DEV : $identifier
 
-    await sender[type].call(this, identifier, notification, _id);
-    msg.status = 'delivered';
-    msg.sendCount++;
-    await msg.save();
-    return msg;
+    await sender[type].call(this, identifier, notification, _id)
+    msg.status = 'delivered'
+    msg.sendCount++
+    await msg.save()
+    return msg
   }
 
   async registerNewToken(token, topics = [], debug = false) {
     //add ALL as default
-    topics.push(topicList.ALL);
+    topics.push(topicList.ALL)
     try {
-      const obj = await PushNotiToken.findOrCreate({token}, {topics});
-      console.log(obj);
-      obj.topics = topics;
-      await obj.save();
-      const sub = topic => this.subscribe(token, topic);
-      await Promise.all(topics.map(sub));
+      const obj = await PushNotiToken.findOrCreate({ token }, { topics })
+      console.log(obj)
+      obj.topics = topics
+      await obj.save()
+      const sub = topic => this.subscribe(token, topic)
+      await Promise.all(topics.map(sub))
     } catch (e) {
-      console.error(e);
+      console.error(e)
     }
   }
 
   //stat include
   //  1. Number of token in DB
   async stat() {
-    const stat = {};
+    const stat = {}
 
     const getTokenCount = async () => {
-      stat.tokenCount = await PushNotiToken.count({});
-    };
+      stat.tokenCount = await PushNotiToken.count({})
+    }
 
-    await Promise.all([getTokenCount()]);
-    return stat;
+    await Promise.all([getTokenCount()])
+    return stat
   }
 
   async listAllMessages() {
-    return await PushNotiMessage.find({});
+    return await PushNotiMessage.find({})
   }
 
   async deleteMessage(_id) {
-    await PushNotiMessage.findByIdAndRemove(_id);
+    await PushNotiMessage.findByIdAndRemove(_id)
   }
 
   /**
@@ -252,28 +278,28 @@ class Wrapper {
       limit = 10,
       sortBy = ['updatedAt'],
       sortVal = ['desc']
-    } = req.query;
-    if (!req.pushNoti) req.pushNoti = {};
+    } = req.query
+    if (!req.pushNoti) req.pushNoti = {}
 
     // example: '-date'
     const sortString = zip(sortBy, sortVal)
       .map(([by, val]) => {
-        if (['asc', 'ascending', '1'].indexOf(val) >= 0) return by;
-        return '-' + by;
-      }).join(' ');
+        if (['asc', 'ascending', '1'].indexOf(val) >= 0) return by
+        return '-' + by
+      })
+      .join(' ')
 
-    const {
-      docs: messages,
-      total,
-      pages
-    } = await PushNotiMessage.paginate({}, {page, limit, sort: sortString});
+    const { docs: messages, total, pages } = await PushNotiMessage.paginate(
+      {},
+      { page, limit, sort: sortString }
+    )
     req.pushNoti = Object.assign({}, req.pushNoti, {
       messages,
       total,
       pages
-    });
-    next();
+    })
+    next()
   }
 }
 
-export default new Wrapper();
+export default new Wrapper()

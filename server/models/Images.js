@@ -5,6 +5,6 @@ const schema = new mongoose.Schema({
   url: String,
   thumbnails: Object,
   storage: String
-});
+})
 
-export default mongoose.model('Image', schema);
+export default mongoose.model('Image', schema)

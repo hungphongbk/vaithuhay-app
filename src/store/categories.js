@@ -51,7 +51,14 @@ export default {
           console.log(`something unexpected with collection ${c.id}:${c.title}`);
           metaList[i] = [];
         }
-        metaList[i].forEach(m => meta[m.key] = JSON.parse(m.value));
+        metaList[i].forEach(m => meta[m.key] = (()=>{
+          try{
+            return JSON.parse(m.value)
+          } catch(e){
+            console.error('error expected with JSON from '+m.key);
+            return null;
+          }
+        })());
 
         //check & patch slides
         if (typeof meta.slides === 'undefined' || typeof meta.slides.list === 'undefined')

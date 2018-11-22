@@ -1,63 +1,67 @@
-import {Router} from 'express';
-import middlewares from "@server/routes/middlewares";
-import {ProductFavorite} from "@server/models";
+import { Router } from 'express'
+import middlewares from '@server/routes/middlewares'
+import { ProductFavorite } from '@server/models'
 
-const router = new Router();
+const router = new Router()
 
 const userFavoriteMiddleware = async (req, res, next) => {
   if (!(req.body.userId || req.query.userId)) {
-    res.status(403).json({message: 'login required'});
-    return;
+    res.status(403).json({ message: 'login required' })
+    return
   }
-  const query = {userId: req.body.userId || req.query.userId};
-  if (req.params.id)
-    query.productId = req.params.id;
-  req.favorites = await ProductFavorite.find(query);
-  next();
-};
+  const query = { userId: req.body.userId || req.query.userId }
+  if (req.params.id) query.productId = req.params.id
+  req.favorites = await ProductFavorite.find(query)
+  next()
+}
 
 router.get('/', middlewares.allProducts, async (req, res) => {
   const data = req.products,
-    id = req.query.id;
+    id = req.query.id
 
-  if (!id) res.json({products: data});
-  else res.json(data.find(p => p.id * 1 === id * 1));
-});
+  if (!id) res.json({ products: data })
+  else res.json(data.find(p => p.id * 1 === id * 1))
+})
 
 // Get user favorites list
 router.get('/favorites', userFavoriteMiddleware, async (req, res) => {
   try {
-    const favorites = await Promise.all(req.favorites.map(f => new Promise(resolve => {
-      f.toJSONAsync(resolve);
-    })));
-    res.json(favorites);
+    const favorites = await Promise.all(
+      req.favorites.map(
+        f =>
+          new Promise(resolve => {
+            f.toJSONAsync(resolve)
+          })
+      )
+    )
+    res.json(favorites)
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
-});
+})
 
 // Query & Make a favorite-add-or-remove action
 router.get('/:id/favorite', userFavoriteMiddleware, (req, res) => {
-  res.json({value: req.favorites.length > 0});
-});
+  res.json({ value: req.favorites.length > 0 })
+})
 router.post('/:id/favorite', userFavoriteMiddleware, async (req, res) => {
   try {
     if (req.favorites.length === 0) {
       //create new
 
-      await (new ProductFavorite({
+      await new ProductFavorite({
         productId: req.params.id,
         userId: req.body.userId
-      })).save();
-      res.json({status: 'ok', behavior: 'add'});
+      }).save()
+      res.json({ status: 'ok', behavior: 'add' })
     } else {
       // await req.favorites[0].remove();
-      await Promise.all(req.favorites.map(model => model.remove()));
-      res.json({status: 'ok', behavior: 'remove'});
+      await Promise.all(req.favorites.map(model => model.remove()))
+      res.json({ status: 'ok', behavior: 'remove' })
     }
   } catch (e) {
-    res.status(500).json({status: 'error', message: e.message});
+    res.status(500).json({ status: 'error', message: e.message })
   }
-});
+})
 
-export default router;
+export default router

@@ -1,21 +1,24 @@
 import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate'
 
-const schema = new mongoose.Schema({
-  status: String,
-  sendFrom: String,
-  sendType: String,
-  sendTo: String,
-  sendCount: {
-    type: Number,
-    default: 0
+const schema = new mongoose.Schema(
+  {
+    status: String,
+    sendFrom: String,
+    sendType: String,
+    sendTo: String,
+    sendCount: {
+      type: Number,
+      default: 0
+    },
+    message: Object,
+    options: Object
   },
-  message: Object,
-  options: Object,
-}, {
-  timestamps: true
-});
-schema.plugin(mongoosePaginate);
+  {
+    timestamps: true
+  }
+)
+schema.plugin(mongoosePaginate)
 
 /**
  * @module model/PushNotiMessage
@@ -25,4 +28,4 @@ schema.plugin(mongoosePaginate);
  * @param {Number} _.sendCount  display sending count
  * @return {PushNotiMessage}    new PushNotiMessage
  */
-export default mongoose.model('PushNotiMessage', schema);
+export default mongoose.model('PushNotiMessage', schema)
