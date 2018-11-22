@@ -48,6 +48,12 @@ export const HaravanAPI = request.defaults({
   baseUrl:
     'https://c96aab241903b825360305142e40a08a:66921be54a74fe0e36d2671d0c5fb77e@vai-thu-hay-i-something-nice.myharavan.com/'
 })
+const HaravanAPIAlternative = request.defaults({
+    baseUrl:
+      'https://0960be1b285c555d784594798247dae8:213dee7cc59da754bd713f633fd48275@vai-thu-hay-i-something-nice.myharavan.com/'
+  }),
+  HrvAPISelector = () =>
+    Math.random() > 0.5 ? HaravanAPI : HaravanAPIAlternative
 
 function loop() {
   const handle = setInterval(async () => {
@@ -57,16 +63,22 @@ function loop() {
         let promise
         switch (type) {
           case 'get':
-            promise = () => HaravanAPI.get(url)
+            promise = () => HrvAPISelector().get(url)
             break
           case 'post':
-            promise = () => HaravanAPI.post(url).json(data)
+            promise = () =>
+              HrvAPISelector()
+                .post(url)
+                .json(data)
             break
           case 'put':
-            promise = () => HaravanAPI.put(url).json(data)
+            promise = () =>
+              HrvAPISelector()
+                .put(url)
+                .json(data)
             break
           case 'del':
-            promise = () => HaravanAPI.delete(url)
+            promise = () => HrvAPISelector().delete(url)
             break
         }
         try {

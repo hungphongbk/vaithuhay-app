@@ -1,9 +1,13 @@
 import { apiGet, cache } from '@server/utils/index'
 import flatten from 'lodash/flatten'
-import { getCollections } from '@server/routes/collections'
+import {
+  getCollections,
+  updateTopProductsCollection
+} from '@server/routes/collections'
 
 export default () =>
   new Promise(async resolve => {
+    // fetch product list & collection list
     const [products$1, products$2, collections] = await Promise.all([
         apiGet(`/admin/products.json`),
         apiGet(`/admin/products.json?page=2`),
@@ -18,6 +22,9 @@ export default () =>
     collections.forEach(({ id, collectionType, handle }) => {
       cache.set(`collection:${collectionType}:${handle}`, id)
     })
+
+    // fetch top products collection
+    await updateTopProductsCollection()
     console.log('fetch all products completed')
     resolve()
   })

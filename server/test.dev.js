@@ -1299,6 +1299,12 @@ var cache = (0, _lruCache2.default)({
 var HaravanAPI = exports.HaravanAPI = _requestPromiseNative2.default.defaults({
   baseUrl: 'https://c96aab241903b825360305142e40a08a:66921be54a74fe0e36d2671d0c5fb77e@vai-thu-hay-i-something-nice.myharavan.com/'
 });
+var HaravanAPIAlternative = _requestPromiseNative2.default.defaults({
+  baseUrl: 'https://0960be1b285c555d784594798247dae8:213dee7cc59da754bd713f633fd48275@vai-thu-hay-i-something-nice.myharavan.com/'
+}),
+    HrvAPISelector = function HrvAPISelector() {
+  return Math.random() > 0.5 ? HaravanAPI : HaravanAPIAlternative;
+};
 
 function loop() {
   var _this = this;
@@ -1324,25 +1330,25 @@ function loop() {
 
                       case 5:
                         promise = function promise() {
-                          return HaravanAPI.get(url);
+                          return HrvAPISelector().get(url);
                         };
                         return _context.abrupt('break', 13);
 
                       case 7:
                         promise = function promise() {
-                          return HaravanAPI.post(url).json(data);
+                          return HrvAPISelector().post(url).json(data);
                         };
                         return _context.abrupt('break', 13);
 
                       case 9:
                         promise = function promise() {
-                          return HaravanAPI.put(url).json(data);
+                          return HrvAPISelector().put(url).json(data);
                         };
                         return _context.abrupt('break', 13);
 
                       case 11:
                         promise = function promise() {
-                          return HaravanAPI.delete(url);
+                          return HrvAPISelector().delete(url);
                         };
                         return _context.abrupt('break', 13);
 
@@ -4732,7 +4738,125 @@ module.exports = isIterateeCall;
 
 
 /***/ }),
-/* 126 */,
+/* 126 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+exports.admin = exports.socketMiddleware = undefined;
+
+var _promise = __webpack_require__(3);
+
+var _promise2 = _interopRequireDefault(_promise);
+
+var _regenerator = __webpack_require__(5);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = __webpack_require__(6);
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+var _utils = __webpack_require__(14);
+
+var _flatten = __webpack_require__(72);
+
+var _flatten2 = _interopRequireDefault(_flatten);
+
+var _models = __webpack_require__(123);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+  allProducts: function () {
+    var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(req, res, next) {
+      var _this = this;
+
+      var queryProductFavorite, fields, all, products;
+      return _regenerator2.default.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              queryProductFavorite = function () {
+                var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(product) {
+                  return _regenerator2.default.wrap(function _callee$(_context) {
+                    while (1) {
+                      switch (_context.prev = _context.next) {
+                        case 0:
+                          _context.next = 2;
+                          return _models.ProductFavorite.find({
+                            productId: product.id
+                          });
+
+                        case 2:
+                          product.favorites = _context.sent;
+                          return _context.abrupt('return', product);
+
+                        case 4:
+                        case 'end':
+                          return _context.stop();
+                      }
+                    }
+                  }, _callee, _this);
+                }));
+
+                return function queryProductFavorite(_x4) {
+                  return _ref2.apply(this, arguments);
+                };
+              }();
+
+              fields = ['id', 'images', 'options', 'product_type', 'tags', 'title', 'variants', 'handle'].join(',');
+              _context2.next = 4;
+              return _promise2.default.all([(0, _utils.apiGet)('/admin/products.json?fields=' + fields), (0, _utils.apiGet)('/admin/products.json?fields=' + fields + '&page=2')]);
+
+            case 4:
+              all = _context2.sent;
+              products = (0, _flatten2.default)(all.map(function (_ref3) {
+                var products = _ref3.products;
+                return products;
+              }));
+              _context2.next = 8;
+              return _promise2.default.all(products.map(queryProductFavorite));
+
+            case 8:
+              req.products = products;
+              req.findHandleFromId = function (id) {
+                return products.find(function (p) {
+                  return p.id * 1 === id * 1;
+                }).handle;
+              };
+              next();
+
+            case 11:
+            case 'end':
+              return _context2.stop();
+          }
+        }
+      }, _callee2, this);
+    }));
+
+    function allProducts(_x, _x2, _x3) {
+      return _ref.apply(this, arguments);
+    }
+
+    return allProducts;
+  }()
+};
+var socketMiddleware = exports.socketMiddleware = function socketMiddleware(io) {
+  return function (req, res, next) {
+    req.io = io;
+    next();
+  };
+};
+
+var admin = exports.admin = function admin(req, res, next) {
+  //admin must have 'x-user-token' in request header
+  if (!req.header('x-user-token')) res.status(403).send({ error: 'Invalid request' });else next();
+};
+
+/***/ }),
 /* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11962,7 +12086,7 @@ module.exports = flatRest;
 
 
 exports.__esModule = true;
-exports.getCollections = undefined;
+exports.updateTopProductsCollection = exports.getCollections = undefined;
 
 var _getIterator2 = __webpack_require__(56);
 
@@ -12004,9 +12128,16 @@ var _reverse = __webpack_require__(405);
 
 var _reverse2 = _interopRequireDefault(_reverse);
 
+var _google = __webpack_require__(604);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var router = (0, _express.Router)();
+function search(metafields, meta) {
+  return metafields.find(function (m) {
+    return m.key === meta;
+  });
+}
 var getCollections = function () {
   var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
     var _ref2, custom_collections, smart_collections, f, rs;
@@ -12156,23 +12287,54 @@ var getPromoProductsCollection = function () {
     return _ref4.apply(this, arguments);
   };
 }();
+var updateTopProductsCollection = function () {
+  var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
+    var collection_id, metafields, _ref6, exists;
 
-router.get('/', function () {
-  var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(req, res) {
     return _regenerator2.default.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
-            _context4.t0 = res;
+            // find top product list
+            collection_id = _index.cache.get('collection:custom:san-pham-hang-dau');
             _context4.next = 3;
-            return getCollections();
+            return (0, _google.getFeaturedProducts)('vaithuhayTopProducts');
 
           case 3:
-            _context4.t1 = _context4.sent;
+            metafields = _context4.sent;
+            _context4.next = 6;
+            return (0, _index.apiGet)('/admin/collects.json?collection_id=' + collection_id);
 
-            _context4.t0.json.call(_context4.t0, _context4.t1);
+          case 6:
+            _ref6 = _context4.sent;
+            exists = _ref6.collects;
+            _context4.next = 10;
+            return _promise2.default.all(exists.map(function (_ref7) {
+              var id = _ref7.id;
+              return _index.HaravanAPI.del('/admin/collects/' + id + '.json');
+            }));
 
-          case 5:
+          case 10:
+            _context4.next = 12;
+            return _promise2.default.all(metafields.map(function (_ref8) {
+              var product_id = _ref8[0];
+              return (0, _index.apiPost)('/admin/collects.json', {
+                collect: {
+                  product_id: product_id,
+                  collection_id: collection_id
+                }
+              });
+            }));
+
+          case 12:
+            _context4.next = 14;
+            return (0, _index.apiGet)('/admin/collects.json?collection_id=' + collection_id, false);
+
+          case 14:
+
+            console.log('update top products completed');
+
+          case 15:
           case 'end':
             return _context4.stop();
         }
@@ -12180,35 +12342,63 @@ router.get('/', function () {
     }, _callee4, undefined);
   }));
 
-  return function (_x, _x2) {
+  return function updateTopProductsCollection() {
     return _ref5.apply(this, arguments);
   };
-}());
-router.post('/new', function () {
-  var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(req, res) {
-    var _ref7, collection_id, products, _ref8, exists;
+}();
 
+router.get('/', function () {
+  var _ref9 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(req, res) {
     return _regenerator2.default.wrap(function _callee5$(_context5) {
       while (1) {
         switch (_context5.prev = _context5.next) {
           case 0:
-            _context5.next = 2;
+            _context5.t0 = res;
+            _context5.next = 3;
+            return getCollections();
+
+          case 3:
+            _context5.t1 = _context5.sent;
+
+            _context5.t0.json.call(_context5.t0, _context5.t1);
+
+          case 5:
+          case 'end':
+            return _context5.stop();
+        }
+      }
+    }, _callee5, undefined);
+  }));
+
+  return function (_x, _x2) {
+    return _ref9.apply(this, arguments);
+  };
+}());
+router.post('/new', function () {
+  var _ref10 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(req, res) {
+    var _ref11, collection_id, products, _ref12, exists;
+
+    return _regenerator2.default.wrap(function _callee6$(_context6) {
+      while (1) {
+        switch (_context6.prev = _context6.next) {
+          case 0:
+            _context6.next = 2;
             return _promise2.default.all([getNewProductsCollection(), (0, _index.apiGet)('/admin/products.json?limit=250')]);
 
           case 2:
-            _ref7 = _context5.sent;
-            collection_id = _ref7[0];
-            products = _ref7[1].products;
+            _ref11 = _context6.sent;
+            collection_id = _ref11[0];
+            products = _ref11[1].products;
 
             console.log(collection_id);
 
             // get exists collects & products of san-pham-moi collection
-            _context5.next = 8;
+            _context6.next = 8;
             return (0, _index.apiGet)('/admin/collects.json?collection_id=' + collection_id);
 
           case 8:
-            _ref8 = _context5.sent;
-            exists = _ref8.collects;
+            _ref12 = _context6.sent;
+            exists = _ref12.collects;
 
             products.forEach(function (p) {
               p.created = Date.parse(p.created_at);
@@ -12221,16 +12411,16 @@ router.post('/new', function () {
 
             // then create post request to update san-pham-moi collection
             // along with it, delete old collects by add a property to remains
-            _context5.next = 14;
-            return _promise2.default.all(exists.map(function (_ref9) {
-              var id = _ref9.id;
+            _context6.next = 14;
+            return _promise2.default.all(exists.map(function (_ref13) {
+              var id = _ref13.id;
               return _index.HaravanAPI.del('/admin/collects/' + id + '.json');
             }));
 
           case 14:
-            _context5.next = 16;
-            return _promise2.default.all(products.slice(0, 20).map(function (_ref10) {
-              var product_id = _ref10.id;
+            _context6.next = 16;
+            return _promise2.default.all(products.slice(0, 20).map(function (_ref14) {
+              var product_id = _ref14.id;
               return _index.HaravanAPI.post('/admin/collects.json').json({
                 collect: { product_id: product_id, collection_id: collection_id }
               });
@@ -12243,42 +12433,42 @@ router.post('/new', function () {
 
           case 17:
           case 'end':
-            return _context5.stop();
+            return _context6.stop();
         }
       }
-    }, _callee5, undefined);
+    }, _callee6, undefined);
   }));
 
   return function (_x3, _x4) {
-    return _ref6.apply(this, arguments);
+    return _ref10.apply(this, arguments);
   };
 }());
 
 router.post('/promo', function () {
-  var _ref11 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(req, res) {
-    var _ref12, collection_id, products, _ref13, exists, saleProducts, _iterator, _isArray, _i, _ref15, product;
+  var _ref15 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(req, res) {
+    var _ref16, collection_id, products, _ref17, exists, saleProducts, _iterator, _isArray, _i, _ref19, product;
 
-    return _regenerator2.default.wrap(function _callee6$(_context6) {
+    return _regenerator2.default.wrap(function _callee7$(_context7) {
       while (1) {
-        switch (_context6.prev = _context6.next) {
+        switch (_context7.prev = _context7.next) {
           case 0:
-            _context6.next = 2;
+            _context7.next = 2;
             return _promise2.default.all([getPromoProductsCollection(), (0, _index.apiGet)('/admin/products.json?limit=250')]);
 
           case 2:
-            _ref12 = _context6.sent;
-            collection_id = _ref12[0];
-            products = _ref12[1].products;
+            _ref16 = _context7.sent;
+            collection_id = _ref16[0];
+            products = _ref16[1].products;
 
             console.log(collection_id);
 
             // get exists collects & products of san-pham-moi collection
-            _context6.next = 8;
+            _context7.next = 8;
             return (0, _index.apiGet)('/admin/collects.json?collection_id=' + collection_id);
 
           case 8:
-            _ref13 = _context6.sent;
-            exists = _ref13.collects;
+            _ref17 = _context7.sent;
+            exists = _ref17.collects;
 
             products.forEach(function (p) {
               p.variants.forEach(function (v) {
@@ -12303,9 +12493,9 @@ router.post('/promo', function () {
             // then create post request to update san-pham-moi collection
             // along with it, delete old collects by add a property to remains
 
-            _context6.next = 15;
-            return _promise2.default.all(exists.map(function (_ref14) {
-              var id = _ref14.id;
+            _context7.next = 15;
+            return _promise2.default.all(exists.map(function (_ref18) {
+              var id = _ref18.id;
               return _index.HaravanAPI.del('/admin/collects/' + id + '.json');
             }));
 
@@ -12314,38 +12504,38 @@ router.post('/promo', function () {
 
           case 16:
             if (!_isArray) {
-              _context6.next = 22;
+              _context7.next = 22;
               break;
             }
 
             if (!(_i >= _iterator.length)) {
-              _context6.next = 19;
+              _context7.next = 19;
               break;
             }
 
-            return _context6.abrupt('break', 31);
+            return _context7.abrupt('break', 31);
 
           case 19:
-            _ref15 = _iterator[_i++];
-            _context6.next = 26;
+            _ref19 = _iterator[_i++];
+            _context7.next = 26;
             break;
 
           case 22:
             _i = _iterator.next();
 
             if (!_i.done) {
-              _context6.next = 25;
+              _context7.next = 25;
               break;
             }
 
-            return _context6.abrupt('break', 31);
+            return _context7.abrupt('break', 31);
 
           case 25:
-            _ref15 = _i.value;
+            _ref19 = _i.value;
 
           case 26:
-            product = _ref15;
-            _context6.next = 29;
+            product = _ref19;
+            _context7.next = 29;
             return _index.HaravanAPI.post('/admin/collects.json').json({
               collect: {
                 product_id: product.id,
@@ -12354,7 +12544,7 @@ router.post('/promo', function () {
             });
 
           case 29:
-            _context6.next = 16;
+            _context7.next = 16;
             break;
 
           case 31:
@@ -12367,19 +12557,20 @@ router.post('/promo', function () {
 
           case 32:
           case 'end':
-            return _context6.stop();
+            return _context7.stop();
         }
       }
-    }, _callee6, undefined);
+    }, _callee7, undefined);
   }));
 
   return function (_x5, _x6) {
-    return _ref11.apply(this, arguments);
+    return _ref15.apply(this, arguments);
   };
 }());
 
 exports.default = router;
 exports.getCollections = getCollections;
+exports.updateTopProductsCollection = updateTopProductsCollection;
 
 /***/ }),
 /* 206 */
@@ -27312,10 +27503,16 @@ exports.default = function () {
 
                 _index.cache.set('collection:' + collectionType + ':' + handle, id);
               });
+
+              // fetch top products collection
+              _context.next = 11;
+              return (0, _collections.updateTopProductsCollection)();
+
+            case 11:
               console.log('fetch all products completed');
               resolve();
 
-            case 11:
+            case 13:
             case 'end':
               return _context.stop();
           }
@@ -37410,7 +37607,12 @@ module.exports = hash;
 /* 530 */,
 /* 531 */,
 /* 532 */,
-/* 533 */,
+/* 533 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(578), __esModule: true };
+
+/***/ }),
 /* 534 */,
 /* 535 */,
 /* 536 */,
@@ -37455,7 +37657,17 @@ module.exports = hash;
 /* 575 */,
 /* 576 */,
 /* 577 */,
-/* 578 */,
+/* 578 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(2);
+var $JSON = core.JSON || (core.JSON = { stringify: JSON.stringify });
+module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
+  return $JSON.stringify.apply($JSON, arguments);
+};
+
+
+/***/ }),
 /* 579 */,
 /* 580 */,
 /* 581 */,
@@ -37481,9 +37693,720 @@ module.exports = hash;
 /* 601 */,
 /* 602 */,
 /* 603 */,
-/* 604 */,
-/* 605 */,
-/* 606 */,
+/* 604 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+exports.getFeaturedProducts = undefined;
+
+var _stringify = __webpack_require__(533);
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+var _regenerator = __webpack_require__(5);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = __webpack_require__(6);
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+var _promise = __webpack_require__(3);
+
+var _promise2 = _interopRequireDefault(_promise);
+
+var _express = __webpack_require__(28);
+
+var _googleapis = __webpack_require__(214);
+
+var _client_secret_764771183033I9qmsuhhb4vsqh8gcd97o3f21fpm6034AppsGoogleusercontent = __webpack_require__(605);
+
+var _client_secret_764771183033I9qmsuhhb4vsqh8gcd97o3f21fpm6034AppsGoogleusercontent2 = _interopRequireDefault(_client_secret_764771183033I9qmsuhhb4vsqh8gcd97o3f21fpm6034AppsGoogleusercontent);
+
+var _path = __webpack_require__(77);
+
+var _path2 = _interopRequireDefault(_path);
+
+var _utils = __webpack_require__(14);
+
+var _middlewares = __webpack_require__(126);
+
+var _middlewares2 = _interopRequireDefault(_middlewares);
+
+var _Logging = __webpack_require__(606);
+
+var _Logging2 = _interopRequireDefault(_Logging);
+
+var _components = __webpack_require__(79);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var VTH_TOP_PRODUCTS = 'vaithuhayTopProducts';
+
+var timeout = function timeout(ms) {
+  return new _promise2.default(function (res) {
+    return setTimeout(res, ms);
+  });
+};
+var log = function log(tag, message) {
+  return console.log('[google/' + tag + '] ' + message);
+};
+
+var router = (0, _express.Router)(),
+    authFn = function authFn() {
+  return new _googleapis.google.auth.OAuth2(_client_secret_764771183033I9qmsuhhb4vsqh8gcd97o3f21fpm6034AppsGoogleusercontent2.default.web.client_id, _client_secret_764771183033I9qmsuhhb4vsqh8gcd97o3f21fpm6034AppsGoogleusercontent2.default.web.client_secret, (process.env.NODE_ENV === 'production' ? 'https://server.vaithuhay.com/b/' : 'https://localhost:8089/') + 'g/login/callback');
+},
+    analytics = function analytics(req, res, next) {
+  req.analytics = _googleapis.google.analytics({
+    version: 'v3',
+    auth: req.auth
+  });
+  next();
+},
+    viewId = 'ga:118256072';
+
+var googleAuth = function () {
+  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(req, res, next) {
+    var auth, token;
+    return _regenerator2.default.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            //init req.auth
+            auth = authFn();
+
+            req.auth = auth;
+            token = req.headers['x-user-token'];
+            // console.log(req.headers);
+
+            if (!token) {
+              _context.next = 21;
+              break;
+            }
+
+            _context.prev = 4;
+            _context.t0 = console;
+            _context.next = 8;
+            return auth.getTokenInfo(token);
+
+          case 8:
+            _context.t1 = _context.sent;
+
+            _context.t0.log.call(_context.t0, _context.t1);
+
+            auth.setCredentials({
+              access_token: token
+            });
+            next();
+            _context.next = 19;
+            break;
+
+          case 14:
+            _context.prev = 14;
+            _context.t2 = _context['catch'](4);
+            _context.next = 18;
+            return _Logging2.default.log(_Logging2.default.TYPES.ERROR, ['analytics'], _context.t2.toString());
+
+          case 18:
+            res.status(500).json({ message: _context.t2.message });
+
+          case 19:
+            _context.next = 22;
+            break;
+
+          case 21:
+            res.json({
+              status: 'login',
+              url: auth.generateAuthUrl({
+                access_type: 'offline',
+                scope: ['https://www.googleapis.com/auth/plus.me', 'https://www.googleapis.com/auth/analytics']
+              })
+            });
+
+          case 22:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, undefined, [[4, 14]]);
+  }));
+
+  return function googleAuth(_x, _x2, _x3) {
+    return _ref.apply(this, arguments);
+  };
+}();
+var updateFeaturedProducts = function () {
+  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(arr, namespace) {
+    var resources = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+
+    var _ref3, metafields;
+
+    return _regenerator2.default.wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            _context4.next = 2;
+            return (0, _utils.apiGet)('/admin' + resources + '/metafields.json?namespace=' + namespace);
+
+          case 2:
+            _ref3 = _context4.sent;
+            metafields = _ref3.metafields;
+
+            if (!(metafields.length > 0)) {
+              _context4.next = 7;
+              break;
+            }
+
+            _context4.next = 7;
+            return _promise2.default.all(metafields.map(function (_ref4) {
+              var id = _ref4.id,
+                  _namespace = _ref4.namespace;
+              return new _promise2.default(function () {
+                var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(resolve) {
+                  return _regenerator2.default.wrap(function _callee2$(_context2) {
+                    while (1) {
+                      switch (_context2.prev = _context2.next) {
+                        case 0:
+                          if (!(namespace === _namespace)) {
+                            _context2.next = 3;
+                            break;
+                          }
+
+                          _context2.next = 3;
+                          return (0, _utils.apiDel)('/admin' + resources + '/metafields/' + id + '.json');
+
+                        case 3:
+                          resolve();
+
+                        case 4:
+                        case 'end':
+                          return _context2.stop();
+                      }
+                    }
+                  }, _callee2, undefined);
+                }));
+
+                return function (_x7) {
+                  return _ref5.apply(this, arguments);
+                };
+              }());
+            }));
+
+          case 7:
+            _context4.next = 9;
+            return _promise2.default.all(arr.map(function (_ref6) {
+              var id = _ref6[0],
+                  handle = _ref6[1];
+              return new _promise2.default(function () {
+                var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(resolve) {
+                  return _regenerator2.default.wrap(function _callee3$(_context3) {
+                    while (1) {
+                      switch (_context3.prev = _context3.next) {
+                        case 0:
+                          _context3.prev = 0;
+                          _context3.next = 3;
+                          return (0, _utils.apiPost)('/admin' + resources + '/metafields.json', {
+                            metafield: {
+                              namespace: namespace,
+                              key: (0, _stringify2.default)(id),
+                              value_type: 'string',
+                              value: handle
+                            }
+                          });
+
+                        case 3:
+                          _context3.next = 8;
+                          break;
+
+                        case 5:
+                          _context3.prev = 5;
+                          _context3.t0 = _context3['catch'](0);
+                          throw _context3.t0;
+
+                        case 8:
+                          resolve();
+
+                        case 9:
+                        case 'end':
+                          return _context3.stop();
+                      }
+                    }
+                  }, _callee3, undefined, [[0, 5]]);
+                }));
+
+                return function (_x8) {
+                  return _ref7.apply(this, arguments);
+                };
+              }());
+            }));
+
+          case 9:
+          case 'end':
+            return _context4.stop();
+        }
+      }
+    }, _callee4, undefined);
+  }));
+
+  return function updateFeaturedProducts(_x5, _x6) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+var getFeaturedProducts = function () {
+  var _ref8 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(namespace) {
+    var resources = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+    var _ref9, metafields;
+
+    return _regenerator2.default.wrap(function _callee5$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            _context5.next = 2;
+            return (0, _utils.apiGet)('/admin' + resources + '/metafields.json?namespace=' + namespace);
+
+          case 2:
+            _ref9 = _context5.sent;
+            metafields = _ref9.metafields;
+
+            if (!(metafields.length === 0)) {
+              _context5.next = 6;
+              break;
+            }
+
+            return _context5.abrupt('return', []);
+
+          case 6:
+            return _context5.abrupt('return', metafields.map(function (_ref10) {
+              var id = _ref10.key,
+                  handle = _ref10.value;
+              return [id * 1, handle];
+            }));
+
+          case 7:
+          case 'end':
+            return _context5.stop();
+        }
+      }
+    }, _callee5, undefined);
+  }));
+
+  return function getFeaturedProducts(_x10) {
+    return _ref8.apply(this, arguments);
+  };
+}();
+var updateLastTime = function () {
+  var _ref11 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(ref) {
+    var db;
+    return _regenerator2.default.wrap(function _callee6$(_context6) {
+      while (1) {
+        switch (_context6.prev = _context6.next) {
+          case 0:
+            db = _components.FirebaseAdmin.database();
+            _context6.next = 3;
+            return db.ref(ref).set(Date.now());
+
+          case 3:
+          case 'end':
+            return _context6.stop();
+        }
+      }
+    }, _callee6, undefined);
+  }));
+
+  return function updateLastTime(_x11) {
+    return _ref11.apply(this, arguments);
+  };
+}();
+
+router.get('/login/status', googleAuth, function (req, res) {
+  res.json({ status: 'ok' });
+});
+router.get('/login/callback', function (req, res) {
+  var auth = req.auth || authFn();
+  req.auth = auth;
+  var code = req.query.code;
+
+  auth.getToken(code, function () {
+    var _ref12 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(err, token) {
+      return _regenerator2.default.wrap(function _callee7$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              if (!err) {
+                _context7.next = 4;
+                break;
+              }
+
+              console.log(err.message);
+              _context7.next = 9;
+              break;
+
+            case 4:
+              auth.setCredentials(token);
+              req.session['tokens'] = token;
+              _context7.next = 8;
+              return req.session.save();
+
+            case 8:
+              res.sendFile(_path2.default.join(global.APP_PATH, '../server/callback.html'));
+
+            case 9:
+            case 'end':
+              return _context7.stop();
+          }
+        }
+      }, _callee7, undefined);
+    }));
+
+    return function (_x12, _x13) {
+      return _ref12.apply(this, arguments);
+    };
+  }());
+});
+
+router.get('/lastUpdated', function (req, res) {
+  var db = _components.FirebaseAdmin.database();
+  // noinspection JSIgnoredPromiseFromCall
+  db.ref('server/' + req.query.q + '/lastUpdated').once('value', function (snapshot) {
+    res.json({
+      diff: Date.now() - snapshot.val() * 1
+    });
+  });
+});
+router.post('/lastUpdated', function (req, res) {
+  updateLastTime('server/' + req.query.q + '/lastUpdated').then(function () {
+    res.json({ status: 'ok' });
+  });
+});
+
+router.get('/', googleAuth, function (req, res) {
+  res.json({ status: 'OK' });
+});
+
+router.post('/top', googleAuth, analytics, _middlewares2.default.allProducts, function () {
+  var _ref13 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9(req, res) {
+    var oldTop, yesterday, before10days, fm;
+    return _regenerator2.default.wrap(function _callee9$(_context9) {
+      while (1) {
+        switch (_context9.prev = _context9.next) {
+          case 0:
+            _context9.next = 2;
+            return getFeaturedProducts(VTH_TOP_PRODUCTS);
+
+          case 2:
+            oldTop = _context9.sent;
+
+            yesterday = function (d) {
+              return new Date(d.setDate(d.getDate() - 1));
+            }(new Date());
+
+            before10days = function (d) {
+              return new Date(d.setDate(d.getDate() - 10));
+            }(new Date());
+
+            fm = function fm(d) {
+              return d.toISOString().slice(0, 10);
+            };
+            // log('top', fm(before10days));
+            // log('top', fm(yesterday));
+
+            req.analytics.data.ga.get({
+              ids: viewId,
+              'start-date': fm(before10days),
+              'end-date': fm(yesterday),
+              // metrics: 'ga:bounces,ga:entrances,ga:pageviews,ga:uniquePageviews,ga:timeOnPage,ga:exits',
+              metrics: 'ga:pageviews',
+              dimensions: 'ga:pagePath',
+              sort: '-ga:pageviews',
+              filters: 'ga:pagePath=~^/products/*',
+              'max-results': 20
+            }, function () {
+              var _ref14 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8(err, body) {
+                var products, rows, rs;
+                return _regenerator2.default.wrap(function _callee8$(_context8) {
+                  while (1) {
+                    switch (_context8.prev = _context8.next) {
+                      case 0:
+                        if (!err) {
+                          _context8.next = 7;
+                          break;
+                        }
+
+                        _context8.next = 3;
+                        return _Logging2.default.log(_Logging2.default.TYPES.ERROR, ['analytics', 'top-products'], err.toString());
+
+                      case 3:
+                        console.error(err);
+                        res.status(500).send(err.message);
+                        _context8.next = 13;
+                        break;
+
+                      case 7:
+                        products = req.products, rows = body.data.rows, rs = rows.map(function (_ref15) {
+                          var path = _ref15[0];
+
+                          var m = /^\/products\/(.*)/.exec(path);
+                          if (m === null) return null;
+                          var product = products.find(function (p) {
+                            return p.handle === m[1];
+                          });
+                          if (typeof product === 'undefined' || product === null) return null;else return [product.id, product.handle];
+                        }).filter(function (r) {
+                          return r !== null;
+                        });
+
+                        //update last updated time into Firebase database
+
+                        _context8.next = 10;
+                        return updateLastTime('server/topProduct/lastUpdated');
+
+                      case 10:
+                        _context8.next = 12;
+                        return updateFeaturedProducts(rs, VTH_TOP_PRODUCTS);
+
+                      case 12:
+                        res.json((0, _utils.diffArray)(oldTop, rs, function (old, current) {
+                          return old[0] === current[0];
+                        }));
+
+                      case 13:
+                      case 'end':
+                        return _context8.stop();
+                    }
+                  }
+                }, _callee8, undefined);
+              }));
+
+              return function (_x16, _x17) {
+                return _ref14.apply(this, arguments);
+              };
+            }());
+
+          case 7:
+          case 'end':
+            return _context9.stop();
+        }
+      }
+    }, _callee9, undefined);
+  }));
+
+  return function (_x14, _x15) {
+    return _ref13.apply(this, arguments);
+  };
+}());
+
+router.post('/relateds', googleAuth, analytics, _middlewares2.default.allProducts, function () {
+  var _ref16 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee11(req, res) {
+    var productUrl, yesterday, before10days, fm;
+    return _regenerator2.default.wrap(function _callee11$(_context11) {
+      while (1) {
+        switch (_context11.prev = _context11.next) {
+          case 0:
+            //get product url
+            productUrl = '/products/' + req.findHandleFromId(req.query.id);
+
+            yesterday = function (d) {
+              return new Date(d.setDate(d.getDate() - 1));
+            }(new Date());
+
+            before10days = function (d) {
+              return new Date(d.setMonth(d.getMonth() - 1));
+            }(new Date());
+
+            fm = function fm(d) {
+              return d.toISOString().slice(0, 10);
+            };
+
+            req.analytics.data.ga.get({
+              ids: viewId,
+              'start-date': fm(before10days),
+              'end-date': fm(yesterday),
+              // metrics: 'ga:bounces,ga:entrances,ga:pageviews,ga:uniquePageviews,ga:timeOnPage,ga:exits',
+              metrics: 'ga:pageviews',
+              dimensions: 'ga:previousPagePath,ga:pagePath',
+              sort: '-ga:pageviews',
+              filters: 'ga:pagePath=~^/products/*;ga:previousPagePath==' + productUrl
+            }, function () {
+              var _ref17 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee10(err, body) {
+                var _ref18, relateds, rows, rs;
+
+                return _regenerator2.default.wrap(function _callee10$(_context10) {
+                  while (1) {
+                    switch (_context10.prev = _context10.next) {
+                      case 0:
+                        if (!err) {
+                          _context10.next = 6;
+                          break;
+                        }
+
+                        _context10.next = 3;
+                        return _Logging2.default.log(_Logging2.default.TYPES.ERROR, ['analytics', 'related-products'], err.toString());
+
+                      case 3:
+                        res.status(500).send(err.message);
+                        _context10.next = 23;
+                        break;
+
+                      case 6:
+                        _context10.prev = 6;
+                        _context10.next = 9;
+                        return (0, _utils.apiGet)('/admin/products.json?limit=250');
+
+                      case 9:
+                        _ref18 = _context10.sent;
+                        relateds = _ref18.products;
+                        rows = body.data.rows;
+                        rs = rows.slice(1).map(function (_ref19) {
+                          var path = _ref19[1];
+
+                          var m = /^\/products\/(.*)/.exec(path);
+                          if (m === null) return null;
+                          var product = relateds.find(function (p) {
+                            return p.handle === m[1];
+                          });
+                          if (typeof product === 'undefined' || product === null) return null;else return [product.id, product.handle];
+                        }).filter(function (r) {
+                          return r !== null;
+                        });
+                        _context10.next = 15;
+                        return updateFeaturedProducts(rs, 'vthRelatedProducts', '/products/' + req.query.id);
+
+                      case 15:
+                        res.json(rows);
+                        _context10.next = 23;
+                        break;
+
+                      case 18:
+                        _context10.prev = 18;
+                        _context10.t0 = _context10['catch'](6);
+                        _context10.next = 22;
+                        return _Logging2.default.log(_Logging2.default.TYPES.ERROR, ['analytics', 'related-products'], err.toString());
+
+                      case 22:
+                        res.status(500).send(_context10.t0.message);
+
+                      case 23:
+                      case 'end':
+                        return _context10.stop();
+                    }
+                  }
+                }, _callee10, undefined, [[6, 18]]);
+              }));
+
+              return function (_x20, _x21) {
+                return _ref17.apply(this, arguments);
+              };
+            }());
+
+          case 5:
+          case 'end':
+            return _context11.stop();
+        }
+      }
+    }, _callee11, undefined);
+  }));
+
+  return function (_x18, _x19) {
+    return _ref16.apply(this, arguments);
+  };
+}());
+
+exports.default = router;
+exports.getFeaturedProducts = getFeaturedProducts;
+
+/***/ }),
+/* 605 */
+/***/ (function(module, exports) {
+
+module.exports = {"web":{"client_id":"764771183033-i9qmsuhhb4vsqh8gcd97o3f21fpm6034.apps.googleusercontent.com","project_id":"website-for-brand","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://www.googleapis.com/oauth2/v3/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"ifn0mgq7zpZWrfABwFV3H3Yr","javascript_origins":["https://server.vaithuhay.com","https://vaithuhay.com","https://localhost:8081"]}}
+
+/***/ }),
+/* 606 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+var _extends2 = __webpack_require__(54);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _typeof2 = __webpack_require__(83);
+
+var _typeof3 = _interopRequireDefault(_typeof2);
+
+var _classCallCheck2 = __webpack_require__(73);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _components = __webpack_require__(79);
+
+var _bluebird = __webpack_require__(185);
+
+var _momentTimezone = __webpack_require__(74);
+
+var _momentTimezone2 = _interopRequireDefault(_momentTimezone);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Logging = function () {
+  function Logging() {
+    (0, _classCallCheck3.default)(this, Logging);
+
+    this.db = _components.FirebaseAdmin.database().ref('vaithuhay').child('logs');
+    this.TYPES = {
+      INFO: 'info',
+      ERROR: 'err'
+    };
+  }
+
+  Logging.prototype._observeOrderNumber = function _observeOrderNumber(_order_number) {
+    var order_number = _order_number;
+    if ((typeof _order_number === 'undefined' ? 'undefined' : (0, _typeof3.default)(_order_number)) === 'object' && typeof _order_number !== 'undefined') {
+      order_number = _order_number.order_number;
+    }
+    return order_number;
+  };
+
+  Logging.prototype.log = function log(type, tags, context) {
+    var additional = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+    return this.db.push().set((0, _extends3.default)({
+      status: type,
+      context: context,
+      createdAt: (0, _momentTimezone2.default)().format('DD-MM-YYYY HH:MM:SS'),
+      tags: tags
+    }, additional));
+  };
+
+  Logging.prototype.logOrderInfo = function logOrderInfo(_order_number, info) {
+    var order_number = this._observeOrderNumber(_order_number);
+
+    return this.log(this.TYPES.INFO, ['order'], info.join('\n'), {
+      order_number: order_number
+    });
+  };
+
+  Logging.prototype.logOrderErr = function logOrderErr(_order_number, errObj) {
+    var order_number = this._observeOrderNumber(_order_number);
+
+    return this.log(this.TYPES.ERROR, ['order'], errObj.toString(), {
+      order_number: order_number
+    });
+  };
+
+  return Logging;
+}();
+
+exports.default = new Logging();
+
+/***/ }),
 /* 607 */,
 /* 608 */,
 /* 609 */,

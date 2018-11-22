@@ -1,12 +1,16 @@
-import { HaravanAPI, apiGet, apiClear } from '../utils/index'
+import { HaravanAPI, apiGet, apiPost, apiClear, cache } from '../utils/index'
 import { Router } from 'express'
 import Setting from '../models/Settings'
 import sort from 'lodash/sortBy'
 import maxBy from 'lodash/maxBy'
 import pickBy from 'lodash/filter'
 import reverse from 'lodash/reverse'
+import { getFeaturedProducts } from '@server/routes/google'
 
 const router = Router()
+function search(metafields, meta) {
+  return metafields.find(m => m.key === meta)
+}
 const getCollections = async () => {
   const [{ custom_collections }, { smart_collections }] = await Promise.all([
       apiGet('/admin/custom_collections.json'),
@@ -53,6 +57,36 @@ const getPromoProductsCollection = async () => {
     }).save()
     return collection.id
   } else return searched[0].value
+}
+const updateTopProductsCollection = async () => {
+  // find top product list
+  const collection_id = cache.get('collection:custom:san-pham-hang-dau')
+  const metafields = await getFeaturedProducts('vaithuhayTopProducts')
+  const { collects: exists } = await apiGet(
+    `/admin/collects.json?collection_id=${collection_id}`
+  )
+
+  // remove old products (by collect)
+  await Promise.all(
+    exists.map(({ id }) => HaravanAPI.del(`/admin/collects/${id}.json`))
+  )
+
+  // and push new
+  await Promise.all(
+    metafields.map(([product_id]) =>
+      apiPost(`/admin/collects.json`, {
+        collect: {
+          product_id,
+          collection_id
+        }
+      })
+    )
+  )
+
+  // reset cache
+  await apiGet(`/admin/collects.json?collection_id=${collection_id}`, false)
+
+  console.log('update top products completed')
 }
 
 router.get('/', async (req, res) => {
@@ -148,4 +182,4 @@ router.post('/promo', async (req, res) => {
 })
 
 export default router
-export { getCollections }
+export { getCollections, updateTopProductsCollection }

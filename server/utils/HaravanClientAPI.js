@@ -17,7 +17,7 @@ const pickFields = (_fields = null, type = 'product') => obj => {
   if (_fields === null) return obj
   let fields = _fields.split(',')
   const defaults = {
-    product: ['id', 'handle', 'url', 'thumbnail', 'price']
+    product: ['id', 'title', 'handle', 'url', 'thumbnail', 'price']
   }
   fields.push(...defaults[type])
   return pick(obj, uniq(fields))
@@ -44,6 +44,11 @@ function postProcessProduct(product) {
       en: product.metafields.title
     }
     delete product.metafields.title
+  } else {
+    product.title = {
+      vi: product.title,
+      en: ''
+    }
   }
 
   // assign url to product

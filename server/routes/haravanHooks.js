@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { apiDel, apiGet, apiPost, apiPut } from '../utils'
+import { apiDel, apiGet, apiPost, apiPut, HaravanAPI } from '../utils'
 import syncQueue from '../jobs/sync-spreadsheet-v2'
 import range from 'lodash/range'
 import flatten from 'lodash/flatten'
@@ -11,14 +11,22 @@ import spreadsheet from '@server/components/Spreadsheet'
 const router = new Router(),
   CARTS_CREATE_ADDRESS = 'https://server.vaithuhay.com/b/callback/createCart',
   ORDER_PROCESS_ADDRESS = 'https://server.vaithuhay.com/b/callback/processOrder'
-
+const flex = obj => {
+  let rs
+  try {
+    rs = JSON.parse(obj)
+  } catch (e) {
+    rs = obj
+  }
+  return rs
+}
 //check whether webhook already registered
 async function createOrUpdate(topics, address) {
-  const { webhooks: $all } = await apiGet('/admin/webhooks.json', false),
+  const { webhooks: $all } = flex(await HaravanAPI.get('/admin/webhooks.json')),
     webhooks = $all.filter(h => h.address === address)
   if (!webhooks || webhooks.length === 0) {
     const create = topic =>
-      apiPost('/admin/webhooks.json', {
+      HaravanAPI.post('/admin/webhooks.json').json({
         webhook: {
           topic,
           address,
@@ -28,7 +36,7 @@ async function createOrUpdate(topics, address) {
     await Promise.all(topics.map(create))
   } else {
     const update = ({ id }) =>
-      apiPut(`/admin/webhooks/${id}.json`, {
+      HaravanAPI.put(`/admin/webhooks/${id}.json`).json({
         webhook: {
           id,
           address
@@ -41,9 +49,11 @@ async function createOrUpdate(topics, address) {
 if (process.env.NODE_ENV === 'development')
   (async function() {
     if (false) {
-      const { webhooks: $all } = await apiGet('/admin/webhooks.json', false)
+      const { webhooks: $all } = flex(await HaravanAPI.get('/admin/webhooks.json'))
       await Promise.all(
-        $all.map(webhook => apiDel('/admin/webhooks/' + webhook.id + '.json'))
+        $all.map(webhook =>
+          HaravanAPI.del('/admin/webhooks/' + webhook.id + '.json')
+        )
       )
     }
     await createOrUpdate(['carts/create', 'carts/update'], CARTS_CREATE_ADDRESS)

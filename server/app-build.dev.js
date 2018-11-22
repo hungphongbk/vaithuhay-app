@@ -1299,6 +1299,12 @@ var cache = (0, _lruCache2.default)({
 var HaravanAPI = exports.HaravanAPI = _requestPromiseNative2.default.defaults({
   baseUrl: 'https://c96aab241903b825360305142e40a08a:66921be54a74fe0e36d2671d0c5fb77e@vai-thu-hay-i-something-nice.myharavan.com/'
 });
+var HaravanAPIAlternative = _requestPromiseNative2.default.defaults({
+  baseUrl: 'https://0960be1b285c555d784594798247dae8:213dee7cc59da754bd713f633fd48275@vai-thu-hay-i-something-nice.myharavan.com/'
+}),
+    HrvAPISelector = function HrvAPISelector() {
+  return Math.random() > 0.5 ? HaravanAPI : HaravanAPIAlternative;
+};
 
 function loop() {
   var _this = this;
@@ -1324,25 +1330,25 @@ function loop() {
 
                       case 5:
                         promise = function promise() {
-                          return HaravanAPI.get(url);
+                          return HrvAPISelector().get(url);
                         };
                         return _context.abrupt('break', 13);
 
                       case 7:
                         promise = function promise() {
-                          return HaravanAPI.post(url).json(data);
+                          return HrvAPISelector().post(url).json(data);
                         };
                         return _context.abrupt('break', 13);
 
                       case 9:
                         promise = function promise() {
-                          return HaravanAPI.put(url).json(data);
+                          return HrvAPISelector().put(url).json(data);
                         };
                         return _context.abrupt('break', 13);
 
                       case 11:
                         promise = function promise() {
-                          return HaravanAPI.delete(url);
+                          return HrvAPISelector().delete(url);
                         };
                         return _context.abrupt('break', 13);
 
@@ -12137,7 +12143,7 @@ module.exports = flatRest;
 
 
 exports.__esModule = true;
-exports.getCollections = undefined;
+exports.updateTopProductsCollection = exports.getCollections = undefined;
 
 var _getIterator2 = __webpack_require__(56);
 
@@ -12179,9 +12185,16 @@ var _reverse = __webpack_require__(405);
 
 var _reverse2 = _interopRequireDefault(_reverse);
 
+var _google = __webpack_require__(604);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var router = (0, _express.Router)();
+function search(metafields, meta) {
+  return metafields.find(function (m) {
+    return m.key === meta;
+  });
+}
 var getCollections = function () {
   var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
     var _ref2, custom_collections, smart_collections, f, rs;
@@ -12331,23 +12344,54 @@ var getPromoProductsCollection = function () {
     return _ref4.apply(this, arguments);
   };
 }();
+var updateTopProductsCollection = function () {
+  var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
+    var collection_id, metafields, _ref6, exists;
 
-router.get('/', function () {
-  var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(req, res) {
     return _regenerator2.default.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
-            _context4.t0 = res;
+            // find top product list
+            collection_id = _index.cache.get('collection:custom:san-pham-hang-dau');
             _context4.next = 3;
-            return getCollections();
+            return (0, _google.getFeaturedProducts)('vaithuhayTopProducts');
 
           case 3:
-            _context4.t1 = _context4.sent;
+            metafields = _context4.sent;
+            _context4.next = 6;
+            return (0, _index.apiGet)('/admin/collects.json?collection_id=' + collection_id);
 
-            _context4.t0.json.call(_context4.t0, _context4.t1);
+          case 6:
+            _ref6 = _context4.sent;
+            exists = _ref6.collects;
+            _context4.next = 10;
+            return _promise2.default.all(exists.map(function (_ref7) {
+              var id = _ref7.id;
+              return _index.HaravanAPI.del('/admin/collects/' + id + '.json');
+            }));
 
-          case 5:
+          case 10:
+            _context4.next = 12;
+            return _promise2.default.all(metafields.map(function (_ref8) {
+              var product_id = _ref8[0];
+              return (0, _index.apiPost)('/admin/collects.json', {
+                collect: {
+                  product_id: product_id,
+                  collection_id: collection_id
+                }
+              });
+            }));
+
+          case 12:
+            _context4.next = 14;
+            return (0, _index.apiGet)('/admin/collects.json?collection_id=' + collection_id, false);
+
+          case 14:
+
+            console.log('update top products completed');
+
+          case 15:
           case 'end':
             return _context4.stop();
         }
@@ -12355,35 +12399,63 @@ router.get('/', function () {
     }, _callee4, undefined);
   }));
 
-  return function (_x, _x2) {
+  return function updateTopProductsCollection() {
     return _ref5.apply(this, arguments);
   };
-}());
-router.post('/new', function () {
-  var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(req, res) {
-    var _ref7, collection_id, products, _ref8, exists;
+}();
 
+router.get('/', function () {
+  var _ref9 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(req, res) {
     return _regenerator2.default.wrap(function _callee5$(_context5) {
       while (1) {
         switch (_context5.prev = _context5.next) {
           case 0:
-            _context5.next = 2;
+            _context5.t0 = res;
+            _context5.next = 3;
+            return getCollections();
+
+          case 3:
+            _context5.t1 = _context5.sent;
+
+            _context5.t0.json.call(_context5.t0, _context5.t1);
+
+          case 5:
+          case 'end':
+            return _context5.stop();
+        }
+      }
+    }, _callee5, undefined);
+  }));
+
+  return function (_x, _x2) {
+    return _ref9.apply(this, arguments);
+  };
+}());
+router.post('/new', function () {
+  var _ref10 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(req, res) {
+    var _ref11, collection_id, products, _ref12, exists;
+
+    return _regenerator2.default.wrap(function _callee6$(_context6) {
+      while (1) {
+        switch (_context6.prev = _context6.next) {
+          case 0:
+            _context6.next = 2;
             return _promise2.default.all([getNewProductsCollection(), (0, _index.apiGet)('/admin/products.json?limit=250')]);
 
           case 2:
-            _ref7 = _context5.sent;
-            collection_id = _ref7[0];
-            products = _ref7[1].products;
+            _ref11 = _context6.sent;
+            collection_id = _ref11[0];
+            products = _ref11[1].products;
 
             console.log(collection_id);
 
             // get exists collects & products of san-pham-moi collection
-            _context5.next = 8;
+            _context6.next = 8;
             return (0, _index.apiGet)('/admin/collects.json?collection_id=' + collection_id);
 
           case 8:
-            _ref8 = _context5.sent;
-            exists = _ref8.collects;
+            _ref12 = _context6.sent;
+            exists = _ref12.collects;
 
             products.forEach(function (p) {
               p.created = Date.parse(p.created_at);
@@ -12396,16 +12468,16 @@ router.post('/new', function () {
 
             // then create post request to update san-pham-moi collection
             // along with it, delete old collects by add a property to remains
-            _context5.next = 14;
-            return _promise2.default.all(exists.map(function (_ref9) {
-              var id = _ref9.id;
+            _context6.next = 14;
+            return _promise2.default.all(exists.map(function (_ref13) {
+              var id = _ref13.id;
               return _index.HaravanAPI.del('/admin/collects/' + id + '.json');
             }));
 
           case 14:
-            _context5.next = 16;
-            return _promise2.default.all(products.slice(0, 20).map(function (_ref10) {
-              var product_id = _ref10.id;
+            _context6.next = 16;
+            return _promise2.default.all(products.slice(0, 20).map(function (_ref14) {
+              var product_id = _ref14.id;
               return _index.HaravanAPI.post('/admin/collects.json').json({
                 collect: { product_id: product_id, collection_id: collection_id }
               });
@@ -12418,42 +12490,42 @@ router.post('/new', function () {
 
           case 17:
           case 'end':
-            return _context5.stop();
+            return _context6.stop();
         }
       }
-    }, _callee5, undefined);
+    }, _callee6, undefined);
   }));
 
   return function (_x3, _x4) {
-    return _ref6.apply(this, arguments);
+    return _ref10.apply(this, arguments);
   };
 }());
 
 router.post('/promo', function () {
-  var _ref11 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(req, res) {
-    var _ref12, collection_id, products, _ref13, exists, saleProducts, _iterator, _isArray, _i, _ref15, product;
+  var _ref15 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(req, res) {
+    var _ref16, collection_id, products, _ref17, exists, saleProducts, _iterator, _isArray, _i, _ref19, product;
 
-    return _regenerator2.default.wrap(function _callee6$(_context6) {
+    return _regenerator2.default.wrap(function _callee7$(_context7) {
       while (1) {
-        switch (_context6.prev = _context6.next) {
+        switch (_context7.prev = _context7.next) {
           case 0:
-            _context6.next = 2;
+            _context7.next = 2;
             return _promise2.default.all([getPromoProductsCollection(), (0, _index.apiGet)('/admin/products.json?limit=250')]);
 
           case 2:
-            _ref12 = _context6.sent;
-            collection_id = _ref12[0];
-            products = _ref12[1].products;
+            _ref16 = _context7.sent;
+            collection_id = _ref16[0];
+            products = _ref16[1].products;
 
             console.log(collection_id);
 
             // get exists collects & products of san-pham-moi collection
-            _context6.next = 8;
+            _context7.next = 8;
             return (0, _index.apiGet)('/admin/collects.json?collection_id=' + collection_id);
 
           case 8:
-            _ref13 = _context6.sent;
-            exists = _ref13.collects;
+            _ref17 = _context7.sent;
+            exists = _ref17.collects;
 
             products.forEach(function (p) {
               p.variants.forEach(function (v) {
@@ -12478,9 +12550,9 @@ router.post('/promo', function () {
             // then create post request to update san-pham-moi collection
             // along with it, delete old collects by add a property to remains
 
-            _context6.next = 15;
-            return _promise2.default.all(exists.map(function (_ref14) {
-              var id = _ref14.id;
+            _context7.next = 15;
+            return _promise2.default.all(exists.map(function (_ref18) {
+              var id = _ref18.id;
               return _index.HaravanAPI.del('/admin/collects/' + id + '.json');
             }));
 
@@ -12489,38 +12561,38 @@ router.post('/promo', function () {
 
           case 16:
             if (!_isArray) {
-              _context6.next = 22;
+              _context7.next = 22;
               break;
             }
 
             if (!(_i >= _iterator.length)) {
-              _context6.next = 19;
+              _context7.next = 19;
               break;
             }
 
-            return _context6.abrupt('break', 31);
+            return _context7.abrupt('break', 31);
 
           case 19:
-            _ref15 = _iterator[_i++];
-            _context6.next = 26;
+            _ref19 = _iterator[_i++];
+            _context7.next = 26;
             break;
 
           case 22:
             _i = _iterator.next();
 
             if (!_i.done) {
-              _context6.next = 25;
+              _context7.next = 25;
               break;
             }
 
-            return _context6.abrupt('break', 31);
+            return _context7.abrupt('break', 31);
 
           case 25:
-            _ref15 = _i.value;
+            _ref19 = _i.value;
 
           case 26:
-            product = _ref15;
-            _context6.next = 29;
+            product = _ref19;
+            _context7.next = 29;
             return _index.HaravanAPI.post('/admin/collects.json').json({
               collect: {
                 product_id: product.id,
@@ -12529,7 +12601,7 @@ router.post('/promo', function () {
             });
 
           case 29:
-            _context6.next = 16;
+            _context7.next = 16;
             break;
 
           case 31:
@@ -12542,19 +12614,20 @@ router.post('/promo', function () {
 
           case 32:
           case 'end':
-            return _context6.stop();
+            return _context7.stop();
         }
       }
-    }, _callee6, undefined);
+    }, _callee7, undefined);
   }));
 
   return function (_x5, _x6) {
-    return _ref11.apply(this, arguments);
+    return _ref15.apply(this, arguments);
   };
 }());
 
 exports.default = router;
 exports.getCollections = getCollections;
+exports.updateTopProductsCollection = updateTopProductsCollection;
 
 /***/ }),
 /* 206 */
@@ -27535,10 +27608,16 @@ exports.default = function () {
 
                 _index.cache.set('collection:' + collectionType + ':' + handle, id);
               });
+
+              // fetch top products collection
+              _context.next = 11;
+              return (0, _collections.updateTopProductsCollection)();
+
+            case 11:
               console.log('fetch all products completed');
               resolve();
 
-            case 11:
+            case 13:
             case 'end':
               return _context.stop();
           }
@@ -45154,6 +45233,7 @@ exports.default = BaseUploader;
 
 
 exports.__esModule = true;
+exports.getFeaturedProducts = undefined;
 
 var _stringify = __webpack_require__(533);
 
@@ -45769,6 +45849,7 @@ router.post('/relateds', googleAuth, analytics, _middlewares2.default.allProduct
 }());
 
 exports.default = router;
+exports.getFeaturedProducts = getFeaturedProducts;
 
 /***/ }),
 /* 605 */
@@ -48287,29 +48368,31 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 //check whether webhook already registered
 var createOrUpdate = function () {
   var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(topics, address) {
-    var _ref2, $all, webhooks, create, update;
+    var _flex, $all, webhooks, create, update;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            _context.next = 2;
-            return (0, _utils.apiGet)('/admin/webhooks.json', false);
+            _context.t0 = flex;
+            _context.next = 3;
+            return _utils.HaravanAPI.get('/admin/webhooks.json');
 
-          case 2:
-            _ref2 = _context.sent;
-            $all = _ref2.webhooks;
+          case 3:
+            _context.t1 = _context.sent;
+            _flex = (0, _context.t0)(_context.t1);
+            $all = _flex.webhooks;
             webhooks = $all.filter(function (h) {
               return h.address === address;
             });
 
             if (!(!webhooks || webhooks.length === 0)) {
-              _context.next = 11;
+              _context.next = 13;
               break;
             }
 
             create = function create(topic) {
-              return (0, _utils.apiPost)('/admin/webhooks.json', {
+              return _utils.HaravanAPI.post('/admin/webhooks.json').json({
                 webhook: {
                   topic: topic,
                   address: address,
@@ -48318,17 +48401,17 @@ var createOrUpdate = function () {
               });
             };
 
-            _context.next = 9;
+            _context.next = 11;
             return _promise2.default.all(topics.map(create));
 
-          case 9:
-            _context.next = 14;
+          case 11:
+            _context.next = 16;
             break;
 
-          case 11:
-            update = function update(_ref3) {
-              var id = _ref3.id;
-              return (0, _utils.apiPut)('/admin/webhooks/' + id + '.json', {
+          case 13:
+            update = function update(_ref2) {
+              var id = _ref2.id;
+              return _utils.HaravanAPI.put('/admin/webhooks/' + id + '.json').json({
                 webhook: {
                   id: id,
                   address: address
@@ -48336,10 +48419,10 @@ var createOrUpdate = function () {
               });
             };
 
-            _context.next = 14;
+            _context.next = 16;
             return _promise2.default.all(webhooks.map(update));
 
-          case 14:
+          case 16:
           case 'end':
             return _context.stop();
         }
@@ -48389,39 +48472,50 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var router = new _express.Router(),
     CARTS_CREATE_ADDRESS = 'https://server.vaithuhay.com/b/callback/createCart',
     ORDER_PROCESS_ADDRESS = 'https://server.vaithuhay.com/b/callback/processOrder';
+var flex = function flex(obj) {
+  var rs = void 0;
+  try {
+    rs = JSON.parse(obj);
+  } catch (e) {
+    rs = obj;
+  }
+  return rs;
+};
 
 if (process.env.NODE_ENV === 'development') (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
-  var _ref5, $all;
+  var _flex2, $all;
 
   return _regenerator2.default.wrap(function _callee2$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
           if (true) {
-            _context2.next = 7;
+            _context2.next = 9;
             break;
           }
 
-          _context2.next = 3;
-          return (0, _utils.apiGet)('/admin/webhooks.json', false);
+          _context2.t0 = flex;
+          _context2.next = 4;
+          return _utils.HaravanAPI.get('/admin/webhooks.json');
 
-        case 3:
-          _ref5 = _context2.sent;
-          $all = _ref5.webhooks;
-          _context2.next = 7;
-          return _promise2.default.all($all.map(function (webhook) {
-            return (0, _utils.apiDel)('/admin/webhooks/' + webhook.id + '.json');
-          }));
-
-        case 7:
+        case 4:
+          _context2.t1 = _context2.sent;
+          _flex2 = (0, _context2.t0)(_context2.t1);
+          $all = _flex2.webhooks;
           _context2.next = 9;
-          return createOrUpdate(['carts/create', 'carts/update'], CARTS_CREATE_ADDRESS);
+          return _promise2.default.all($all.map(function (webhook) {
+            return _utils.HaravanAPI.del('/admin/webhooks/' + webhook.id + '.json');
+          }));
 
         case 9:
           _context2.next = 11;
-          return createOrUpdate(['orders/create', 'orders/cancelled', 'orders/updated', 'orders/delete', 'orders/fulfilled', 'orders/paid'], ORDER_PROCESS_ADDRESS);
+          return createOrUpdate(['carts/create', 'carts/update'], CARTS_CREATE_ADDRESS);
 
         case 11:
+          _context2.next = 13;
+          return createOrUpdate(['orders/create', 'orders/cancelled', 'orders/updated', 'orders/delete', 'orders/fulfilled', 'orders/paid'], ORDER_PROCESS_ADDRESS);
+
+        case 13:
         case 'end':
           return _context2.stop();
       }
@@ -48463,8 +48557,8 @@ router.post('/processOrder', orderMiddleware, function (req, res) {
 });
 
 router.post('/manual', function () {
-  var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(req, res) {
-    var params, _ref7, count, orders;
+  var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(req, res) {
+    var params, _ref5, count, orders;
 
     return _regenerator2.default.wrap(function _callee3$(_context3) {
       while (1) {
@@ -48477,15 +48571,15 @@ router.post('/manual', function () {
             return (0, _utils.apiGet)('/admin/orders/count.json?' + _queryString2.default.stringify(params), false);
 
           case 3:
-            _ref7 = _context3.sent;
-            count = _ref7.count;
+            _ref5 = _context3.sent;
+            count = _ref5.count;
             _context3.t0 = _flatten2.default;
             _context3.next = 8;
             return _promise2.default.all((0, _range2.default)(Math.ceil(count / 50)).map(function (i) {
               return (0, _utils.apiGet)('/admin/orders.json?' + _queryString2.default.stringify((0, _extends3.default)({}, params, {
                 page: i + 1
-              })), false).then(function (_ref8) {
-                var orders = _ref8.orders;
+              })), false).then(function (_ref6) {
+                var orders = _ref6.orders;
                 return orders;
               });
             }));
@@ -48514,7 +48608,7 @@ router.post('/manual', function () {
   }));
 
   return function (_x3, _x4) {
-    return _ref6.apply(this, arguments);
+    return _ref4.apply(this, arguments);
   };
 }());
 
@@ -48532,8 +48626,8 @@ if (process.env.NODE_ENV === 'development') {
   };
 
   router.post('/syncOrder', function () {
-    var _ref9 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(req, res) {
-      var _req$query, _req$query$days, days, _req$query$before, before, _req$query$number, number, _req$query$reset, reset, params, _ref10, count, $orders, orders, pushToQueue;
+    var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(req, res) {
+      var _req$query, _req$query$days, days, _req$query$before, before, _req$query$number, number, _req$query$reset, reset, params, _ref8, count, $orders, orders, pushToQueue;
 
       return _regenerator2.default.wrap(function _callee5$(_context5) {
         while (1) {
@@ -48560,15 +48654,15 @@ if (process.env.NODE_ENV === 'development') {
               return _context5.sent;
 
             case 6:
-              _ref10 = _context5.sent;
-              count = _ref10.count;
+              _ref8 = _context5.sent;
+              count = _ref8.count;
               _context5.t0 = _flatten2.default;
               _context5.next = 11;
               return _promise2.default.all((0, _range2.default)(Math.ceil(count / 50)).map(function (i) {
                 return (0, _utils.apiGet)('/admin/orders.json?' + _queryString2.default.stringify((0, _extends3.default)({}, params, {
                   page: i + 1
-                })), false).then(function (_ref11) {
-                  var orders = _ref11.orders;
+                })), false).then(function (_ref9) {
+                  var orders = _ref9.orders;
                   return orders;
                 });
               }));
@@ -48578,7 +48672,7 @@ if (process.env.NODE_ENV === 'development') {
               $orders = (0, _context5.t0)(_context5.t1);
               _context5.next = 15;
               return filterAsync($orders, function () {
-                var _ref12 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(order) {
+                var _ref10 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(order) {
                   return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
                       switch (_context4.prev = _context4.next) {
@@ -48598,7 +48692,7 @@ if (process.env.NODE_ENV === 'development') {
                 }));
 
                 return function (_x7) {
-                  return _ref12.apply(this, arguments);
+                  return _ref10.apply(this, arguments);
                 };
               }());
 
@@ -48634,7 +48728,7 @@ if (process.env.NODE_ENV === 'development') {
     }));
 
     return function (_x5, _x6) {
-      return _ref9.apply(this, arguments);
+      return _ref7.apply(this, arguments);
     };
   }());
 }
@@ -49031,7 +49125,7 @@ var pickFields = function pickFields() {
     if (_fields === null) return obj;
     var fields = _fields.split(',');
     var defaults = {
-      product: ['id', 'handle', 'url', 'thumbnail', 'price']
+      product: ['id', 'title', 'handle', 'url', 'thumbnail', 'price']
     };
     fields.push.apply(fields, defaults[type]);
     return (0, _pick2.default)(obj, (0, _uniq2.default)(fields));
@@ -49066,6 +49160,11 @@ function postProcessProduct(product) {
       en: product.metafields.title
     };
     delete product.metafields.title;
+  } else {
+    product.title = {
+      vi: product.title,
+      en: ''
+    };
   }
 
   // assign url to product

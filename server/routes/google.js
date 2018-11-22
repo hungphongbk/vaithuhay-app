@@ -289,3 +289,4 @@ router.post(
 )
 
 export default router
+export { getFeaturedProducts }
