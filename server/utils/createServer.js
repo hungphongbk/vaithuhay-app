@@ -5,6 +5,7 @@ import socketIO from 'socket.io'
 import requestStats from 'request-stats'
 import { FirebaseAdmin } from '@server/components'
 import omit from 'lodash/omit'
+import bootstrap from '@server/utils/bootstrap'
 
 const dev = process.env.NODE_ENV === 'development',
   port = global.APP_PORT
@@ -55,7 +56,10 @@ export default function(app) {
       })
   })
 
-  server.listen(port)
+  bootstrap().then(() => {
+    console.log('ready now')
+    server.listen(port)
+  })
 
   return { server, io }
 }

@@ -26,6 +26,7 @@ import user from '@server/routes/user'
 import pushNoti from '@server/routes/push-notification'
 import HaravanHooks from '@server/routes/haravanHooks'
 import FacebookHooks from '@server/routes/facebookHooks'
+import ssr from '@server/routes/ssr'
 import { socketMiddleware } from './routes/middlewares'
 import { createServer } from './utils'
 //passport with social
@@ -33,14 +34,15 @@ import './auth/facebook'
 
 // mongoose
 mongoose.Promise = global.Promise
-mongoose.connect(
-  'mongodb://hungphongbk:hungPhong1*!%40@localhost/vaithuhay',
-  {
-    //useMongoClient: true,
-    poolSize: 2,
-    promiseLibrary: global.Promise
-  }
-)
+if (process.env.NODE_ENV === 'production')
+  mongoose.connect(
+    'mongodb://hungphongbk:hungPhong1*!%40@localhost/vaithuhay',
+    {
+      //useMongoClient: true,
+      poolSize: 2,
+      promiseLibrary: global.Promise
+    }
+  )
 
 const app = express(),
   { server, io } = createServer(app)
@@ -91,6 +93,7 @@ app.use('/callback', HaravanHooks)
 app.use('/fb-callback', FacebookHooks)
 app.use('/noti', pushNoti)
 app.use('/products', products)
+app.use('/ssr', ssr)
 app.use('/', index)
 
 app.use(function(req, res, next) {

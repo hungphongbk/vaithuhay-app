@@ -152,3 +152,4 @@ export const regex = {
 export { default as createServer } from './createServer'
 export { default as diffArray } from './diffArray'
 export { default as MutexLock } from './mutexLock'
+export { cache }
