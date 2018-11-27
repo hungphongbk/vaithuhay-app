@@ -26595,7 +26595,7 @@ var UploadImages = function (_SocketBase) {
   }
 
   UploadImages.prototype._createImage = function () {
-    var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+    var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(filename) {
       var rs;
       return _regenerator2.default.wrap(function _callee$(_context) {
         while (1) {
@@ -26621,7 +26621,7 @@ var UploadImages = function (_SocketBase) {
       }, _callee, this);
     }));
 
-    function _createImage() {
+    function _createImage(_x) {
       return _ref.apply(this, arguments);
     }
 
@@ -26639,7 +26639,7 @@ var UploadImages = function (_SocketBase) {
             case 0:
               socket = this.socket;
               _context2.next = 3;
-              return this._createImage();
+              return this._createImage(filename);
 
             case 3:
               imageObj = _context2.sent;
@@ -26659,7 +26659,7 @@ var UploadImages = function (_SocketBase) {
       }, _callee2, this);
     }));
 
-    function uploadImage(_x) {
+    function uploadImage(_x2) {
       return _ref3.apply(this, arguments);
     }
 

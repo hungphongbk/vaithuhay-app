@@ -45,7 +45,7 @@ img {
     button.btn.btn-primary.btn-block(ref="btn", @click="$refs.input.click()", :data-ellipsis="ellipsis") Thêm hình ảnh
     .form-group
       label.sr-only File upload
-      input.text-primary.font-weight-bold(ref="input", type="file", accept="image/*", :data-title="value$", @change="upload($event)")
+      input.text-primary.font-weight-bold(ref="input", type="file", accept="image/*", :data-title="value$", @change="uploadV2($event)")
     .row(v-if="value")
       .col-sm-8.offset-sm-2
         img(:src="(typeof value==='object')?value.thumbnails[thumbnail]:''")
@@ -67,6 +67,7 @@ export default {
   data() {
     return {
       ready: false,
+      uploadHandle: null,
       ellipsis: ''
     }
   },
@@ -83,28 +84,54 @@ export default {
     }
   },
   methods: {
+    beginUpload() {
+      this.uploadHandle = setInterval(() => {
+        switch (this.ellipsis.length) {
+          case 0:
+          case 3:
+            this.ellipsis = '.'
+            break
+          case 1:
+            this.ellipsis = '..'
+            break
+          case 2:
+            this.ellipsis = '...'
+            break
+        }
+      }, 300)
+    },
+    endUpload(url) {
+      clearInterval(this.uploadHandle)
+      this.ellipsis = ''
+      this.$refs.btn.removeAttribute('disabled')
+      if (url) {
+        this.$emit('input', url)
+      }
+    },
+    // USING SOCKET.IO
+    async uploadV2({ target }) {
+      if (!(target.files && target.files[0])) return
+      const readFile = file =>
+        new Promise(resolve => {
+          const reader = new FileReader()
+          reader.onload = e => resolve(e.target.result)
+          reader.readAsArrayBuffer(file)
+        })
+      const file = target.files[0],
+        filename = file.name,
+        buf = Buffer.from(new Uint8Array(await readFile(file)))
+      this.$socket.emit('uploadImage', { filename, buf })
+    },
+    // DEPRECATED SOON: USING TRADITIONAL HTTP REQUEST
     async upload({ target }) {
       if (target.files && target.files[0]) {
         const file = target.files[0],
           form = new FormData()
-        let url, handle
+        let url
         form.append('img', file)
         this.$refs.btn.setAttribute('disabled', '')
         try {
-          handle = setInterval(() => {
-            switch (this.ellipsis.length) {
-              case 0:
-              case 3:
-                this.ellipsis = '.'
-                break
-              case 1:
-                this.ellipsis = '..'
-                break
-              case 2:
-                this.ellipsis = '...'
-                break
-            }
-          }, 300)
+          this.beginUpload()
           url = await postForm('/images', form)
         } catch ({ responseJSON }) {
           await this.$store.dispatch('notifications/pushDanger', {
@@ -114,12 +141,7 @@ export default {
             }</i>`
           })
         } finally {
-          clearInterval(handle)
-          this.ellipsis = ''
-          this.$refs.btn.removeAttribute('disabled')
-          if (url) {
-            this.$emit('input', url)
-          }
+          this.endUpload(url)
         }
       }
     }

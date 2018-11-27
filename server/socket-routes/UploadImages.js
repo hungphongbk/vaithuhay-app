@@ -8,7 +8,7 @@ class UploadImages extends SocketBase {
     socket.on('uploadImage', this.uploadImage.bind(this))
   }
 
-  async _createImage() {
+  async _createImage(filename) {
     const rs = await Image.findOne({
       filename
     })
@@ -25,7 +25,7 @@ class UploadImages extends SocketBase {
 
   async uploadImage({ filename, buf }) {
     const { socket } = this,
-      imageObj = await this._createImage()
+      imageObj = await this._createImage(filename)
     await generateSet(imageObj, filename, buf, statusObj =>
       socket.emit('uploadImageStatus', statusObj)
     )
