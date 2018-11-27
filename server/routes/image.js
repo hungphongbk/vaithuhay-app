@@ -46,6 +46,20 @@ const gm = gm$.subClass({ imageMagick: true }),
 //Process images middleware
 const widths = [80, 150, 300, 400, 600, 1200, 1920]
 
+const compress = (img, options) =>
+  new Promise((resolve, reject) => {
+    const { w, format } = options
+    gm(img)
+      .resize(w)
+      .noProfile()
+      .sharpen(3, 0.8)
+      .compress(format)
+      .toBuffer(format, (err, data) => {
+        if (err) reject(err)
+        else imagemin.buffer(data, { plugins }).then(resolve)
+      })
+  })
+
 async function generateSet(image, filename) {
   const [filenameWithoutExt, ext] = filename.split('.'),
     transform = w =>
@@ -58,38 +72,29 @@ async function generateSet(image, filename) {
             return rs
           })(ext)
 
-        gm(imageUrl('../uploads/' + filename))
-          .resize(w)
-          .noProfile()
-          .sharpen(3, 0.8)
-          .compress(format)
-          // .quality(70)
-          .toBuffer(format, (err, data) => {
-            if (err) {
-              console.log('error when resizing image to ' + w + 'w')
-              reject(err)
-            } else {
-              // console.log(data);
-              imagemin.buffer(data, { plugins }).then(buf => {
-                fs.writeFileSync(filePath, buf)
-                if (!image.thumbnails) image.thumbnails = {}
-                image.thumbnails[`${w}w`] =
-                  'https://server.vaithuhay.com/uploads/' + newFilename
-                // if (process.env.NODE_ENV === 'production')
-                //     imagemin.buffer(data, {
-                //         plugins: [
-                //             ...plugins,
-                //             __non_webpack_require__('imagemin-webp')()
-                //         ]
-                //     }).then(webpBuf => {
-                //         fs.writeFileSync(imageUrl(`../uploads/${filenameWithoutExt}-${w}w.webp`), webpBuf);
-                //         resolve()
-                //     })
-                // else
-                resolve()
-              })
-            }
+        compress(imageUrl('../uploads/' + filename), {
+          w,
+          format
+        })
+          .then(buf => {
+            fs.writeFileSync(filePath, buf)
+            if (!image.thumbnails) image.thumbnails = {}
+            image.thumbnails[`${w}w`] =
+              'https://server.vaithuhay.com/uploads/' + newFilename
+            // if (process.env.NODE_ENV === 'production')
+            //     imagemin.buffer(data, {
+            //         plugins: [
+            //             ...plugins,
+            //             __non_webpack_require__('imagemin-webp')()
+            //         ]
+            //     }).then(webpBuf => {
+            //         fs.writeFileSync(imageUrl(`../uploads/${filenameWithoutExt}-${w}w.webp`), webpBuf);
+            //         resolve()
+            //     })
+            // else
+            resolve()
           })
+          .catch(reject)
       })
   try {
     await Promise.all(widths.map(transform))
@@ -188,3 +193,4 @@ router.post('/patch', async (req, res) => {
 })
 
 export default router
+export { compress }

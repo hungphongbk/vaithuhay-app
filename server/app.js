@@ -1,3 +1,5 @@
+import UploadImages from '@server/socket-routes/UploadImages'
+
 process
   .on('unhandledRejection', (reason, p) => {
     console.error(reason, 'Unhandled Rejection at Promise', p)
@@ -50,6 +52,8 @@ mongoose.connect(
 
 const app = express(),
   { server, io } = createServer(app)
+
+UploadImages.create(io, 'upload')
 
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 sessionComponent(app)

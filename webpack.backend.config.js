@@ -50,7 +50,13 @@ module.exports = merge(base, {
                 'transform-regenerator',
                 'transform-async-functions',
                 'transform-decorators-legacy',
-                'transform-flow-strip-types'
+                'transform-flow-strip-types',
+                [
+                  'transform-class-properties',
+                  {
+                    spec: true
+                  }
+                ]
               ]
             }
           },

@@ -13,7 +13,7 @@ import moment from 'moment'
 import 'moment/locale/vi'
 import VueMoment from 'vue-moment'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
-// import './socket'
+import './socket'
 
 Vue.use(VueAsyncComputed)
 Vue.use(VueMoment, { moment })
