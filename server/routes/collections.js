@@ -12,7 +12,10 @@ function search(metafields, meta) {
   return metafields.find(m => m.key === meta)
 }
 const getCollections = async () => {
-  const [{ custom_collections }, { smart_collections }] = await Promise.all([
+  const [
+      { custom_collections } = { custom_collections: [] },
+      { smart_collections } = { smart_collections: [] }
+    ] = await Promise.all([
       apiGet('/admin/custom_collections.json'),
       apiGet('/admin/smart_collections.json')
     ]),
