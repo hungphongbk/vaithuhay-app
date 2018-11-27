@@ -66,7 +66,13 @@ export default {
   },
   data() {
     return {
+      ready: false,
       ellipsis: ''
+    }
+  },
+  sockets: {
+    connect() {
+      this.ready = true
     }
   },
   computed: {

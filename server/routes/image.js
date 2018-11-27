@@ -60,7 +60,12 @@ const compress = (img, options) =>
       })
   })
 
-async function generateSet(image, filename) {
+async function generateSet(
+  image,
+  filename,
+  buffer = null,
+  callback = () => {}
+) {
   const [filenameWithoutExt, ext] = filename.split('.'),
     transform = w =>
       new Promise((resolve, reject) => {
@@ -72,7 +77,7 @@ async function generateSet(image, filename) {
             return rs
           })(ext)
 
-        compress(imageUrl('../uploads/' + filename), {
+        compress(buffer || imageUrl('../uploads/' + filename), {
           w,
           format
         })
@@ -92,9 +97,18 @@ async function generateSet(image, filename) {
             //         resolve()
             //     })
             // else
+            callback({
+              message: `Nén ảnh thành công, chiều rộng ${w}px`
+            })
             resolve()
           })
-          .catch(reject)
+          .catch(err => {
+            callback({
+              err: true,
+              message: `Lỗi khi nén ảnh (thông báo: ${err.message})`
+            })
+            reject(err)
+          })
       })
   try {
     await Promise.all(widths.map(transform))
@@ -193,4 +207,4 @@ router.post('/patch', async (req, res) => {
 })
 
 export default router
-export { compress }
+export { compress, generateSet, widths }

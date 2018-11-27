@@ -14,4 +14,14 @@ export const SocketInstance = socketio(
       }
 )
 
-Vue.use(VueSocketIO, SocketInstance, store)
+Vue.use(
+  new VueSocketIO({
+    debug: true,
+    connection: SocketInstance,
+    vuex: {
+      store,
+      actionPrefix: 'SOCKET_',
+      mutationPrefix: 'SOCKET_'
+    }
+  })
+)

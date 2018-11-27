@@ -26550,6 +26550,14 @@ module.exports = server;
 
 exports.__esModule = true;
 
+var _regenerator = __webpack_require__(2);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = __webpack_require__(3);
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
 var _classCallCheck2 = __webpack_require__(33);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -26566,6 +26574,12 @@ var _SocketBase2 = __webpack_require__(496);
 
 var _SocketBase3 = _interopRequireDefault(_SocketBase2);
 
+var _Images = __webpack_require__(536);
+
+var _Images2 = _interopRequireDefault(_Images);
+
+var _image = __webpack_require__(533);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var UploadImages = function (_SocketBase) {
@@ -26576,11 +26590,81 @@ var UploadImages = function (_SocketBase) {
 
     var _this = (0, _possibleConstructorReturn3.default)(this, _SocketBase.call(this, io, socket));
 
-    socket.on('upload image', _this.uploadImage.bind(_this));
+    socket.on('uploadImage', _this.uploadImage.bind(_this));
     return _this;
   }
 
-  UploadImages.prototype.uploadImage = function uploadImage(data) {};
+  UploadImages.prototype._createImage = function () {
+    var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+      var rs;
+      return _regenerator2.default.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return _Images2.default.findOne({
+                filename: filename
+              }).lean(false).exec();
+
+            case 2:
+              rs = _context.sent;
+              return _context.abrupt('return', rs || new _Images2.default({
+                filename: filename,
+                url: 'https://server.vaithuhay.com/uploads/' + filename
+              }));
+
+            case 4:
+            case 'end':
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    }));
+
+    function _createImage() {
+      return _ref.apply(this, arguments);
+    }
+
+    return _createImage;
+  }();
+
+  UploadImages.prototype.uploadImage = function () {
+    var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(_ref2) {
+      var filename = _ref2.filename,
+          buf = _ref2.buf;
+      var socket, imageObj;
+      return _regenerator2.default.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              socket = this.socket;
+              _context2.next = 3;
+              return this._createImage();
+
+            case 3:
+              imageObj = _context2.sent;
+              _context2.next = 6;
+              return (0, _image.generateSet)(imageObj, filename, buf, function (statusObj) {
+                return socket.emit('uploadImageStatus', statusObj);
+              });
+
+            case 6:
+              socket.emit('uploadImageDone', imageObj.toJSON());
+
+            case 7:
+            case 'end':
+              return _context2.stop();
+          }
+        }
+      }, _callee2, this);
+    }));
+
+    function uploadImage(_x) {
+      return _ref3.apply(this, arguments);
+    }
+
+    return uploadImage;
+  }();
 
   return UploadImages;
 }(_SocketBase3.default);
@@ -31416,7 +31500,7 @@ function forAll(obj, callback, currentPath) {
 
 
 exports.__esModule = true;
-exports.compress = undefined;
+exports.widths = exports.generateSet = exports.compress = undefined;
 
 var _extends2 = __webpack_require__(44);
 
@@ -31436,6 +31520,9 @@ var _promise2 = _interopRequireDefault(_promise);
 
 var generateSet = function () {
   var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(image, filename) {
+    var buffer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    var callback = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : function () {};
+
     var _filename$split, filenameWithoutExt, ext, transform;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
@@ -31452,7 +31539,7 @@ var generateSet = function () {
                   return rs;
                 }(ext);
 
-                compress(imageUrl('../uploads/' + filename), {
+                compress(buffer || imageUrl('../uploads/' + filename), {
                   w: w,
                   format: format
                 }).then(function (buf) {
@@ -31470,8 +31557,17 @@ var generateSet = function () {
                   //         resolve()
                   //     })
                   // else
+                  callback({
+                    message: 'N\xE9n \u1EA3nh th\xE0nh c\xF4ng, chi\u1EC1u r\u1ED9ng ' + w + 'px'
+                  });
                   resolve();
-                }).catch(reject);
+                }).catch(function (err) {
+                  callback({
+                    err: true,
+                    message: 'L\u1ED7i khi n\xE9n \u1EA3nh (th\xF4ng b\xE1o: ' + err.message + ')'
+                  });
+                  reject(err);
+                });
               });
             };
             _context.prev = 1;
@@ -31499,7 +31595,7 @@ var generateSet = function () {
     }, _callee, this, [[1, 8]]);
   }));
 
-  return function generateSet(_x, _x2) {
+  return function generateSet(_x3, _x4) {
     return _ref.apply(this, arguments);
   };
 }();
@@ -31656,7 +31752,7 @@ var optimize = function () {
     }, _callee2, undefined, [[8, 15]]);
   }));
 
-  return function optimize(_x3, _x4, _x5) {
+  return function optimize(_x5, _x6, _x7) {
     return _ref2.apply(this, arguments);
   };
 }();
@@ -31729,13 +31825,15 @@ router.post('/patch', function () {
     }, _callee3, undefined);
   }));
 
-  return function (_x6, _x7) {
+  return function (_x8, _x9) {
     return _ref3.apply(this, arguments);
   };
 }());
 
 exports.default = router;
 exports.compress = compress;
+exports.generateSet = generateSet;
+exports.widths = widths;
 
 /***/ }),
 /* 534 */
