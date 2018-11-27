@@ -1,7 +1,7 @@
 <style lang="scss" scoped>
-  .item {
-    display: inline-block;
-  }
+.item {
+  display: inline-block;
+}
 </style>
 <template lang="pug">
   div
@@ -15,45 +15,45 @@
         save-button.btn.btn-success(:fn="select")
 </template>
 <script>
-  import ProductSelector from './product-selector.vue'
+import ProductSelector from './product-selector.vue'
 
-  export default {
-    components: {
-      ProductSelector,
-      'product-view': {
-        functional: true,
-        render(h, {props, parent}) {
-          const product = id => parent.products.find(p => p.id * 1 === id * 1);
-          return props.value.map(id => (
-            <p class="item mb-1 text-primary">{product(id).title}</p>
-          ))
-        }
-      }
-    },
-    props: {
-      title: {
-        type: String,
-        default: 'Chọn sản phẩm'
-      },
-      value: {
-        required: true
-      }
-    },
-    data() {
-      return {
-        show: false
-      }
-    },
-    computed: {
-      products() {
-        return this.$store.state.products.products
-      }
-    },
-    methods: {
-      select() {
-        this.$emit('input', this.value);
-        this.show = false;
+export default {
+  components: {
+    ProductSelector,
+    'product-view': {
+      functional: true,
+      render(h, { props, parent }) {
+        const product = id => parent.products.find(p => p.id * 1 === id * 1)
+        return props.value.map(id => (
+          <p class="item mb-1 text-primary">{product(id).title}</p>
+        ))
       }
     }
+  },
+  props: {
+    title: {
+      type: String,
+      default: 'Chọn sản phẩm'
+    },
+    value: {
+      required: true
+    }
+  },
+  data() {
+    return {
+      show: false
+    }
+  },
+  computed: {
+    products() {
+      return this.$store.state.products.products
+    }
+  },
+  methods: {
+    select() {
+      this.$emit('input', this.value)
+      this.show = false
+    }
   }
+}
 </script>

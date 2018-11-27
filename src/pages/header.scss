@@ -1,6 +1,7 @@
 .header {
   padding-top: 20px;
-  .page-title, .btn {
+  .page-title,
+  .btn {
     display: inline-block;
     vertical-align: baseline;
   }
@@ -13,8 +14,8 @@
       margin-left: 1.5em;
     }
   }
-  .fa-stack{
-    margin-right: .7rem;
+  .fa-stack {
+    margin-right: 0.7rem;
   }
 }
 
@@ -22,6 +23,6 @@
   text-transform: uppercase;
 }
 
-.btn{
+.btn {
   cursor: pointer;
 }

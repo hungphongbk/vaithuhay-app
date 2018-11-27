@@ -1,15 +1,15 @@
 <style lang="scss" scoped>
-  @import "./header.scss";
+@import './header.scss';
 
-  .btn {
-    cursor: pointer;
-  }
+.btn {
+  cursor: pointer;
+}
 
-  .json-data {
-    height: 600px;
-    max-height: 600px;
-    overflow: scroll;
-  }
+.json-data {
+  height: 600px;
+  max-height: 600px;
+  overflow: scroll;
+}
 </style>
 <template lang="pug">
   div
@@ -37,63 +37,62 @@
             textarea.form-control.json-data {{beautify(selected.value)}}
 </template>
 <script>
-  import {get} from '../plugins/jquery-ajax'
-  import beautify from 'json-beautify'
-  import range from 'lodash/range'
+import { get } from '../plugins/jquery-ajax'
+import beautify from 'json-beautify'
+import range from 'lodash/range'
 
-  export default {
-    data() {
-      return {
-        logs: [],
-        pages: 0,
-        pageList: [true],
-        pageCurrent: 1,
-        selected: null
-      }
+export default {
+  data() {
+    return {
+      logs: [],
+      pages: 0,
+      pageList: [true],
+      pageCurrent: 1,
+      selected: null
+    }
+  },
+  computed: {
+    orders() {
+      return this.logs.filter(log => log.category === 'haravan_order_data')
     },
-    computed: {
-      orders() {
-        return this.logs.filter(log => log.category === 'haravan_order_data');
-      },
-      firstPage() {
-        return 1;
-      },
-      lastPage() {
-        return this.pages < 10 ? this.pages : 10;
-      },
-      pageRange() {
-        return range(this.firstPage, this.lastPage + 1)
-      },
-      paginatedOrders() {
-        const {pageCurrent: p, orders} = this,
-          [first, last] = [(p - 1) * 20, p * 20 - 1];
-        return orders.slice(first, last)
-      }
+    firstPage() {
+      return 1
     },
-    methods: {
-      beautify(json) {
-        console.log(beautify(JSON.parse(json), null, 2, 1000));
-        return beautify(JSON.parse(json), null, 2, 1000);
-      }
+    lastPage() {
+      return this.pages < 10 ? this.pages : 10
     },
-    watch: {
-      pageCurrent(page) {
-        if (!this.pageList[page]) {
-          get('/logs?page=' + page, true)
-            .then(({logs}) => {
-              for (let i = 0; i < 20; i++)
-                this.$set(this.logs, (page - 1) * 20 + i, logs[i]);
-              this.pageList[page] = true;
-            })
-        }
-      }
+    pageRange() {
+      return range(this.firstPage, this.lastPage + 1)
     },
-    async mounted() {
-      if (this.logs.length === 0) {
-        const {logs, pages} = await get('/logs', true);
-        this.logs.push(...logs);
-        this.pages = pages;
+    paginatedOrders() {
+      const { pageCurrent: p, orders } = this,
+        [first, last] = [(p - 1) * 20, p * 20 - 1]
+      return orders.slice(first, last)
+    }
+  },
+  methods: {
+    beautify(json) {
+      console.log(beautify(JSON.parse(json), null, 2, 1000))
+      return beautify(JSON.parse(json), null, 2, 1000)
+    }
+  },
+  watch: {
+    pageCurrent(page) {
+      if (!this.pageList[page]) {
+        get('/logs?page=' + page, true).then(({ logs }) => {
+          for (let i = 0; i < 20; i++)
+            this.$set(this.logs, (page - 1) * 20 + i, logs[i])
+          this.pageList[page] = true
+        })
       }
     }
+  },
+  async mounted() {
+    if (this.logs.length === 0) {
+      const { logs, pages } = await get('/logs', true)
+      this.logs.push(...logs)
+      this.pages = pages
+    }
   }
+}
 </script>

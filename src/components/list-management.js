@@ -25,15 +25,14 @@ export default {
   methods: {
     add() {
       if (this.mode === 'new') {
-        this.list.push(this.current);
-        this.$emit('input', this.list);
-      } else this.mode = 'new';
-      this.current = this.new();
+        this.list.push(this.current)
+        this.$emit('input', this.list)
+      } else this.mode = 'new'
+      this.current = this.new()
     },
     update(item) {
-      this.mode = 'edit';
-      this.current = item;
+      this.mode = 'edit'
+      this.current = item
     }
-
   }
 }

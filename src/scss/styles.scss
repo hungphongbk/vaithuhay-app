@@ -1,7 +1,7 @@
-@import "styles/bootstrap";
+@import 'styles/bootstrap';
 
-$fa-font-path: "~font-awesome/fonts";
-@import "~font-awesome/scss/font-awesome.scss";
+$fa-font-path: '~font-awesome/fonts';
+@import '~font-awesome/scss/font-awesome.scss';
 .nav-tabs {
   margin-bottom: 1.3rem;
 }
@@ -11,7 +11,7 @@ $fa-font-path: "~font-awesome/fonts";
 }
 
 .btn > .fa {
-  margin-right: .7em;
+  margin-right: 0.7em;
 }
 
 .input-multi-lang {
@@ -31,10 +31,12 @@ $fa-font-path: "~font-awesome/fonts";
 }
 
 .fade- {
-  &enter-active, &leave-active {
-    transition: all .25s ease;
+  &enter-active,
+  &leave-active {
+    transition: all 0.25s ease;
   }
-  &enter, &leave-to {
+  &enter,
+  &leave-to {
     opacity: 0;
   }
 }
@@ -46,19 +48,19 @@ $fa-font-path: "~font-awesome/fonts";
 .dev-label {
   &:before {
     content: 'DEV';
-    margin-right: .5em;
-    margin-bottom: .1em;
-    font-size: .85em;
-    padding: 0 .4em;
+    margin-right: 0.5em;
+    margin-bottom: 0.1em;
+    font-size: 0.85em;
+    padding: 0 0.4em;
     display: inline;
     color: white;
     background-color: lighten(#616f82, 20%);
   }
 }
 
-.nav-tabs .nav-link{
-  font-size: 1.1*$font-size-base;
-  &.active{
+.nav-tabs .nav-link {
+  font-size: 1.1 * $font-size-base;
+  &.active {
     font-weight: 600;
   }
 }

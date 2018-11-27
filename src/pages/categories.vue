@@ -1,5 +1,5 @@
 <style lang="scss" scoped>
-  @import "./header.scss";
+@import './header.scss';
 </style>
 <template lang="pug">
   div
@@ -24,32 +24,32 @@
           save-button(v-if="c.handle==='onsale'", :fn="updateOnSale", title="Cập nhật", :lg="false")
 </template>
 <script>
-  import {get, post} from '../plugins/jquery-ajax'
-  import {mapState} from 'vuex'
+import { get, post } from '../plugins/jquery-ajax'
+import { mapState } from 'vuex'
 
-  export default {
-    page: 'categories',
-    computed: {
-      collections() {
-        return this.$store.state.categories.categories
-      }
+export default {
+  page: 'categories',
+  computed: {
+    collections() {
+      return this.$store.state.categories.categories
+    }
+  },
+  methods: {
+    async save() {
+      await this.$store.dispatch('categories/saveAll')
     },
-    methods: {
-      async save() {
-        await this.$store.dispatch('categories/saveAll');
-      },
-      async updateCollection(collection) {
-        const btn = this.$refs[collection][0];
-        btn.inProgress = true;
-        await post(`/collections/${collection}`);
-        btn.inProgress = false;
-      },
-      async updateOnSale() {
-        await post('/collections/promo');
-        await this.$store.dispatch('notifications/pushSuccess', {
-          message: 'Cập nhật danh sách SP khuyến mãi thành công'
-        })
-      }
+    async updateCollection(collection) {
+      const btn = this.$refs[collection][0]
+      btn.inProgress = true
+      await post(`/collections/${collection}`)
+      btn.inProgress = false
+    },
+    async updateOnSale() {
+      await post('/collections/promo')
+      await this.$store.dispatch('notifications/pushSuccess', {
+        message: 'Cập nhật danh sách SP khuyến mãi thành công'
+      })
     }
   }
+}
 </script>

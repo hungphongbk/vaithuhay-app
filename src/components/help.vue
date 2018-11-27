@@ -1,5 +1,4 @@
-<style lang="scss">
-</style>
+<style lang="scss"></style>
 <template lang="pug">
   div
     button.btn.btn-outline-info.btn-lg.rounded-circle(data-toggle="modal", data-target="#modal")
@@ -14,9 +13,9 @@
           .modal-body(v-html="docs")
 </template>
 <script>
-  export default {
-    props: {
-      docs: String
-    }
+export default {
+  props: {
+    docs: String
   }
+}
 </script>

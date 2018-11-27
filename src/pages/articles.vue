@@ -1,9 +1,9 @@
 <style lang="scss" scoped>
-  @import "./header.scss";
+@import './header.scss';
 
-  .btn {
-    cursor: pointer;
-  }
+.btn {
+  cursor: pointer;
+}
 </style>
 <template lang="pug">
   div
@@ -33,71 +33,77 @@
         save-button.btn.btn-success(:fn="saveSelected")
 </template>
 <script>
-  import ProductSelector from '../components/product-selector.vue'
-  import {findProduct} from "../plugins"
-  import PageSearch from '@client/components/page-search.vue'
-  import {functions} from "@client/helpers";
+import ProductSelector from '../components/product-selector.vue'
+import { findProduct } from '../plugins'
+import PageSearch from '@client/components/page-search.vue'
+import { functions } from '@client/helpers'
 
-  const {normalizeVie}=functions;
+const { normalizeVie } = functions
 
-  export default {
-    components: {ProductSelector, PageSearch},
-    data() {
-      return {
-        selected: null,
-        kw:''
-      }
-    },
-    computed: {
-      articles() {
-        const self = this;
-        return self.$store.state.articles.articles.map(a => ({
-          ...a,
-          get relatedProduct() {
-            const {meta} = a;
-            if (!meta.relatedProduct || !meta.relatedProduct.item || meta.relatedProduct.item.length === 0) return [];
-            const products = meta.relatedProduct.item.map(findProduct)
-            for (let i = 0; i < products.length; i++) {
-              if (typeof products[i] === 'undefined' || products[i] === null) {
-                self.$delete(products, i);
-                self.$delete(meta.relatedProduct.item, i);
-              }
+export default {
+  components: { ProductSelector, PageSearch },
+  data() {
+    return {
+      selected: null,
+      kw: ''
+    }
+  },
+  computed: {
+    articles() {
+      const self = this
+      return self.$store.state.articles.articles.map(a => ({
+        ...a,
+        get relatedProduct() {
+          const { meta } = a
+          if (
+            !meta.relatedProduct ||
+            !meta.relatedProduct.item ||
+            meta.relatedProduct.item.length === 0
+          )
+            return []
+          const products = meta.relatedProduct.item.map(findProduct)
+          for (let i = 0; i < products.length; i++) {
+            if (typeof products[i] === 'undefined' || products[i] === null) {
+              self.$delete(products, i)
+              self.$delete(meta.relatedProduct.item, i)
             }
-            return products;
           }
-        }));
-      },
-      searchedArticles() {
-        const {kw, articles} = this;
-        if (kw.length === 0) return articles;
-
-        const keyword = normalizeVie(kw);
-        return articles.filter(article => {
-          if (normalizeVie(article.title).indexOf(keyword) >= 0) return true;
-          if (normalizeVie(article.meta_description).indexOf(keyword) >= 0) return true;
-          return normalizeVie(article.tags).indexOf(keyword) >= 0;
-        });
-      }
-    },
-    watch: {
-      selected(value) {
-        if (value === null) return;
-        if (typeof value.meta.relatedProduct === 'undefined') {
-          this.$set(value.meta, 'relatedProduct', {
-            item: []
-          })
+          return products
         }
-      }
+      }))
     },
-    methods: {
-      async saveSelected() {
-        await this.$store.dispatch('articles/update', {
-          id: this.selected.id,
-          key: 'relatedProduct',
-          value: this.selected.meta.relatedProduct
+    searchedArticles() {
+      const { kw, articles } = this
+      if (kw.length === 0) return articles
+
+      const keyword = normalizeVie(kw)
+      return articles.filter(article => {
+        if (normalizeVie(article.title).indexOf(keyword) >= 0) return true
+        if (normalizeVie(article.meta_description).indexOf(keyword) >= 0)
+          return true
+        return normalizeVie(article.tags).indexOf(keyword) >= 0
+      })
+    }
+  },
+  watch: {
+    selected(value) {
+      if (value === null) return
+      if (typeof value.meta.relatedProduct === 'undefined') {
+        this.$set(value.meta, 'relatedProduct', {
+          item: []
         })
-        this.selected = null;
       }
     }
+  },
+  methods: {
+    async saveSelected() {
+      await this.$store.dispatch('articles/update', {
+        id: this.selected.id,
+        key: 'relatedProduct',
+        value: this.selected.meta.relatedProduct
+      })
+      this.selected = null
+    }
   }
+}
 </script>

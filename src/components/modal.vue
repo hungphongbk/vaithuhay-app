@@ -1,12 +1,14 @@
 <style lang="scss">
-  .fade- {
-    &enter-active, &leave-active {
-      transition: all .25s ease;
-    }
-    &enter, &leave-to {
-      opacity: 0;
-    }
+.fade- {
+  &enter-active,
+  &leave-active {
+    transition: all 0.25s ease;
   }
+  &enter,
+  &leave-to {
+    opacity: 0;
+  }
+}
 </style>
 <template lang="pug">
   transition(name="fade")
@@ -23,23 +25,22 @@
             slot
 </template>
 <script>
-  export default {
-    props: {
-      title: String,
-      size:String,
-      dismissable:{
-        type:Boolean,
-        default:true
-      }
-    },
-    computed:{
-      classes(){
-        const cls=[];
-        if(this.size)
-          cls.push(`modal-${this.size}`);
+export default {
+  props: {
+    title: String,
+    size: String,
+    dismissable: {
+      type: Boolean,
+      default: true
+    }
+  },
+  computed: {
+    classes() {
+      const cls = []
+      if (this.size) cls.push(`modal-${this.size}`)
 
-        return cls;
-      }
+      return cls
     }
   }
+}
 </script>

@@ -1,12 +1,13 @@
 <style lang="scss" scoped>
-  .current {
-    background: darken(#fff, 5%);
-    font-weight: 600;
-  }
+.current {
+  background: darken(#fff, 5%);
+  font-weight: 600;
+}
 
-  .list-group-item, button.close {
-    cursor: pointer;
-  }
+.list-group-item,
+button.close {
+  cursor: pointer;
+}
 </style>
 <template lang="pug">
   div(:class="this.col?'row':null")
@@ -22,71 +23,73 @@
             span(aria-hidden="true") ×
 </template>
 <script>
-  import {mapState} from 'vuex'
-  import debounce from 'lodash/debounce'
+import { mapState } from 'vuex'
+import debounce from 'lodash/debounce'
 
-  export default {
-    props: {
-      value: {
-        required: true
-      },
-      col: {
-        type: Boolean,
-        default: false
-      },
-      single: {
-        type: Boolean,
-        default: false
-      }
+export default {
+  props: {
+    value: {
+      required: true
     },
-    data() {
-      return {
-        keyword: ''
-      }
+    col: {
+      type: Boolean,
+      default: false
     },
-    computed: {
-      ...mapState({
-        articles: state => state.articles.articles
-      }),
-      articles$() {
-        const self = this;
-        return self.articles.map(p => ({
-          ...p,
-          get checked() {
-            if (self.single) return self.value * 1 === p.id * 1;
-            return self.value.findIndex(id => id * 1 === p.id * 1) >= 0
-          }
-        }));
-      },
-      articles$search() {
-        if (this.keyword === '') return this.articles$;
-        return this.articles$.filter(p => p.title.toLowerCase().includes(this.keyword.toLowerCase()))
-      },
-      articles$checked() {
-        return this.articles$.filter(p => p.checked)
-      },
-      colCls() {
-        if (this.col) return 'col-sm-6';
-        return 'mb-4';
-      }
-    },
-    methods: {
-      toggle(_id) {
-        const self = this;
-        if (self.single) {
-          self.$emit('input', _id * 1);
-        } else {
-          const index = self.value.findIndex(id => id * 1 === _id);
-          if (index < 0) self.value.push(_id);
-          else {
-            self.value.splice(index, 1)
-          }
-          self.$emit('input', self.value);
-        }
-      },
-      update_: debounce(function ({target}) {
-        this.keyword = target.value;
-      }, 300)
+    single: {
+      type: Boolean,
+      default: false
     }
+  },
+  data() {
+    return {
+      keyword: ''
+    }
+  },
+  computed: {
+    ...mapState({
+      articles: state => state.articles.articles
+    }),
+    articles$() {
+      const self = this
+      return self.articles.map(p => ({
+        ...p,
+        get checked() {
+          if (self.single) return self.value * 1 === p.id * 1
+          return self.value.findIndex(id => id * 1 === p.id * 1) >= 0
+        }
+      }))
+    },
+    articles$search() {
+      if (this.keyword === '') return this.articles$
+      return this.articles$.filter(p =>
+        p.title.toLowerCase().includes(this.keyword.toLowerCase())
+      )
+    },
+    articles$checked() {
+      return this.articles$.filter(p => p.checked)
+    },
+    colCls() {
+      if (this.col) return 'col-sm-6'
+      return 'mb-4'
+    }
+  },
+  methods: {
+    toggle(_id) {
+      const self = this
+      if (self.single) {
+        self.$emit('input', _id * 1)
+      } else {
+        const index = self.value.findIndex(id => id * 1 === _id)
+        if (index < 0) self.value.push(_id)
+        else {
+          self.value.splice(index, 1)
+        }
+        self.$emit('input', self.value)
+      }
+    },
+    update_: debounce(function({ target }) {
+      this.keyword = target.value
+    }, 300)
   }
+}
 </script>

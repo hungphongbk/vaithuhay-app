@@ -1,5 +1,4 @@
-<style lang="scss">
-</style>
+<style lang="scss"></style>
 <template lang="pug">
   div
     .modal-body
@@ -76,67 +75,66 @@
       button.btn.btn-success(type="button", @click="$emit('created',{message, options, stored: false})") Lưu lại & Gửi đi
 </template>
 <script>
-  import {DateTimePicker, ProductSelector} from "@client/components";
+import { DateTimePicker, ProductSelector } from '@client/components'
 
-  export default {
-    components: {
-      DateTimePicker,
-      ProductSelector,
-      FormGroup: {
-        functional: true,
-        render(h, {props, children}) {
-          return (
-            <div class="form-group row">
-              <label class="col-sm-3 col-form-label">{props.title}</label>
-              <div class="col-sm-9">{children}</div>
-            </div>
-          )
-        }
-      }
-    },
-    data() {
-      return {
-        message: {
-          title: '',
-          body: '',
-          click_action: '',
-          icon: ''
-        },
-        options: {
-          messageType: 'general',
-          selectedProduct: null,
-          isSchedule: false,
-          scheduleType: 'exact',
-          scheduleExact: '',
-          utmParams: {
-            campaign: '',
-            content: '',
-            term: ''
-          }
-        }
-      }
-    },
-    watch: {
-      'options.messageType': function (newVal) {
-        const {options} = this;
-        if (newVal === 'general') {
-          options.selectedProduct = null;
-        } else if (newVal === 'product') {
-
-        }
-      },
-      'options.selectedProduct': function (newVal) {
-        if (newVal === null) return;
-
-        const products = this.$store.state.products.products,
-          product = products.find(p => p.id * 1 === newVal * 1);
-
-        this.message = Object.assign({}, this.message, {
-          title: product.title,
-          click_action: 'vaithuhay.com/products/' + product.handle,
-          icon: product.images[0].src.replace(/https?:\/\//, '')
-        })
+export default {
+  components: {
+    DateTimePicker,
+    ProductSelector,
+    FormGroup: {
+      functional: true,
+      render(h, { props, children }) {
+        return (
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label">{props.title}</label>
+            <div class="col-sm-9">{children}</div>
+          </div>
+        )
       }
     }
+  },
+  data() {
+    return {
+      message: {
+        title: '',
+        body: '',
+        click_action: '',
+        icon: ''
+      },
+      options: {
+        messageType: 'general',
+        selectedProduct: null,
+        isSchedule: false,
+        scheduleType: 'exact',
+        scheduleExact: '',
+        utmParams: {
+          campaign: '',
+          content: '',
+          term: ''
+        }
+      }
+    }
+  },
+  watch: {
+    'options.messageType': function(newVal) {
+      const { options } = this
+      if (newVal === 'general') {
+        options.selectedProduct = null
+      } else if (newVal === 'product') {
+      }
+    },
+    'options.selectedProduct': function(newVal) {
+      if (newVal === null) return
+
+      const products = this.$store.state.products.products,
+        product = products.find(p => p.id * 1 === newVal * 1)
+
+      this.message = Object.assign({}, this.message, {
+        title: product.title,
+        click_action: 'vaithuhay.com/products/' + product.handle,
+        icon: product.images[0].src.replace(/https?:\/\//, '')
+      })
+    }
   }
+}
 </script>

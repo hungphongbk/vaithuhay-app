@@ -1,22 +1,22 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import products from './products';
-import categories from './categories';
-import articles from './articles';
-import notifications from './notifications';
-import auth from './auth';
-import qs from 'query-string';
-import {getXhr} from '../plugins/jquery-ajax';
-import VuexPersistence from 'vuex-persist';
-import * as types from './types';
+import Vue from 'vue'
+import Vuex from 'vuex'
+import products from './products'
+import categories from './categories'
+import articles from './articles'
+import notifications from './notifications'
+import auth from './auth'
+import qs from 'query-string'
+import { getXhr } from '../plugins/jquery-ajax'
+import VuexPersistence from 'vuex-persist'
+import * as types from './types'
 
-Vue.use(Vuex);
-const {plugin: vuexLocal} = new VuexPersistence({
+Vue.use(Vuex)
+const { plugin: vuexLocal } = new VuexPersistence({
   storage: window.localStorage,
   reducer: state => ({
     dev: state.dev
   })
-});
+})
 // {plugin: vuexSession} = new VuexPersistence({
 //   storage: window.sessionStorage,
 //   reducer: state => ({
@@ -31,36 +31,36 @@ const store = new Vuex.Store({
       appConfig: {},
       isConnected: false,
       dev: false
-    };
+    }
   },
   getters: {
-    hash({}, {}, {route}) {
-      return qs.parse(route.hash);
+    hash({}, {}, { route }) {
+      return qs.parse(route.hash)
     },
     [types.G_APP_DEV_MODE](state) {
-      return state.dev;
+      return state.dev
     }
   },
   mutations: {
     SOCKET_CONNECT(state) {
-      state.isConnected = true;
+      state.isConnected = true
     },
     SOCKET_DISCONNECT(state) {
-      state.isConnected = false;
+      state.isConnected = false
     },
     ['app/configLoaded'](state, config) {
-      state.appConfig = config;
+      state.appConfig = config
     },
     [types.M_APP_TOGGLE_DEV_MODE](state, value) {
-      state.dev = value;
+      state.dev = value
     }
   },
   actions: {
-    switchTab({}, {id, $router}) {
-      $router.push({hash: '#tab=' + id});
+    switchTab({}, { id, $router }) {
+      $router.push({ hash: '#tab=' + id })
     },
-    async loadConfig({commit}) {
-      commit('app/configLoaded', await getXhr('/dist/config.json'));
+    async loadConfig({ commit }) {
+      commit('app/configLoaded', await getXhr('/dist/config.json'))
     }
   },
   modules: {
@@ -71,12 +71,12 @@ const store = new Vuex.Store({
     notifications
   },
   plugins: [vuexLocal]
-});
+})
 
 Object.defineProperty(Vue.prototype, '$appDevMode', {
   get() {
-    return store.state.dev;
+    return store.state.dev
   }
-});
+})
 
-export default store;
+export default store

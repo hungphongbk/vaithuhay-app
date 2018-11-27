@@ -1,6 +1,4 @@
-<style lang="scss" module>
-
-</style>
+<style lang="scss" module></style>
 <template lang="pug">
   .form-inline
     label.sr-only Tìm kiếm
@@ -8,23 +6,23 @@
     small.text-muted.ml-3(v-if="keyword.length>0") Nhấn Enter để tìm kiếm
 </template>
 <script>
-  import debounce from 'lodash/debounce'
+import debounce from 'lodash/debounce'
 
-  export default {
-    props: {
-      title: {
-        type: String,
-        required: true
-      }
-    },
-    data: () => ({
-      keyword: '',
-      value: ''
-    }),
-    methods: {
-      doSearch: function () {
-        this.$emit('input', this.keyword)
-      }
+export default {
+  props: {
+    title: {
+      type: String,
+      required: true
+    }
+  },
+  data: () => ({
+    keyword: '',
+    value: ''
+  }),
+  methods: {
+    doSearch: function() {
+      this.$emit('input', this.keyword)
     }
   }
+}
 </script>

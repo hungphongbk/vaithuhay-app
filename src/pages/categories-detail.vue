@@ -1,13 +1,13 @@
 <style lang="scss" scoped>
-  @import "./header.scss";
+@import './header.scss';
 
-  .nav.nav-tabs {
-    margin-top: 20px;
-  }
+.nav.nav-tabs {
+  margin-top: 20px;
+}
 
-  .nav-item a {
-    text-transform: uppercase;
-  }
+.nav-item a {
+  text-transform: uppercase;
+}
 </style>
 <template lang="pug">
   div
@@ -46,39 +46,39 @@
                   button.btn.btn-sm.btn-danger(@click="slides.splice(index, 1)") Xóa
 </template>
 <script>
-  import Upload from '../components/upload-img.vue'
-  import {multiLang, d} from '../helpers/mixins'
-  import {get, post} from '../plugins/jquery-ajax'
-  import {mapState, mapGetters, mapActions} from 'vuex'
+import Upload from '../components/upload-img.vue'
+import { multiLang, d } from '../helpers/mixins'
+import { get, post } from '../plugins/jquery-ajax'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
-  const newSlide = () => ({
-    image: d(() => ""),
-    url: ""
-  });
+const newSlide = () => ({
+  image: d(() => ''),
+  url: ''
+})
 
-  export default {
-    mixins: [multiLang],
-    components: {Upload},
-    data() {
-      return {
-        newSlide
-      }
-    },
-    computed: {
-      ...mapState({
-        id: state => state.route.params.id
-      }),
-      ...mapGetters({
-        current: 'categories/current'
-      }),
-      slides() {
-        return this.current.meta.slides.list;
-      }
-    },
-    methods: {
-      ...mapActions({
-        save: 'categories/save'
-      })
+export default {
+  mixins: [multiLang],
+  components: { Upload },
+  data() {
+    return {
+      newSlide
     }
+  },
+  computed: {
+    ...mapState({
+      id: state => state.route.params.id
+    }),
+    ...mapGetters({
+      current: 'categories/current'
+    }),
+    slides() {
+      return this.current.meta.slides.list
+    }
+  },
+  methods: {
+    ...mapActions({
+      save: 'categories/save'
+    })
   }
+}
 </script>

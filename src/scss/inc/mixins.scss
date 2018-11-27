@@ -1,7 +1,11 @@
-@import "pseudo";
+@import 'pseudo';
 
 @mixin reset-link {
-  &, &:hover, &:focus, &:active, &:visited {
+  &,
+  &:hover,
+  &:focus,
+  &:active,
+  &:visited {
     text-decoration: none;
     @content;
   }
@@ -11,7 +15,7 @@
   position: relative;
   &:before {
     display: block;
-    content: "";
+    content: '';
     width: 100%;
     padding-top: ($height / $width) * 100%;
   }

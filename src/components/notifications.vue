@@ -1,11 +1,11 @@
 <style lang="scss" scoped>
-  .wrapper {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    width: 300px;
-    height: auto;
-  }
+.wrapper {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  width: 300px;
+  height: auto;
+}
 </style>
 <template lang="pug">
   .wrapper
@@ -15,11 +15,11 @@
       p(v-else v-html="alert.message")
 </template>
 <script>
-  export default {
-    computed: {
-      list() {
-        return this.$store.state.notifications.list;
-      }
+export default {
+  computed: {
+    list() {
+      return this.$store.state.notifications.list
     }
   }
+}
 </script>

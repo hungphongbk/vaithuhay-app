@@ -1,12 +1,12 @@
-@import "../inc";
+@import '../inc';
 
 $custom-control-indicator-bg: #dee2e6;
 $custom-control-indicator-disabled-bg: #e9ecef;
 $custom-control-description-disabled-color: #868e96;
 
-$switch-height: calc(#{$input-height} * .8) !default;
-$switch-height-sm: calc(#{$input-height-sm} * .8) !default;
-$switch-height-lg: calc(#{$input-height-lg} * .8) !default;
+$switch-height: calc(#{$input-height} * 0.8) !default;
+$switch-height-sm: calc(#{$input-height-sm} * 0.8) !default;
+$switch-height-lg: calc(#{$input-height-lg} * 0.8) !default;
 $switch-border-radius: $switch-height !default;
 $switch-bg: $custom-control-indicator-bg !default;
 $switch-checked-bg: map-get($theme-colors, 'primary') !default;
@@ -15,8 +15,9 @@ $switch-disabled-color: $custom-control-description-disabled-color !default;
 $switch-thumb-bg: $white !default;
 $switch-thumb-border-radius: 50% !default;
 $switch-thumb-padding: 2px !default;
-$switch-focus-box-shadow: 0 0 0 $input-btn-focus-width rgba(map-get($theme-colors, 'primary'), .25);
-$switch-transition: .2s all !default;
+$switch-focus-box-shadow: 0 0 0 $input-btn-focus-width
+  rgba(map-get($theme-colors, 'primary'), 0.25);
+$switch-transition: 0.2s all !default;
 
 .switch {
   font-size: $font-size-base;
@@ -44,7 +45,7 @@ $switch-transition: .2s all !default;
       outline: none;
       user-select: none;
       vertical-align: middle;
-      text-indent: calc(calc(#{$switch-height} * 2) + .5rem);
+      text-indent: calc(calc(#{$switch-height} * 2) + 0.5rem);
     }
 
     + label::before,
@@ -107,7 +108,7 @@ $switch-transition: .2s all !default;
         min-width: calc(#{$switch-height-sm} * 2);
         height: $switch-height-sm;
         line-height: $switch-height-sm;
-        text-indent: calc(calc(#{$switch-height-sm} * 2) + .5rem);
+        text-indent: calc(calc(#{$switch-height-sm} * 2) + 0.5rem);
       }
 
       + label::before {
@@ -134,7 +135,7 @@ $switch-transition: .2s all !default;
         min-width: calc(#{$switch-height-lg} * 2);
         height: $switch-height-lg;
         line-height: $switch-height-lg;
-        text-indent: calc(calc(#{$switch-height-lg} * 2) + .5rem);
+        text-indent: calc(calc(#{$switch-height-lg} * 2) + 0.5rem);
       }
 
       + label::before {

@@ -1,56 +1,57 @@
 <style lang="scss" scoped>
-  @import "./header.scss";
-  @import "../scss/inc/mixins";
+@import './header.scss';
+@import '../scss/inc/mixins';
 
-  .message-list {
-    .fa-stack {
-      margin-right: .3rem;
-    }
-    td {
-      padding: .5rem;
-      h6 {
-        margin-bottom: .4rem;
-        &, > * {
-          display: inline-block;
-        }
-      }
-      p {
-        margin-bottom: 0;
+.message-list {
+  .fa-stack {
+    margin-right: 0.3rem;
+  }
+  td {
+    padding: 0.5rem;
+    h6 {
+      margin-bottom: 0.4rem;
+      &,
+      > * {
+        display: inline-block;
       }
     }
-  }
-
-  .message-icon {
-    @include aspect-ratio(1, 1);
-    overflow: hidden;
-    width: 50px;
-    float: left;
-    & + .message-body {
-      margin-left: 58px;
-    }
-    img {
-      height: 100%;
-      width: auto;
+    p {
+      margin-bottom: 0;
     }
   }
+}
 
-  .message-actions {
-    a {
-      padding: {
-        top: .2rem;
-        bottom: .2rem;
-        right: .7rem;
-      }
-      margin-right: .7rem;
-      &:not(:last-child) {
-        border-right: 1px solid #ccc;
-      }
+.message-icon {
+  @include aspect-ratio(1, 1);
+  overflow: hidden;
+  width: 50px;
+  float: left;
+  & + .message-body {
+    margin-left: 58px;
+  }
+  img {
+    height: 100%;
+    width: auto;
+  }
+}
+
+.message-actions {
+  a {
+    padding: {
+      top: 0.2rem;
+      bottom: 0.2rem;
+      right: 0.7rem;
+    }
+    margin-right: 0.7rem;
+    &:not(:last-child) {
+      border-right: 1px solid #ccc;
     }
   }
+}
 
-  a{
-    cursor: pointer;
-  }
+a {
+  cursor: pointer;
+}
 </style>
 <template lang="pug">
   div
@@ -127,68 +128,68 @@
       message-composer(:template="newPushNotiStatus", @created="message=>createPushNoti(message)")
 </template>
 <script>
-  import PushNotification from '@client/store/push-noti'
-  import {Settings} from "@client/plugins";
-  import MessageComposer from './push-noti/message-composer.vue'
-  import {Pagination} from "@client/components";
+import PushNotification from '@client/store/push-noti'
+import { Settings } from '@client/plugins'
+import MessageComposer from './push-noti/message-composer.vue'
+import { Pagination } from '@client/components'
 
-  const settings = new Settings.DB('push-noti');
+const settings = new Settings.DB('push-noti')
 
-  export default {
-    components: {
-      MessageComposer,
-      Pagination
-    },
-    data() {
-      return {
-        settings: {
-          welcome: {
-            title: '',
-            body: '',
-            click_action: ''
-          }
-        },
-        newPushNotiStatus: null
-      }
-    },
-    computed: {
-      list() {
-        return this.$store.getters['noti/list']
-      }
-    },
-    methods: {
-      async fetchSettings() {
-        const json = await settings.get('welcome');
-        Object.assign(this.settings.welcome, {title: '', body: ''}, json)
+export default {
+  components: {
+    MessageComposer,
+    Pagination
+  },
+  data() {
+    return {
+      settings: {
+        welcome: {
+          title: '',
+          body: '',
+          click_action: ''
+        }
       },
-      async saveSettings() {
-        await settings.set('welcome', this.settings.welcome)
-      },
-      async test() {
-        await this.$store.dispatch('noti/send', {
-          message: this.settings.welcome,
-          test: true
-        })
-      },
-      async createPushNoti(payload) {
-        this.newPushNotiStatus = null;
-        await this.$store.dispatch('noti/send', payload)
-      },
-      async resend(_id) {
-        await this.$store.dispatch('noti/resend', _id)
-      },
-      async del(_id) {
-        await this.$store.dispatch('noti/delete', _id);
-      }
-    },
-    async created() {
-      const store = this.$store;
-      if (!(store && store.state && store.state['noti']))
-        store.registerModule('noti', PushNotification);
-      await Promise.all([
-        this.fetchSettings(),
-        this.$store.dispatch('noti/fetch')
-      ])
+      newPushNotiStatus: null
     }
+  },
+  computed: {
+    list() {
+      return this.$store.getters['noti/list']
+    }
+  },
+  methods: {
+    async fetchSettings() {
+      const json = await settings.get('welcome')
+      Object.assign(this.settings.welcome, { title: '', body: '' }, json)
+    },
+    async saveSettings() {
+      await settings.set('welcome', this.settings.welcome)
+    },
+    async test() {
+      await this.$store.dispatch('noti/send', {
+        message: this.settings.welcome,
+        test: true
+      })
+    },
+    async createPushNoti(payload) {
+      this.newPushNotiStatus = null
+      await this.$store.dispatch('noti/send', payload)
+    },
+    async resend(_id) {
+      await this.$store.dispatch('noti/resend', _id)
+    },
+    async del(_id) {
+      await this.$store.dispatch('noti/delete', _id)
+    }
+  },
+  async created() {
+    const store = this.$store
+    if (!(store && store.state && store.state['noti']))
+      store.registerModule('noti', PushNotification)
+    await Promise.all([
+      this.fetchSettings(),
+      this.$store.dispatch('noti/fetch')
+    ])
   }
+}
 </script>

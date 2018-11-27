@@ -1,17 +1,17 @@
 <style lang="scss" scoped>
-  @import "./header.scss";
+@import './header.scss';
 
-  .card-columns {
-    column-count: 4;
-  }
+.card-columns {
+  column-count: 4;
+}
 
-  .card-img-left {
-    border-bottom-left-radius: calc(.25rem - 1px);
-    border-top-left-radius: calc(.25rem - 1px);
-    float: left;
-    padding-right: 1em;
-    margin-bottom: -1.25em;
-  }
+.card-img-left {
+  border-bottom-left-radius: calc(0.25rem - 1px);
+  border-top-left-radius: calc(0.25rem - 1px);
+  float: left;
+  padding-right: 1em;
+  margin-bottom: -1.25em;
+}
 </style>
 <template lang="pug">
   div
@@ -61,62 +61,64 @@
             button.btn.btn-danger(@click="list.splice(index, 1)") Xóa
 </template>
 <script>
-  import {multiLang, d} from "../helpers/mixins"
-  import {get, post} from '../plugins/jquery-ajax'
-  import Help from '../components/help.vue'
-  import Upload from '../components/upload-img.vue'
+import { multiLang, d } from '../helpers/mixins'
+import { get, post } from '../plugins/jquery-ajax'
+import Help from '../components/help.vue'
+import Upload from '../components/upload-img.vue'
 
-  const newPromo = () => ({
-    title: "",
-    code: "",
-    url: "",
-    img: d(() => null),
-    behavior: 'none'
-  });
+const newPromo = () => ({
+  title: '',
+  code: '',
+  url: '',
+  img: d(() => null),
+  behavior: 'none'
+})
 
-  export default {
-    page: 'promotions',
-    mixins: [multiLang],
-    components: {Help, Upload},
-    data() {
-      return {
-        list: [],
-        newPromo: newPromo(),
-        mode: 'new'
-      }
-    },
-    methods: {
-      add() {
-        if (this.mode === 'new')
-          this.list.push(this.newPromo);
-        else this.mode = 'new';
-        this.newPromo = newPromo();
-      },
-      async fetch() {
-        const self = this;
-        const {list = []} = await get('/meta?key=promotions');
-        console.log(list);
-        //patch
-        await Promise.all(list.map(item => new Promise(async resolve => {
-          const [vi, en] = await Promise.all([
-            self.patchImage(item.img.vi),
-            self.patchImage(item.img.en)
-          ]);
-          item.img.vi = vi;
-          item.img.en = en;
-          resolve()
-        })));
-        this.list = list.filter(item => item.title.length > 0) || []
-      },
-      async save() {
-        await post('/meta?key=promotions', {list: this.list});
-      }
-    },
-    mounted() {
-      this.fetch();
+export default {
+  page: 'promotions',
+  mixins: [multiLang],
+  components: { Help, Upload },
+  data() {
+    return {
+      list: [],
+      newPromo: newPromo(),
+      mode: 'new'
     }
+  },
+  methods: {
+    add() {
+      if (this.mode === 'new') this.list.push(this.newPromo)
+      else this.mode = 'new'
+      this.newPromo = newPromo()
+    },
+    async fetch() {
+      const self = this
+      const { list = [] } = await get('/meta?key=promotions')
+      console.log(list)
+      //patch
+      await Promise.all(
+        list.map(
+          item =>
+            new Promise(async resolve => {
+              const [vi, en] = await Promise.all([
+                self.patchImage(item.img.vi),
+                self.patchImage(item.img.en)
+              ])
+              item.img.vi = vi
+              item.img.en = en
+              resolve()
+            })
+        )
+      )
+      this.list = list.filter(item => item.title.length > 0) || []
+    },
+    async save() {
+      await post('/meta?key=promotions', { list: this.list })
+    }
+  },
+  mounted() {
+    this.fetch()
   }
+}
 </script>
-<docs>
-  ### Chua co gi het
-</docs>
+<docs> ### Chua co gi het </docs>

@@ -34,15 +34,19 @@ import './auth/facebook'
 
 // mongoose
 mongoose.Promise = global.Promise
-if (process.env.NODE_ENV === 'production')
-  mongoose.connect(
-    'mongodb://hungphongbk:hungPhong1*!%40@localhost/vaithuhay',
-    {
-      //useMongoClient: true,
-      poolSize: 2,
-      promiseLibrary: global.Promise
-    }
-  )
+// if (process.env.NODE_ENV === 'production')
+mongoose.connect(
+  process.env.NODE_ENV === 'production'
+    ? 'mongodb://hungphongbk:hungPhong1*!%40@localhost/vaithuhay'
+    : 'mongodb://localhost/vaithuhay',
+  {
+    useNewUrlParser: true,
+    //useMongoClient: true,
+    poolSize: 2,
+    promiseLibrary: global.Promise
+  }
+)
+// )
 
 const app = express(),
   { server, io } = createServer(app)

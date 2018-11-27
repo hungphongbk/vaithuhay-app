@@ -1,7 +1,7 @@
-import Vue from 'vue';
-import Modal from '@client/components/modal.vue';
+import Vue from 'vue'
+import Modal from '@client/components/modal.vue'
 
-const $ev = new Vue();
+const $ev = new Vue()
 
 export default {
   data: () => ({
@@ -11,24 +11,26 @@ export default {
     }
   }),
   render(h) {
-    if (!this.modal) return (<div/>);
+    if (!this.modal) return <div />
     const modal = this.modal,
       ModalBody = modal.body,
       on = {
         'modal-dismiss': () => {
-          this.modal = null;
+          this.modal = null
         }
-      };
-    return (<Modal title={modal.title} dismissable={modal.dismissable || false}>
-      <ModalBody {...{on}}/>
-    </Modal>);
+      }
+    return (
+      <Modal title={modal.title} dismissable={modal.dismissable || false}>
+        <ModalBody {...{ on }} />
+      </Modal>
+    )
   },
   created() {
-    this.modal = null;
+    this.modal = null
     $ev.$on('modal', data => {
-      this.modal = data;
-    });
+      this.modal = data
+    })
   }
-};
+}
 
-export const ModalManager = data => $ev.$emit('modal', data);
+export const ModalManager = data => $ev.$emit('modal', data)

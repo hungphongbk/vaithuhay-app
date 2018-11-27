@@ -1,5 +1,5 @@
 <style lang="scss" scoped>
-  @import "./header.scss";
+@import './header.scss';
 </style>
 <template lang="pug">
   div
@@ -59,74 +59,69 @@
               input.form-control(type="text", v-model="fanpage")
 </template>
 <script>
-  import {multiLang, d} from "../helpers/mixins"
-  import {get, post} from '../plugins/jquery-ajax'
-  import pick from 'lodash/pick'
-  import Upload from '../components/upload-img.vue'
+import { multiLang, d } from '../helpers/mixins'
+import { get, post } from '../plugins/jquery-ajax'
+import pick from 'lodash/pick'
+import Upload from '../components/upload-img.vue'
 
-  const $ = jQuery;
-  const newSlide = () => ({
-    image: d(() => ({
-      url: "",
-      thumbnails: [],
-      show: true
-    })),
-    mobile: d(() => ({
-      url: "",
-      thumbnails: []
-    })),
-    url: ""
-  });
+const $ = jQuery
+const newSlide = () => ({
+  image: d(() => ({
+    url: '',
+    thumbnails: [],
+    show: true
+  })),
+  mobile: d(() => ({
+    url: '',
+    thumbnails: []
+  })),
+  url: ''
+})
 
-  export default {
-    mixins: [multiLang],
-    components: {Upload},
-    data() {
-      return {
-        commit: d(() => [
-          {text: ''},
-          {text: ''},
-          {text: ''},
-          {text: ''}
-        ]),
-        fanpage: "",
-        slider: [],
-        newSlide
-      }
-    },
-    methods: {
-      async get() {
-        const [{commit}, {fanpage, slider}] = await Promise.all([
-          get('/settings/page/index'),
-          get('/meta?key=homepage')
-        ]);
-        Object.assign(this.commit, commit);
-        this.fanpage = fanpage;
-        if (typeof slider !== 'undefined' && slider !== null) {
-          slider.forEach(slide => {
-            if (typeof slide.mobile !== 'object')
-              slide.mobile = d(() => ({
-                url: '',
-                thumbnails: []
-              }))
-          })
-          this.slider = slider;
-        }
-      },
-      async save() {
-        await Promise.all([
-          post('/settings/page/index', {
-            commit: this.commit
-          }),
-          post('/meta?key=homepage', {
-            fanpage: this.fanpage,
-            slider: this.slider
-          })
-        ])
-      }
-    },
-    async mounted() {
-      await this.get();
+export default {
+  mixins: [multiLang],
+  components: { Upload },
+  data() {
+    return {
+      commit: d(() => [{ text: '' }, { text: '' }, { text: '' }, { text: '' }]),
+      fanpage: '',
+      slider: [],
+      newSlide
     }
+  },
+  methods: {
+    async get() {
+      const [{ commit }, { fanpage, slider }] = await Promise.all([
+        get('/settings/page/index'),
+        get('/meta?key=homepage')
+      ])
+      Object.assign(this.commit, commit)
+      this.fanpage = fanpage
+      if (typeof slider !== 'undefined' && slider !== null) {
+        slider.forEach(slide => {
+          if (typeof slide.mobile !== 'object')
+            slide.mobile = d(() => ({
+              url: '',
+              thumbnails: []
+            }))
+        })
+        this.slider = slider
+      }
+    },
+    async save() {
+      await Promise.all([
+        post('/settings/page/index', {
+          commit: this.commit
+        }),
+        post('/meta?key=homepage', {
+          fanpage: this.fanpage,
+          slider: this.slider
+        })
+      ])
+    }
+  },
+  async mounted() {
+    await this.get()
   }
+}
 </script>

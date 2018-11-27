@@ -60,6 +60,18 @@ const UserMiddleware = async (req: Request, res: Response, next) => {
   }
 
 router.get('/', async (req: Request, res: Response) => {
+  if (process.env.NODE_ENV === 'development') {
+    res.json([
+      {
+        name: 'Trương Hùng Phong',
+        email: 'programmingd32@gmail.com',
+        avatar:
+          'https://lh3.googleusercontent.com/-d36CQB_94IM/AAAAAAAAAAI/AAAAAAAAAjw/vqUetnviJ1M/s96-c/photo.jpg',
+        permissions: 'page.index,page.about-us,page.users,cat'.split(',')
+      }
+    ])
+    return
+  }
   res.json(await AppUser.find({}))
 })
 router.post('/', async (req: Request, res: Response) => {
@@ -74,6 +86,13 @@ router.post('/', async (req: Request, res: Response) => {
 })
 router.post('/verify', async (req: Request, res: Response) => {
   const { email, name, avatar } = req.body
+  if (
+    process.env.NODE_ENV === 'development' &&
+    email === 'programmingd32@gmail.com'
+  ) {
+    res.json({})
+    return
+  }
   const user = AppUser.findOne({ email })
   if (user) {
     await user.update({

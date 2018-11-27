@@ -1,17 +1,13 @@
-import {get, post} from "@client/plugins/jquery-ajax";
+import { get, post } from '@client/plugins/jquery-ajax'
 
 class SettingsBase {
   constructor(namespace = 'global') {
-    this.namespace = namespace;
+    this.namespace = namespace
   }
 
-  async get(key, namespace = 'global') {
+  async get(key, namespace = 'global') {}
 
-  }
-
-  async set(key, value, namespace = 'global') {
-
-  }
+  async set(key, value, namespace = 'global') {}
 }
 
 class SettingsServerDB extends SettingsBase {
@@ -22,12 +18,9 @@ class SettingsServerDB extends SettingsBase {
   async set(key, value) {
     return await post(`/settings/${this.namespace}/${key}`, value)
   }
-
 }
 
-class SettingsHaravan extends SettingsBase {
-
-}
+class SettingsHaravan extends SettingsBase {}
 
 export default {
   DB: SettingsServerDB,

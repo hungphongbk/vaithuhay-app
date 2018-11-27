@@ -1,5 +1,5 @@
 <style lang="scss" scoped>
-  @import "./header.scss";
+@import './header.scss';
 </style>
 <template lang="pug">
   div
@@ -7,16 +7,15 @@
       h1.page-title Sản phẩm liên quan
 </template>
 <script>
-  import {mapState} from 'vuex'
-  import {postText} from '../plugins/jquery-ajax'
+import { mapState } from 'vuex'
+import { postText } from '../plugins/jquery-ajax'
 
-  export default {
-    computed: {
-      ...mapState({
-        products: state => state.products.products
-      })
-    },
-    methods: {
-    }
-  }
+export default {
+  computed: {
+    ...mapState({
+      products: state => state.products.products
+    })
+  },
+  methods: {}
+}
 </script>

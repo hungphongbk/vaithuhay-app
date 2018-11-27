@@ -1,5 +1,5 @@
 <style lang="scss" scoped>
-  @import "./header.scss";
+@import './header.scss';
 </style>
 <template lang="pug">
   div
@@ -9,11 +9,9 @@
     hr
 </template>
 <script>
-  export default {
-    methods: {
-      async save() {
-
-      }
-    }
+export default {
+  methods: {
+    async save() {}
   }
+}
 </script>
