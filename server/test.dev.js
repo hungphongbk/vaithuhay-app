@@ -12758,9 +12758,7 @@ exports.default = function (app) {
   }
 
   var server = dev ? createDev() : createProd(),
-      io = (0, _socket2.default)(server, dev ? {} : {
-    resource: '/vaithuhay/b/socket.io'
-  });
+      io = (0, _socket2.default)(server);
 
   (0, _requestStats2.default)(server, function (requestInfo) {
     var env = dev ? 'dev' : 'prod';

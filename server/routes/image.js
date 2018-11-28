@@ -46,19 +46,49 @@ const gm = gm$.subClass({ imageMagick: true }),
 //Process images middleware
 const widths = [80, 150, 300, 400, 600, 1200, 1920]
 
-const compress = (img, options) =>
-  new Promise((resolve, reject) => {
-    const { w, format } = options
-    gm(img)
-      .resize(w)
-      .noProfile()
-      .sharpen(3, 0.8)
-      .compress(format)
-      .toBuffer(format, (err, data) => {
-        if (err) reject(err)
-        else imagemin.buffer(data, { plugins }).then(resolve)
+/**
+ * Fix error "Stream yields empty buffer"
+ *
+ * @param data
+ * @returns {Promise}
+ */
+function gmToBuffer(data) {
+  return new Promise((resolve, reject) => {
+    data.stream((err, stdout, stderr) => {
+      if (err) {
+        return reject(err)
+      }
+      const chunks = []
+      stdout.on('data', chunk => {
+        chunks.push(chunk)
       })
+      // these are 'once' because they can and do fire multiple times for multiple errors,
+      // but this is a promise so you'll have to deal with them one at a time
+      stdout.once('end', () => {
+        resolve(Buffer.concat(chunks))
+      })
+      stderr.once('data', data => {
+        reject(String(data))
+      })
+    })
   })
+}
+
+const compress = async (img, options) => {
+  const { w, format } = options
+  const gmStream = gm(img)
+    .setFormat(format)
+    .resize(w)
+    .noProfile()
+    .sharpen(3, 0.8)
+    .compress(format)
+  // .toBuffer(format, (err, data) => {
+  //   if (err) reject(err)
+  //   else imagemin.buffer(data, { plugins }).then(resolve)
+  // })
+  const buffer = await gmToBuffer(gmStream)
+  return imagemin.buffer(buffer, { plugins })
+}
 
 async function generateSet(
   image,

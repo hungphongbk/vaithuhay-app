@@ -6,11 +6,11 @@ import store from '../store'
 const dev = process.env.NODE_ENV !== 'production'
 
 export const SocketInstance = socketio(
-  dev ? 'https://localhost:8089' : 'https://server.vaithuhay.com/b',
+  dev ? 'https://localhost:8089' : 'https://server.vaithuhay.com/',
   dev
     ? {}
     : {
-        path: '/vaithuhay/b/socket.io'
+        path: '/b/socket.io'
       }
 )
 

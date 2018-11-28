@@ -1,17 +1,16 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path')
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin'),
   merge = require('webpack-merge'),
-  base = require('./webpack/base.config.js');
-  // MyUtils = require('hungphongbk-utils');
-
+  base = require('./webpack/base.config.js')
+// MyUtils = require('hungphongbk-utils');
 
 const devMode = process.env.NODE_ENV === 'development',
   serverName = devMode ? '' : 'https://server.vaithuhay.com/dist/',
-  cssLoader = (loaders) => {
+  cssLoader = loaders => {
     if (devMode) {
-      loaders.unshift('style-loader');
+      loaders.unshift('style-loader')
       return loaders
     } else {
       return ExtractTextPlugin.extract({
@@ -19,7 +18,7 @@ const devMode = process.env.NODE_ENV === 'development',
         use: loaders
       })
     }
-  };
+  }
 
 module.exports = merge(base, {
   entry: {
@@ -29,7 +28,7 @@ module.exports = merge(base, {
     path: path.resolve(__dirname, './dist'),
     publicPath: serverName,
     filename: 'build.js?[hash]',
-    chunkFilename: '[name].bundle.js?[chunkhash]',
+    chunkFilename: '[name].bundle.js?[chunkhash]'
   },
   module: {
     rules: [
@@ -41,10 +40,12 @@ module.exports = merge(base, {
             // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
             // the "scss" and "sass" values for the lang attribute to the right configs here.
             // other preprocessors should work out of the box, no loader config like this necessary.
-            'scss': 'vue-style-loader!css-loader!sass-loader',
-            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
-            'docs': require.resolve(path.join(__dirname, 'webpack/docs-loader.js')),
-            'js': 'babel-loader?cacheDirectory'
+            scss: 'vue-style-loader!css-loader!sass-loader',
+            sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
+            docs: require.resolve(
+              path.join(__dirname, 'webpack/docs-loader.js')
+            ),
+            js: 'babel-loader?cacheDirectory'
           }
           // other vue-loader options go here
         }
@@ -52,9 +53,10 @@ module.exports = merge(base, {
       {
         test: /\.js$/,
         include: [
-          path.resolve(__dirname, "src"), // your scripts
-          path.resolve(__dirname, "node_modules/query-string"),
-          path.resolve(__dirname, "node_modules/strict-uri-encode"),
+          path.resolve(__dirname, 'src'), // your scripts
+          path.resolve(__dirname, 'node_modules/query-string'),
+          path.resolve(__dirname, 'node_modules/strict-uri-encode'),
+          path.resolve(__dirname, 'node_modules/vue-socket.io')
         ],
         loader: 'babel-loader?cacheDirectory'
       },
@@ -66,7 +68,7 @@ module.exports = merge(base, {
         test: /\.scss$/,
         use: cssLoader(['cache-loader', 'css-loader', 'sass-loader'])
       },
-      {test: /\/ckeditor5-.*\.svg$/, loader: 'raw-loader'},
+      { test: /\/ckeditor5-.*\.svg$/, loader: 'raw-loader' },
       {
         test: /\.(png|jpg|gif)$/,
         loader: 'file-loader',
@@ -97,7 +99,7 @@ module.exports = merge(base, {
   },
   resolve: {
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      vue$: 'vue/dist/vue.esm.js'
     }
   },
   devServer: {
@@ -118,7 +120,7 @@ module.exports.plugins = [
     jQuery: 'jquery',
     'window.jQuery': 'jquery',
     Popper: ['popper.js', 'default'],
-    'moment': 'moment',
+    moment: 'moment',
     'window.moment': 'moment'
   }),
   new webpack.IgnorePlugin(/(locale)/, /node_modules.+(moment)/),
@@ -126,12 +128,12 @@ module.exports.plugins = [
     template: './index.src.html',
     filename: devMode ? 'index.html' : '../index.html'
   })
-];
+]
 if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map';
+  module.exports.devtool = '#source-map'
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
-    new ExtractTextPlugin("styles.css?[contenthash]"),
+    new ExtractTextPlugin('styles.css?[contenthash]'),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
@@ -152,7 +154,7 @@ if (process.env.NODE_ENV === 'production') {
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
-    }),
+    })
     // MyUtils.SftpSync({
     //   localPath: path.resolve(__dirname, 'dist'),
     //   remotePath: '/home/phong/api.v1/vaithuhay/dist'

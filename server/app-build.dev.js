@@ -12863,9 +12863,7 @@ exports.default = function (app) {
   }
 
   var server = dev ? createDev() : createProd(),
-      io = (0, _socket2.default)(server, dev ? {} : {
-    resource: '/vaithuhay/b/socket.io'
-  });
+      io = (0, _socket2.default)(server);
 
   (0, _requestStats2.default)(server, function (requestInfo) {
     var env = dev ? 'dev' : 'prod';
@@ -26550,6 +26548,10 @@ module.exports = server;
 
 exports.__esModule = true;
 
+var _extends2 = __webpack_require__(44);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _regenerator = __webpack_require__(2);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -26630,7 +26632,8 @@ var UploadImages = function (_SocketBase) {
 
   UploadImages.prototype.uploadImage = function () {
     var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(_ref2) {
-      var filename = _ref2.filename,
+      var uuid = _ref2.uuid,
+          filename = _ref2.filename,
           buf = _ref2.buf;
       var socket, imageObj;
       return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -26643,15 +26646,21 @@ var UploadImages = function (_SocketBase) {
 
             case 3:
               imageObj = _context2.sent;
-              _context2.next = 6;
+
+              console.log(buf.toString().length);
+              _context2.next = 7;
               return (0, _image.generateSet)(imageObj, filename, buf, function (statusObj) {
-                return socket.emit('uploadImageStatus', statusObj);
+                return socket.emit('uploadImageStatus', (0, _extends3.default)({
+                  uuid: uuid
+                }, statusObj));
               });
 
-            case 6:
-              socket.emit('uploadImageDone', imageObj.toJSON());
-
             case 7:
+              socket.emit('uploadImageDone', (0, _extends3.default)({
+                uuid: uuid
+              }, imageObj.toJSON()));
+
+            case 8:
             case 'end':
               return _context2.stop();
           }
@@ -31519,15 +31528,15 @@ var _promise = __webpack_require__(1);
 var _promise2 = _interopRequireDefault(_promise);
 
 var generateSet = function () {
-  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(image, filename) {
+  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(image, filename) {
     var buffer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
     var callback = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : function () {};
 
     var _filename$split, filenameWithoutExt, ext, transform;
 
-    return _regenerator2.default.wrap(function _callee$(_context) {
+    return _regenerator2.default.wrap(function _callee2$(_context2) {
       while (1) {
-        switch (_context.prev = _context.next) {
+        switch (_context2.prev = _context2.next) {
           case 0:
             _filename$split = filename.split('.'), filenameWithoutExt = _filename$split[0], ext = _filename$split[1], transform = function transform(w) {
               return new _promise2.default(function (resolve, reject) {
@@ -31570,33 +31579,33 @@ var generateSet = function () {
                 });
               });
             };
-            _context.prev = 1;
-            _context.next = 4;
+            _context2.prev = 1;
+            _context2.next = 4;
             return _promise2.default.all(widths.map(transform));
 
           case 4:
-            _context.next = 6;
+            _context2.next = 6;
             return image.save();
 
           case 6:
-            _context.next = 11;
+            _context2.next = 11;
             break;
 
           case 8:
-            _context.prev = 8;
-            _context.t0 = _context['catch'](1);
-            throw _context.t0;
+            _context2.prev = 8;
+            _context2.t0 = _context2['catch'](1);
+            throw _context2.t0;
 
           case 11:
           case 'end':
-            return _context.stop();
+            return _context2.stop();
         }
       }
-    }, _callee, this, [[1, 8]]);
+    }, _callee2, this, [[1, 8]]);
   }));
 
-  return function generateSet(_x3, _x4) {
-    return _ref.apply(this, arguments);
+  return function generateSet(_x5, _x6) {
+    return _ref2.apply(this, arguments);
   };
 }();
 
@@ -31682,93 +31691,76 @@ var gm = _gm2.default.subClass({ imageMagick: true }),
 //Process images middleware
 var widths = [80, 150, 300, 400, 600, 1200, 1920];
 
-var compress = function compress(img, options) {
+/**
+ * Fix error "Stream yields empty buffer"
+ *
+ * @param data
+ * @returns {Promise}
+ */
+function gmToBuffer(data) {
   return new _promise2.default(function (resolve, reject) {
-    var w = options.w,
-        format = options.format;
-
-    gm(img).resize(w).noProfile().sharpen(3, 0.8).compress(format).toBuffer(format, function (err, data) {
-      if (err) reject(err);else _imagemin2.default.buffer(data, { plugins: plugins }).then(resolve);
+    data.stream(function (err, stdout, stderr) {
+      if (err) {
+        return reject(err);
+      }
+      var chunks = [];
+      stdout.on('data', function (chunk) {
+        chunks.push(chunk);
+      });
+      // these are 'once' because they can and do fire multiple times for multiple errors,
+      // but this is a promise so you'll have to deal with them one at a time
+      stdout.once('end', function () {
+        resolve(Buffer.concat(chunks));
+      });
+      stderr.once('data', function (data) {
+        reject(String(data));
+      });
     });
   });
-};
+}
 
-var optimize = function () {
-  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(req, res, next) {
-    var filename, rs, image;
-    return _regenerator2.default.wrap(function _callee2$(_context2) {
+var compress = function () {
+  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(img, options) {
+    var w, format, gmStream, buffer;
+    return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context.prev = _context.next) {
           case 0:
-            filename = req.file.filename;
+            w = options.w, format = options.format;
+            gmStream = gm(img).setFormat(format).resize(w).noProfile().sharpen(3, 0.8).compress(format);
+            // .toBuffer(format, (err, data) => {
+            //   if (err) reject(err)
+            //   else imagemin.buffer(data, { plugins }).then(resolve)
+            // })
 
-            if (!(filename.length === 0 || filename === '#')) {
-              _context2.next = 4;
-              break;
-            }
-
-            res.json({
-              filename: filename,
-              url: '#',
-              thumbnails: (0, _extends3.default)({}, (0, _zipObject2.default)(widths.map(function (w) {
-                return w + 'w';
-              }), new Array(widths.length).fill('#')))
-            });
-            return _context2.abrupt('return');
+            _context.next = 4;
+            return gmToBuffer(gmStream);
 
           case 4:
-            _context2.next = 6;
-            return _Images2.default.findOne({
-              filename: filename
-            }).lean(false).exec();
+            buffer = _context.sent;
+            return _context.abrupt('return', _imagemin2.default.buffer(buffer, { plugins: plugins }));
 
           case 6:
-            rs = _context2.sent;
-            image = rs || new _Images2.default({
-              filename: filename,
-              url: 'https://server.vaithuhay.com/uploads/' + filename
-            });
-            _context2.prev = 8;
-            _context2.next = 11;
-            return generateSet(image, filename);
-
-          case 11:
-            req.images = image;
-            next();
-            _context2.next = 18;
-            break;
-
-          case 15:
-            _context2.prev = 15;
-            _context2.t0 = _context2['catch'](8);
-
-            res.status(500).send({ error: _context2.t0.message });
-
-          case 18:
           case 'end':
-            return _context2.stop();
+            return _context.stop();
         }
       }
-    }, _callee2, undefined, [[8, 15]]);
+    }, _callee, undefined);
   }));
 
-  return function optimize(_x5, _x6, _x7) {
-    return _ref2.apply(this, arguments);
+  return function compress(_x, _x2) {
+    return _ref.apply(this, arguments);
   };
 }();
 
-router.post('/', upload.single('img'), optimize, function (req, res) {
-  res.json(req.images.toJSON());
-});
-
-router.post('/patch', function () {
-  var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(req, res) {
-    var filename, widths, rs, image;
+var optimize = function () {
+  var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(req, res, next) {
+    var filename, rs, image;
     return _regenerator2.default.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            filename = req.body.filename, widths = [80, 150, 300, 400, 600, 1200, 1920];
+            filename = req.file.filename;
 
             if (!(filename.length === 0 || filename === '#')) {
               _context3.next = 4;
@@ -31796,7 +31788,75 @@ router.post('/patch', function () {
               filename: filename,
               url: 'https://server.vaithuhay.com/uploads/' + filename
             });
-            _context3.next = 10;
+            _context3.prev = 8;
+            _context3.next = 11;
+            return generateSet(image, filename);
+
+          case 11:
+            req.images = image;
+            next();
+            _context3.next = 18;
+            break;
+
+          case 15:
+            _context3.prev = 15;
+            _context3.t0 = _context3['catch'](8);
+
+            res.status(500).send({ error: _context3.t0.message });
+
+          case 18:
+          case 'end':
+            return _context3.stop();
+        }
+      }
+    }, _callee3, undefined, [[8, 15]]);
+  }));
+
+  return function optimize(_x7, _x8, _x9) {
+    return _ref3.apply(this, arguments);
+  };
+}();
+
+router.post('/', upload.single('img'), optimize, function (req, res) {
+  res.json(req.images.toJSON());
+});
+
+router.post('/patch', function () {
+  var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(req, res) {
+    var filename, widths, rs, image;
+    return _regenerator2.default.wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            filename = req.body.filename, widths = [80, 150, 300, 400, 600, 1200, 1920];
+
+            if (!(filename.length === 0 || filename === '#')) {
+              _context4.next = 4;
+              break;
+            }
+
+            res.json({
+              filename: filename,
+              url: '#',
+              thumbnails: (0, _extends3.default)({}, (0, _zipObject2.default)(widths.map(function (w) {
+                return w + 'w';
+              }), new Array(widths.length).fill('#')))
+            });
+            return _context4.abrupt('return');
+
+          case 4:
+            _context4.next = 6;
+            return _Images2.default.findOne({
+              filename: filename
+            }).lean(false).exec();
+
+          case 6:
+            rs = _context4.sent;
+            image = rs || new _Images2.default({
+              filename: filename,
+              url: 'https://server.vaithuhay.com/uploads/' + filename
+            });
+            _context4.next = 10;
             return generateSet(image, filename);
 
           case 10:
@@ -31819,14 +31879,14 @@ router.post('/patch', function () {
 
           case 11:
           case 'end':
-            return _context3.stop();
+            return _context4.stop();
         }
       }
-    }, _callee3, undefined);
+    }, _callee4, undefined);
   }));
 
-  return function (_x8, _x9) {
-    return _ref3.apply(this, arguments);
+  return function (_x10, _x11) {
+    return _ref4.apply(this, arguments);
   };
 }());
 

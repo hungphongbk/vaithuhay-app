@@ -31,14 +31,7 @@ export default function(app) {
   }
 
   const server = dev ? createDev() : createProd(),
-    io = socketIO(
-      server,
-      dev
-        ? {}
-        : {
-            resource: '/vaithuhay/b/socket.io'
-          }
-    )
+    io = socketIO(server)
 
   requestStats(server, requestInfo => {
     const env = dev ? 'dev' : 'prod'

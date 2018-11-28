@@ -23,13 +23,20 @@ class UploadImages extends SocketBase {
     )
   }
 
-  async uploadImage({ filename, buf }) {
+  async uploadImage({ uuid, filename, buf }) {
     const { socket } = this,
       imageObj = await this._createImage(filename)
+    console.log(buf.toString().length)
     await generateSet(imageObj, filename, buf, statusObj =>
-      socket.emit('uploadImageStatus', statusObj)
+      socket.emit('uploadImageStatus', {
+        uuid,
+        ...statusObj
+      })
     )
-    socket.emit('uploadImageDone', imageObj.toJSON())
+    socket.emit('uploadImageDone', {
+      uuid,
+      ...imageObj.toJSON()
+    })
   }
 }
 

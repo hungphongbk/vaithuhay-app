@@ -43,3 +43,12 @@ export const d = obj => {
     })
   return tr
 }
+
+let uuid = 0
+Vue.mixin({
+  beforeCreate() {
+    const { name = null } = this.$options
+    this.uuid = (name ? name + '-' : '') + uuid.toString('16')
+    uuid++
+  }
+})
