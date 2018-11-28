@@ -97,7 +97,7 @@ async function generateSet(
   callback = () => {}
 ) {
   const [filenameWithoutExt, ext] = filename.split('.'),
-    transform = w =>
+    transform = (w, index) =>
       new Promise((resolve, reject) => {
         const newFilename = `${filenameWithoutExt}-${w}w.${ext}`,
           filePath = imageUrl('../uploads/' + newFilename),
@@ -128,7 +128,8 @@ async function generateSet(
             //     })
             // else
             callback({
-              message: `Nén ảnh thành công, chiều rộng ${w}px`
+              message: `Nén ảnh thành công, chiều rộng ${w}px`,
+              percentage: (index + 1) / widths.length
             })
             resolve()
           })

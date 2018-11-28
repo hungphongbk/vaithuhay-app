@@ -49,7 +49,7 @@
 </style>
 <template lang="pug">
   div(:class="$style.container")
-    button.btn.btn-primary.btn-block(ref="btn", @click="$refs.input.click()", :data-ellipsis="ellipsis") Thêm hình ảnh
+    button.btn.btn-primary.btn-block(ref="btn", @click="$refs.input.click()", :data-ellipsis="ellipsis") Thêm hình ảnh{{progress}}
     div(:class="$style.formGroup")
       label.sr-only File upload
       input.text-primary.font-weight-bold(ref="input", type="file", accept="image/*", :data-title="value$", @change="uploadV2($event)")
@@ -75,13 +75,18 @@ export default {
     return {
       ready: false,
       uploadHandle: null,
-      ellipsis: ''
+      ellipsis: '',
+      progress: ''
     }
   },
   sockets: {
     connect() {
       console.log('connected to socket.io')
       this.ready = true
+    },
+    uploadImageStatus({ uuid, percentage }) {
+      if (uuid !== this.uuid) return
+      this.progress = ` (${Math.round(percentage * 100)})`
     },
     uploadImageDone(image) {
       if (image.uuid === this.uuid) this.endUpload(image)
@@ -112,6 +117,7 @@ export default {
       }, 300)
     },
     endUpload(url) {
+      this.progress = ''
       clearInterval(this.uploadHandle)
       this.ellipsis = ''
       this.$refs.btn.removeAttribute('disabled')

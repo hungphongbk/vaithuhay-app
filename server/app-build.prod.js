@@ -24634,7 +24634,7 @@ var generateSet = function () {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            _filename$split = filename.split('.'), filenameWithoutExt = _filename$split[0], ext = _filename$split[1], transform = function transform(w) {
+            _filename$split = filename.split('.'), filenameWithoutExt = _filename$split[0], ext = _filename$split[1], transform = function transform(w, index) {
               return new _promise2.default(function (resolve, reject) {
                 var newFilename = filenameWithoutExt + '-' + w + 'w.' + ext,
                     filePath = imageUrl('../uploads/' + newFilename),
@@ -24663,7 +24663,8 @@ var generateSet = function () {
                   //     })
                   // else
                   callback({
-                    message: 'N\xE9n \u1EA3nh th\xE0nh c\xF4ng, chi\u1EC1u r\u1ED9ng ' + w + 'px'
+                    message: 'N\xE9n \u1EA3nh th\xE0nh c\xF4ng, chi\u1EC1u r\u1ED9ng ' + w + 'px',
+                    percentage: (index + 1) / widths.length
                   });
                   resolve();
                 }).catch(function (err) {
