@@ -49,7 +49,9 @@ async function createOrUpdate(topics, address) {
 if (process.env.NODE_ENV === 'development')
   (async function() {
     if (false) {
-      const { webhooks: $all } = flex(await HaravanAPI.get('/admin/webhooks.json'))
+      const { webhooks: $all } = flex(
+        await HaravanAPI.get('/admin/webhooks.json')
+      )
       await Promise.all(
         $all.map(webhook =>
           HaravanAPI.del('/admin/webhooks/' + webhook.id + '.json')

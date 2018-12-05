@@ -67,7 +67,9 @@ router.get('/', async (req: Request, res: Response) => {
         email: 'programmingd32@gmail.com',
         avatar:
           'https://lh3.googleusercontent.com/-d36CQB_94IM/AAAAAAAAAAI/AAAAAAAAAjw/vqUetnviJ1M/s96-c/photo.jpg',
-        permissions: 'page.index,page.about-us,page.users,cat'.split(',')
+        permissions: 'page.index,page.about-us,page.users,cat,product.promo'.split(
+          ','
+        )
       }
     ])
     return

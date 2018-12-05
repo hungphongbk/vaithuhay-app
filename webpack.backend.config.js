@@ -12,7 +12,7 @@ module.exports = merge(base, {
     test: './server/testcli.js'
   },
   output: {
-    path: path.resolve(__dirname, './server'),
+    path: path.resolve(__dirname, './server-dist'),
     filename: '[name]' + (isProd ? '.prod' : '.dev') + '.js',
     libraryTarget: 'commonjs2'
   },

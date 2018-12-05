@@ -103,6 +103,14 @@ export default {
         if (typeof meta.settings.enable === 'string')
           meta.settings.enable = meta.settings.enable === 'true'
         c.meta = meta
+
+        // assert meta trans
+        if (
+          typeof meta.trans === 'undefined' ||
+          typeof meta.trans.translated === 'undefined'
+        ) {
+          meta.trans = { translated: '' }
+        }
       })
       // await Promise.all(flattenDeep(anotherPromises));
       await promiseSerial(

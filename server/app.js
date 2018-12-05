@@ -2,7 +2,7 @@ import UploadImages from '@server/socket-routes/UploadImages'
 
 process
   .on('unhandledRejection', (reason, p) => {
-    console.error(reason, 'Unhandled Rejection at Promise', p)
+    console.error(reason.message, 'Unhandled Rejection at Promise')
   })
   .on('uncaughtException', err => {
     console.error(err, 'Uncaught Exception thrown')
@@ -37,17 +37,25 @@ import './auth/facebook'
 // mongoose
 mongoose.Promise = global.Promise
 // if (process.env.NODE_ENV === 'production')
-mongoose.connect(
-  process.env.NODE_ENV === 'production'
-    ? 'mongodb://hungphongbk:hungPhong1*!%40@localhost/vaithuhay'
-    : 'mongodb://localhost/vaithuhay',
-  {
-    useNewUrlParser: true,
-    //useMongoClient: true,
-    poolSize: 2,
-    promiseLibrary: global.Promise
-  }
-)
+mongoose
+  .connect(
+    process.env.NODE_ENV === 'production'
+      ? 'mongodb://hungphongbk:hungPhong1*!%40@localhost/vaithuhay'
+      : 'mongodb://localhost/vaithuhay',
+    {
+      useNewUrlParser: true,
+      // useMongoClient: true,
+      poolSize: 2,
+      promiseLibrary: global.Promise
+    }
+  )
+  .then(() => {
+    console.log('Completed setup Vaithuhay MongoDB')
+  })
+  .catch(err => {
+    console.err('Error when setup Vaithuhay MongoDB')
+    console.err(err.message)
+  })
 // )
 
 const app = express(),

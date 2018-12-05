@@ -16,15 +16,19 @@ export default () =>
       products = flatten(
         [products$1, products$2].map(({ products }) => products)
       )
-    products.forEach(({ id, handle }) => {
-      cache.set('product:' + handle, id)
-    })
-    collections.forEach(({ id, collectionType, handle }) => {
-      cache.set(`collection:${collectionType}:${handle}`, id)
-    })
+    await Promise.all(
+      products.map(({ id, handle }) => {
+        return cache.setAsync('product:' + handle, id)
+      })
+    )
+    await Promise.all(
+      collections.map(({ id, collectionType, handle }) => {
+        return cache.setAsync(`collection:${collectionType}:${handle}`, id)
+      })
+    )
 
     // fetch top products collection
-    await updateTopProductsCollection()
+    // await updateTopProductsCollection()
     console.log('fetch all products completed')
     resolve()
   })

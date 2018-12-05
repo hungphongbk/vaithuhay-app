@@ -23,8 +23,8 @@ const debug = require('debug')('download-manager:server')
 
 const server =
   process.env.NODE_ENV === 'development'
-    ? require('../server/app-build.dev')
-    : require('../server/app-build.prod')
+    ? require('../server-dist/app-build.dev')
+    : require('../server-dist/app-build.prod')
 
 /**
  * Listen on provided port, on all network interfaces.

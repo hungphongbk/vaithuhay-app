@@ -1,7 +1,9 @@
 import request from 'request-promise-native'
-import LRU from 'lru-cache'
+import Redis from 'redis'
+import Bluebird from 'bluebird'
 import './polyfill'
 // import 'colors'
+Bluebird.promisifyAll(Redis)
 
 const flex = obj => {
   let rs
@@ -13,11 +15,7 @@ const flex = obj => {
   return rs
 }
 
-const cache = LRU({
-    length: function(n, key) {
-      return n.length + key.length
-    }
-  }),
+const cache = Redis.createClient(),
   delayFn = ms =>
     new Promise(resolve => {
       console.log(`delay ${ms}ms`)
@@ -127,10 +125,10 @@ const pushQueue = (url, type = 'get', data = {}) =>
 export async function apiGet(url, _cache = true) {
   let value
   if (_cache) {
-    value = cache.get(url)
+    value = await cache.getAsync(url)
     if (!value) {
       value = await pushQueue(url)
-      cache.set(url, value)
+      await cache.setAsync(url, value)
     }
   } else value = await pushQueue(url)
   return flex(value)

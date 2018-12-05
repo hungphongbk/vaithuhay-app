@@ -81,9 +81,9 @@ function _getProductById(id) {
     .then(emitTopProp('product'))
     .then(attachMetafields('products', id))
 }
-function _getProductByHandle(handle) {
-  const id = cache.get('product:' + handle)
-  return _getProductById(id)
+async function _getProductByHandle(handle) {
+  const id = await cache.getAsync('product:' + handle)
+  return await _getProductById(id)
 }
 function getProduct(handle) {
   let id = parseInt(handle),
@@ -118,14 +118,14 @@ async function _getCollectionById(id, type) {
   )
   return collection
 }
-function _getCollectionByHandle(handle) {
+async function _getCollectionByHandle(handle) {
   let type = 'custom',
-    id = cache.get('collection:custom:' + handle)
+    id = await cache.getAsync('collection:custom:' + handle)
   if (!id) {
-    id = cache.get('collection:smart:' + handle)
+    id = await cache.getAsync('collection:smart:' + handle)
     type = 'smart'
   }
-  return _getCollectionById(id, type)
+  return await _getCollectionById(id, type)
 }
 function getCollection(handle) {
   return _getCollectionByHandle(handle).then(postProcessCollection)

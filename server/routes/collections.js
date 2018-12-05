@@ -63,7 +63,7 @@ const getPromoProductsCollection = async () => {
 }
 const updateTopProductsCollection = async () => {
   // find top product list
-  const collection_id = cache.get('collection:custom:san-pham-hang-dau')
+  const collection_id = await cache.getAsync('collection:custom:san-pham-hang-dau')
   const metafields = await getFeaturedProducts('vaithuhayTopProducts')
   const { collects: exists } = await apiGet(
     `/admin/collects.json?collection_id=${collection_id}`

@@ -11,19 +11,9 @@ export default {
       return product
     }
 
-    const fields = [
-      'id',
-      'images',
-      'options',
-      'product_type',
-      'tags',
-      'title',
-      'variants',
-      'handle'
-    ].join(',')
     const all = await Promise.all([
-        apiGet(`/admin/products.json?fields=${fields}`),
-        apiGet(`/admin/products.json?fields=${fields}&page=2`)
+        apiGet(`/admin/products.json`),
+        apiGet(`/admin/products.json?page=2`)
       ]),
       products = flatten(all.map(({ products }) => products))
     await Promise.all(products.map(queryProductFavorite))
