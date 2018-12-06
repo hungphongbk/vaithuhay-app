@@ -37,6 +37,14 @@ const bootstrap = async () => {
     )
   }
 
+  /**
+   * Step 1: fetch promotions stored in shop metafield, within each, delete
+   *    matched promotion stored in product/collection
+   * Step 2: fetch promotions from MongoDB, store them back to shop metafield
+   *    and product/collection metafield
+   */
+
+  // STEP 1
   const haravan_promotionProgram = (await HaravanClientApi.getMetafields(
     null,
     null,
@@ -50,6 +58,8 @@ const bootstrap = async () => {
 
   console.log(haravan_promotionProgram)
   await Promise.all(haravan_promotionProgram.value.list.map(removeOldProgram))
+
+  // STEP 2
 }
 
 router.get('/', async (req, res) => {
