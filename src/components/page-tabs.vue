@@ -23,6 +23,7 @@
 import { mapActions } from 'vuex'
 
 export default {
+  name: 'PageTabs',
   props: {
     hash: {
       type: Boolean,
