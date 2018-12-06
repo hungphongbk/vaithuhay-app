@@ -10,7 +10,7 @@ import bootstrap from '@server/utils/bootstrap'
 const dev = process.env.NODE_ENV === 'development',
   port = global.APP_PORT
 
-export default function(app) {
+export default function(app, bootstrapCallbacks = []) {
   //firebase db ref to 'requestLogging/[dev/prod]'
   const dbRef = FirebaseAdmin.database().ref('server')
 
@@ -49,10 +49,12 @@ export default function(app) {
       })
   })
 
-  bootstrap().then(() => {
-    console.log('ready now')
-    server.listen(port)
-  })
+  bootstrap()
+    .then(() => Promise.all(bootstrapCallbacks.map(f => f())))
+    .then(() => {
+      console.log('ready now')
+      server.listen(port)
+    })
 
   return { server, io }
 }

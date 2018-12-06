@@ -29,6 +29,9 @@ import pushNoti from '@server/routes/push-notification'
 import HaravanHooks from '@server/routes/haravanHooks'
 import FacebookHooks from '@server/routes/facebookHooks'
 import ssr from '@server/routes/ssr'
+import Promotions, {
+  bootstrap as promotionsBootstrap
+} from '@server/routes/promotions'
 import { socketMiddleware } from './routes/middlewares'
 import { createServer } from './utils'
 //passport with social
@@ -59,7 +62,7 @@ mongoose
 // )
 
 const app = express(),
-  { server, io } = createServer(app)
+  { server, io } = createServer(app, [promotionsBootstrap])
 
 UploadImages.create(io, 'upload')
 

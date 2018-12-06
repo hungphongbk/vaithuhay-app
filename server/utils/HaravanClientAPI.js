@@ -22,19 +22,29 @@ const pickFields = (_fields = null, type = 'product') => obj => {
   fields.push(...defaults[type])
   return pick(obj, uniq(fields))
 }
-const compressMetafields = metafields =>
+const compressMetafields = (metafields, withId = false) =>
   (metafields.metafields || metafields)
-    .map(({ key, value }) => ({
-      [key]: flex(value)
+    .map(({ id, key, value }) => ({
+      [key]: withId
+        ? {
+            id,
+            value: flex(value)
+          }
+        : flex(value)
     }))
     .reduce((acc, metafield) => Object.assign({}, acc, metafield), {})
+function getMetafields(resource = null, id = null, withId = false) {
+  let url
+  if (resource)
+    url = `/admin/${resource}/${id}/metafields.json?namespace=vaithuhay`
+  else url = '/admin/metafields.json?namespace=vaithuhay'
+  return apiGet(url).then(metafields => compressMetafields(metafields, withId))
+}
 const attachMetafields = (resource, id) => resourceObj =>
-  apiGet(`/admin/${resource}/${id}/metafields.json?namespace=vaithuhay`)
-    .then(compressMetafields)
-    .then(metafields => ({
-      ...resourceObj,
-      metafields
-    }))
+  getMetafields(resource, id).then(metafields => ({
+    ...resourceObj,
+    metafields
+  }))
 
 function postProcessProduct(product) {
   // combine multi lang title
@@ -132,6 +142,7 @@ function getCollection(handle) {
 }
 
 const HaravanClientApi = {
+  getMetafields,
   getProduct,
   getCollection
 }
