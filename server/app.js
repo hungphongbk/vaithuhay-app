@@ -41,7 +41,7 @@ mongoose
   .connect(
     process.env.NODE_ENV === 'production'
       ? 'mongodb://hungphongbk:hungPhong1*!%40@localhost/vaithuhay'
-      : 'mongodb://localhost/vaithuhay',
+      : 'mongodb://admin:hungPhong1812@localhost/vaithuhay?authSource=admin',
     {
       useNewUrlParser: true,
       // useMongoClient: true,
@@ -53,8 +53,8 @@ mongoose
     console.log('Completed setup Vaithuhay MongoDB')
   })
   .catch(err => {
-    console.err('Error when setup Vaithuhay MongoDB')
-    console.err(err.message)
+    console.error('Error when setup Vaithuhay MongoDB')
+    console.error(err.message)
   })
 // )
 

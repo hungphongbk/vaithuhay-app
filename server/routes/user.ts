@@ -60,7 +60,7 @@ const UserMiddleware = async (req: Request, res: Response, next) => {
   }
 
 router.get('/', async (req: Request, res: Response) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' && false) {
     res.json([
       {
         name: 'Trương Hùng Phong',
