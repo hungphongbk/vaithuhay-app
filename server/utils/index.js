@@ -146,9 +146,9 @@ export async function apiDel(url) {
   await pushQueue(url, 'del')
 }
 
-export function apiClear(url) {
-  if (typeof url === 'undefined') cache.reset()
-  else cache.del(url)
+export async function apiClear(url) {
+  if (typeof url === 'undefined') await cache.reset()
+  else await cache.del(url)
 }
 
 export const log = {

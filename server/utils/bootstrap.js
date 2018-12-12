@@ -4,6 +4,7 @@ import {
   getCollections,
   updateTopProductsCollection
 } from '@server/routes/collections'
+import HaravanClientApi from '@server/utils/HaravanClientAPI'
 
 export default () =>
   new Promise(async resolve => {
@@ -17,8 +18,16 @@ export default () =>
         [products$1, products$2].map(({ products }) => products)
       )
     await Promise.all(
-      products.map(({ id, handle }) => {
-        return cache.setAsync('product:' + handle, id)
+      products.map(async ({ id, handle, variants }) => {
+        // await Promise.all(
+        //   variants.map(variant =>
+        //     HaravanClientApi.setMetafieldForProductVariant(id, variant.id, {
+        //       originalPrice: variant.compare_at_price || variant.price
+        //     })
+        //   )
+        // )
+        // console.log('update metafield for variants in product ' + handle)
+        await cache.setAsync('product:' + handle, id)
       })
     )
     await Promise.all(

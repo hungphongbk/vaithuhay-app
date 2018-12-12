@@ -42,8 +42,6 @@
     div.clearfix.header
       h1.page-title Danh sách sản phẩm
         span.badge.badge-secondary.ml-2 {{products.length}}
-      //.btn.btn-success.btn-lg(@click="updateRelateds") Cập nhật sản phẩm liên quan
-      //save-button(:fn="updateTops", title="Cập nhật sản phẩm top")
     .row
       .col-sm-12
         page-search.mb-4.mt-4(v-model="kw" title="Tìm kiếm sản phẩm")
@@ -151,58 +149,6 @@ export default {
         return 'text-success'
       }
       return 'text-muted'
-    },
-    async updateRelateds() {
-      const response = await getXhr('/g')
-      if (response.status && response.status === 'login') {
-        console.log(
-          window.open(response.url, '_blank', 'resizable,scrollbars,status')
-        )
-      } else {
-        this.relateds = 0
-        {
-          $(this.$refs.loadingModal).modal({
-            backdrop: 'static',
-            keyboard: false
-          })
-          {
-            for (const products of chunk(this.products, 3)) {
-              await Promise.all(
-                products.map(p => retry(postXhr, [`/g/relateds?id=${p.id}`], 3))
-              )
-              this.relateds += products.length
-            }
-            {
-              $(this.$refs.loadingModal).modal('hide')
-              {
-                $(document.body).removeClass('modal-open')
-                $('.modal-backdrop').remove()
-              }
-            }
-          }
-        }
-      }
-    },
-    async updateTops() {
-      // throw 'ahihi'
-      const rs = await postXhr('/g/top')
-      const change = { remove: 0, add: 0 }
-      if (rs.length > 0) {
-        change.remove = rs.filter(({ type }) => type === '-')
-        change.add = rs.filter(({ type }) => type === '+')
-      }
-      const message =
-        rs.length === 0
-          ? '<i>Không có sự thay đổi nào</i>'
-          : `Loại bỏ <strong>${
-              change.remove.length
-            }</strong> sản phẩm, thêm <strong>${
-              change.add.length
-            }</strong> sản phẩm`
-      await this.$store.dispatch('notifications/pushSuccess', {
-        message:
-          'Cập nhật danh sách sản phẩm hàng đầu thành công :)<br/>' + message
-      })
     }
   }
 }

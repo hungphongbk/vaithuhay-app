@@ -11,6 +11,7 @@ import zip from 'lodash/zip'
 import range from 'lodash/range'
 import flatten from 'lodash/flatten'
 import { admin as adminMiddleware } from '@server/routes/middlewares'
+import HaravanClientApi from '@server/utils/HaravanClientAPI'
 
 moment.tz.setDefault('Asia/Ho_Chi_Minh')
 moment.locale('vi')
@@ -245,6 +246,15 @@ router.get('/meta/:resource/:id', async (req, res) => {
   try {
     const { resource, id } = req.params,
       { metafields } = await apiGet(`/admin/${resource}/${id}/metafields.json`)
+    res.json(metafields)
+  } catch (e) {
+    res.json([])
+  }
+})
+router.get('/meta-v2/:resource/:id', async (req, res) => {
+  try {
+    const { resource, id } = req.params,
+      metafields = await HaravanClientApi.getMetafields(resource, id)
     res.json(metafields)
   } catch (e) {
     res.json([])

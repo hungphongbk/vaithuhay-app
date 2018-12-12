@@ -1,4 +1,4 @@
-import { apiGet, cache } from '@server/utils/index'
+import { apiClear, apiGet, apiPost, apiPut, cache } from '@server/utils/index'
 import pick from 'lodash/pick'
 import uniq from 'lodash/uniq'
 
@@ -33,13 +33,89 @@ const compressMetafields = (metafields, withId = false) =>
         : flex(value)
     }))
     .reduce((acc, metafield) => Object.assign({}, acc, metafield), {})
-function getMetafields(resource = null, id = null, withId = false) {
-  let url
-  if (resource)
-    url = `/admin/${resource}/${id}/metafields.json?namespace=vaithuhay`
-  else url = '/admin/metafields.json?namespace=vaithuhay'
+function buildMetafieldUrl(...args) {
+  const toSingular = resource => resource.slice(0, -1)
+
+  const [resource1, id1, resource2, id2] = args
+  let url = '/admin'
+  if (resource1 && !resource2) {
+    url += `/${resource1}/${id1}`
+  }
+  url += '/metafields.json?namespace=vaithuhay'
+  if (resource2)
+    url += `&metafield[owner_id]=${id2}&metafield[owner_resource]=${toSingular(
+      resource1
+    ) +
+      '_' +
+      toSingular(resource2)}`
+  return url
+}
+function getMetafields(
+  resource = null,
+  id = null,
+  withId = false,
+  resource2 = null,
+  id2 = null
+) {
+  let url = buildMetafieldUrl(resource, id, resource2, id2)
   return apiGet(url).then(metafields => compressMetafields(metafields, withId))
 }
+const setMetafield = (
+  resource = null,
+  id = null,
+  resource2 = null,
+  id2 = null
+) => async (metafields = {}) => {
+  // console.log('set metafield ' + resource + ': ' + id)
+  let url = buildMetafieldUrl(resource, id, resource2, id2)
+
+  const _metafields = getMetafields(resource, id, true, resource2, id2)
+  const buildMetafieldForm = form =>
+    Object.assign(
+      {},
+      form,
+      resource2 && false
+        ? {
+            owner_id: id2,
+            owner_resource: 'product_variant'
+          }
+        : {}
+    )
+
+  for (const [key, value] of Object.entries(metafields)) {
+    if (typeof _metafields[key] === 'undefined' || !_metafields[key]) {
+      //POST request
+      console.log('post')
+      await apiPost(url, {
+        metafield: buildMetafieldForm({
+          namespace: 'vaithuhay',
+          key,
+          value_type: 'string',
+          value
+        })
+      })
+    } else {
+      // PUT request
+      const { id: metafieldId, value } = _metafields[key],
+        subUrl = url.replace('.json', `/${metafieldId}.json`)
+      await apiPut(subUrl, {
+        metafield: buildMetafieldForm({
+          value
+        })
+      })
+      await apiClear(subUrl)
+    }
+  }
+  // clear caches
+  await apiClear(url)
+}
+const setMetafieldForProduct = (id, metafields) =>
+  setMetafield('products', id).call(null, metafields)
+const setMetafieldForProductVariant = (productId, variantId, metafields) =>
+  setMetafield('products', productId, 'variants', variantId).call(
+    null,
+    metafields
+  )
 const attachMetafields = (resource, id) => resourceObj =>
   getMetafields(resource, id).then(metafields => ({
     ...resourceObj,
@@ -143,6 +219,9 @@ function getCollection(handle) {
 
 const HaravanClientApi = {
   getMetafields,
+  setMetafield,
+  setMetafieldForProduct,
+  setMetafieldForProductVariant,
   getProduct,
   getCollection
 }

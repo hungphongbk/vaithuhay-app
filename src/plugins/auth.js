@@ -1,3 +1,14 @@
+import Vue from 'vue'
+
+Vue.mixin({
+  methods: {
+    hasRole(role) {
+      const { permissions } = this.$store.getters['auth/currentUser']
+      return permissions.findIndex(r => r === role) >= 0
+    }
+  }
+})
+
 export default (store, router) => {
   const auth = store.state.auth
   router.beforeEach((to, from, next) => {

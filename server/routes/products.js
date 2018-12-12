@@ -64,4 +64,14 @@ router.post('/:id/favorite', userFavoriteMiddleware, async (req, res) => {
   }
 })
 
+router.get('/:id/patch-variants', middlewares.allProducts, async (req, res) => {
+  const product = req.products.find(p => p.id * 1 === req.params.id * 1)
+  res.json(
+    product.variants.map(v => ({
+      id: v.id,
+      compare_at_price: v.compare_at_price || v.price
+    }))
+  )
+})
+
 export default router

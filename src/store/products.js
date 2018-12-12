@@ -71,7 +71,10 @@ export default {
         stat = { counter: 0 },
         metaList = await Promise.all(
           products.map(p =>
-            get(`/meta/products/${p.id}`).then(rs => {
+            Promise.all([
+              get(`/meta/products/${p.id}`),
+              get(`/meta-v2/products/${p.id}`)
+            ]).then(rs => {
               if (onProgress)
                 onProgress({
                   percentage: Math.round(
@@ -85,7 +88,7 @@ export default {
 
       products.forEach((p, i) => {
         const meta = {}
-        metaList[i].forEach(m => {
+        metaList[i][0].forEach(m => {
           switch (m.key) {
             case 'vaithuhay-faq':
               meta.faq = JSON.parse(m.value).faq
@@ -100,6 +103,7 @@ export default {
 
         if (!meta.relatedArticles) meta.relatedArticles = []
         p.meta = meta
+        p.metaV2 = metaList[i][1]
       })
       commit('fetch', products.map(p => Product.wrap(context, p)))
     }

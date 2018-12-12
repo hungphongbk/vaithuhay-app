@@ -17,6 +17,7 @@ import { mapState, mapGetters } from 'vuex'
 import Help from '../components/help.vue'
 import debounce from 'lodash/debounce'
 import ArticleSelector from '../components/article-selector.vue'
+import CircularJSON from 'circular-json'
 
 const fetch = async id =>
   Promise.all([
@@ -48,7 +49,13 @@ export default {
     }),
     ...mapGetters({
       current: 'products/current'
-    })
+    }),
+    currentJSON() {
+      const current = { ...this.current }
+      delete current.context
+      // console.log(Object.getOwnPropertyNames(current))
+      return CircularJSON.stringify(current, null, '    ')
+    }
   },
   async beforeRouteEnter({ params }, {}, next) {
     const [{ faq }, { desc }, title, relatedArticles] = await fetch(params.id)
