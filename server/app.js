@@ -44,7 +44,7 @@ mongoose
   .connect(
     process.env.NODE_ENV === 'production'
       ? 'mongodb://hungphongbk:hungPhong1*!%40@localhost/vaithuhay'
-      : 'mongodb://admin:hungPhong1812@localhost/vaithuhay?authSource=admin',
+      : 'mongodb://hungphongbk:hungPhong1*!%40@188.166.177.127/vaithuhay',
     {
       useNewUrlParser: true,
       // useMongoClient: true,
