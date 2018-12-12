@@ -1,7 +1,6 @@
 <template lang="pug">
-  .card
-    .card-body
-      h6.card-title Slider danh mục
+  div
+    h6.card-title Slider danh mục
 </template>
 <script>
 export default {

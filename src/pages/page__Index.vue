@@ -40,7 +40,8 @@ export default {
       newSlide,
       admin: {
         newLayout: {
-          CollectionSlider: 'Slider danh mục'
+          CollectionSlider: 'Slider danh mục',
+          Promotions: 'Khuyến mãi'
         }
       }
     }
