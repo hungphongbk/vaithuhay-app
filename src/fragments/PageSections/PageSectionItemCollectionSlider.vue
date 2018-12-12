@@ -9,7 +9,7 @@
       .modal-body
         collection-selector(v-model="tmpCollections")
       .modal-footer
-        .btn.btn-success OK
+        .btn.btn-success(@click="ok") OK
 </template>
 <script>
 import Modal from '../../components/modal.vue'
@@ -37,6 +37,10 @@ export default {
     dismiss() {
       this.showCollectionSelector = false
       this.reset()
+    },
+    ok() {
+      this.showCollectionSelector = false
+      this.data.collections = this.tmpCollections
     }
   },
   mounted() {
