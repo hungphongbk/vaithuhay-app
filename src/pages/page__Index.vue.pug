@@ -5,9 +5,11 @@ div
     save-button(:fn="save")
   page-tabs
     page-tab#ui(title="Giao diện trang chủ")
+      p.text-danger
+        i Tính năng đang trong giai đoạn phát triển :)
       dropdown(caption="Thêm một Section mới" :list="admin.newLayout" @action="addNewLayout")
-      .w-50.mt-4(v-if="layout!==null && layout.length>0")
-        page-section-item(v-for="item in layout" :key="item.id" :item="item" @update="data=>updateLayoutItem(item.id, data)")
+      .w-100.mt-4(v-if="layout!==null && layout.length>0")
+        page-section-item(v-for="item in layout" :key="item.id" :item="item" @update="data=>updateLayoutItem(item.id, data)" @remove="()=>removeLayoutItem(item.id)")
     page-tab#slide-panel(title="slider")
       list-management.row(v-model="slider", :new="newSlide")
         template(slot-scope="props")

@@ -1,10 +1,12 @@
 import CollectionSlider from './PageSectionItemCollectionSlider.vue'
 import Promotions from './PageSectionItemPromotions.vue'
+import Banner from './PageSectionItemBanner.vue'
 import should from 'should'
 
 const Types = {
   CollectionSlider,
-  Promotions
+  Promotions,
+  Banner
 }
 
 export default {
@@ -16,9 +18,9 @@ export default {
       <div class="card">
         <div class="card-body p-3">
           <button class="close">
-            <span aria-hidden={'true'}>&times;</span>
+            <span aria-hidden={'true'} onClick={listeners.remove}>&times;</span>
           </button>
-          <Type data={props.item.data} {...listeners} />
+          <Type {...props.item} {...listeners} />
         </div>
       </div>
     )
@@ -27,7 +29,7 @@ export default {
     item: {
       type: Object,
       validator(value) {
-        return should(value).have.properties(['type', 'data'])
+        return should(value).have.properties(['type'])
       }
     }
   }

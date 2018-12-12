@@ -24,11 +24,13 @@ const newSlide = () => ({
   })),
   url: ''
 })
-const newLayout = type => ({
-  id: uuid(),
-  type,
-  data: {}
-})
+const newLayout = type => {
+  const id = uuid()
+  return {
+    id,
+    type
+  }
+}
 
 export default {
   components: { Upload, PageSectionItem, Dropdown },
@@ -43,7 +45,8 @@ export default {
       admin: {
         newLayout: {
           CollectionSlider: 'Slider danh mục',
-          Promotions: 'Khuyến mãi'
+          Promotions: 'Khuyến mãi',
+          Banner: 'Banner'
         }
       }
     }
@@ -82,12 +85,16 @@ export default {
       ])
     },
     addNewLayout(type) {
+      if (!this.layout) this.layout = []
       this.layout.push(newLayout(type))
     },
     updateLayoutItem(id, data) {
-      console.log(id)
       const item = this.layout.find(layoutItem => layoutItem.id === id)
       item.data = data
+    },
+    removeLayoutItem(id) {
+      const index = this.layout.findIndex(layoutItem => layoutItem.id === id)
+      this.layout.splice(index, 1)
     }
   },
   async mounted() {

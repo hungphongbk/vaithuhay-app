@@ -30,10 +30,11 @@
   div.media
     img.mr-3(src="../../images/icon-collections.png")
     .media-body
-      h6.card-title Slider danh mục
+      h6.card-title.mb-1 Slider danh mục
         i(v-if="data.collections.length===0") &nbsp;(trống)
-      p(:class="$style.categories")
+      small.mb-2.d-inline-block(:class="$style.categories")
         span.text-primary(v-for="cat in categories") {{cat.title}}
+      br
       .btn.btn-primary.btn-sm(@click="showCollectionSelector = true") Chỉnh sửa
     modal(v-if="showCollectionSelector" title="Chọn danh mục sản phẩm" @dismiss="dismiss")
       .modal-body
