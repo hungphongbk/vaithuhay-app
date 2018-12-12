@@ -7,7 +7,7 @@ div
     page-tab#ui(title="Giao diện trang chủ")
       dropdown(caption="Thêm một Section mới" :list="admin.newLayout" @action="addNewLayout")
       .w-50.mt-4
-        page-section-item(v-for="item in layout" :item="item")
+        page-section-item(v-for="item in layout" :key="item.id" :item="item" @update="data=>updateLayoutItem(item.id, data)")
     page-tab#slide-panel(title="slider")
       list-management.row(v-model="slider", :new="newSlide")
         template(slot-scope="props")

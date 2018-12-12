@@ -9,6 +9,7 @@ import pick from 'lodash/pick'
 import Upload from '../components/upload-img.vue'
 import PageSectionItem from '../fragments/PageSections/PageSectionItem'
 import Dropdown from '../components/dropdown.vue'
+import uuid from 'uuid/v4'
 
 const $ = jQuery
 const newSlide = () => ({
@@ -24,6 +25,7 @@ const newSlide = () => ({
   url: ''
 })
 const newLayout = type => ({
+  id: uuid(),
   type,
   data: {}
 })
@@ -48,7 +50,7 @@ export default {
   },
   methods: {
     async get() {
-      const [{ commit }, { fanpage, slider }] = await Promise.all([
+      const [{ commit }, { fanpage, slider, layout }] = await Promise.all([
         get('/settings/page/index'),
         get('/meta?key=homepage')
       ])
@@ -64,6 +66,7 @@ export default {
         })
         this.slider = slider
       }
+      if (typeof layout !== 'undefined' && layout !== null) this.layout = layout
     },
     async save() {
       await Promise.all([
@@ -72,12 +75,17 @@ export default {
         }),
         post('/meta?key=homepage', {
           fanpage: this.fanpage,
-          slider: this.slider
+          slider: this.slider,
+          layout: this.layout
         })
       ])
     },
     addNewLayout(type) {
       this.layout.push(newLayout(type))
+    },
+    updateLayoutItem(id, data) {
+      const item = this.layout.find(layoutItem => layoutItem.id === id)
+      item.data = data
     }
   },
   async mounted() {
