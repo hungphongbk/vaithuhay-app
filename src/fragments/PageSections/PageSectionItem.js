@@ -10,14 +10,15 @@ const Types = {
 export default {
   name: 'PageSectionItem',
   functional: true,
-  render: (h, { props, data, children }) => {
+  render: (h, { props, listeners }) => {
+    const Type = Types[props.item.type]
     return (
       <div class="card">
         <div class="card-body p-3">
           <button class="close">
             <span aria-hidden={'true'}>&times;</span>
           </button>
-          {h(Types[props.item.type], data, children)}
+          <Type data={props.item.data} {...listeners} />
         </div>
       </div>
     )

@@ -38,7 +38,7 @@ export default {
       commit: d(() => [{ text: '' }, { text: '' }, { text: '' }, { text: '' }]),
       fanpage: '',
       slider: [],
-      layout: [],
+      layout: null,
       newSlide,
       admin: {
         newLayout: {
@@ -66,6 +66,7 @@ export default {
         })
         this.slider = slider
       }
+      console.log(layout)
       if (typeof layout !== 'undefined' && layout !== null) this.layout = layout
     },
     async save() {
@@ -84,6 +85,7 @@ export default {
       this.layout.push(newLayout(type))
     },
     updateLayoutItem(id, data) {
+      console.log(id)
       const item = this.layout.find(layoutItem => layoutItem.id === id)
       item.data = data
     }
