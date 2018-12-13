@@ -27,18 +27,21 @@
 }
 </style>
 <template lang="pug">
-  div.media
+  div.media(v-if="data")
     img.mr-3(src="../../images/icon-collections.png")
     .media-body
       h6.card-title.mb-1 Slider danh mục
         i(v-if="data.collections.length===0") &nbsp;(trống)
-      small.mb-2.d-inline-block(:class="$style.categories")
+      small.mb-2.d-inline-block(:class="$style.categories" v-if="data.collections.length>0")
         span.text-primary(v-for="cat in categories") {{cat.title}}
       br
       .btn.btn-primary.btn-sm(@click="showCollectionSelector = true") Chỉnh sửa
     modal(v-if="showCollectionSelector" title="Chọn danh mục sản phẩm" @dismiss="dismiss")
       .modal-body
         collection-selector(v-model="tmpCollections")
+        br
+        label Số sản phẩm tối đa hiển thị trên mỗi slide
+        input.form-control(type="text" v-model="tmpMaxItems")
       .modal-footer
         .btn.btn-success(@click="ok") OK
 </template>
@@ -51,16 +54,14 @@ export default {
   components: { Modal, CollectionSelector },
   props: {
     data: {
-      type: Object,
-      default: () => ({
-        collections: [],
-        maxItems: 20
-      })
+      validator: val => typeof val === 'object' || val === null,
+      required: true
     }
   },
   data: () => ({
     showCollectionSelector: false,
-    tmpCollections: []
+    tmpCollections: [],
+    tmpMaxItems: 20
   }),
   computed: {
     categories() {
@@ -72,6 +73,7 @@ export default {
   methods: {
     reset() {
       this.tmpCollections = this.data.collections
+      this.tmpMaxItems = this.data.maxItems
     },
     dismiss() {
       this.showCollectionSelector = false
@@ -80,11 +82,17 @@ export default {
     ok() {
       this.showCollectionSelector = false
       this.data.collections = this.tmpCollections
+      this.data.maxItems = this.tmpMaxItems
+      this.$emit('update', this.data)
     }
   },
   mounted() {
-    if (this.data.collections.length === 0) this.$emit('update', this.data)
-    this.reset()
+    if (!this.data)
+      this.$emit('update', {
+        collections: [],
+        maxItems: 20
+      })
+    this.$nextTick(() => this.reset())
   }
 }
 </script>

@@ -28,7 +28,8 @@ const newLayout = type => {
   const id = uuid()
   return {
     id,
-    type
+    type,
+    data: null
   }
 }
 
@@ -90,6 +91,7 @@ export default {
     },
     updateLayoutItem(id, data) {
       const item = this.layout.find(layoutItem => layoutItem.id === id)
+      console.log(item)
       item.data = data
     },
     removeLayoutItem(id) {

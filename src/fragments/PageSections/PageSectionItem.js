@@ -18,9 +18,11 @@ export default {
       <div class="card">
         <div class="card-body p-3">
           <button class="close">
-            <span aria-hidden={'true'} onClick={listeners.remove}>&times;</span>
+            <span aria-hidden={'true'} onClick={listeners.remove}>
+              &times;
+            </span>
           </button>
-          <Type {...props.item} {...listeners} />
+          <Type data={props.item.data} onUpdate={listeners.update} />
         </div>
       </div>
     )
@@ -29,7 +31,7 @@ export default {
     item: {
       type: Object,
       validator(value) {
-        return should(value).have.properties(['type'])
+        return should(value).have.properties(['type', 'data'])
       }
     }
   }
