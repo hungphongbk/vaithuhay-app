@@ -70,7 +70,6 @@ export default {
         })
         this.slider = slider
       }
-      console.log(layout)
       if (typeof layout !== 'undefined' && layout !== null) this.layout = layout
     },
     async save() {
@@ -91,7 +90,6 @@ export default {
     },
     updateLayoutItem(id, data) {
       const item = this.layout.find(layoutItem => layoutItem.id === id)
-      console.log(item)
       item.data = data
     },
     removeLayoutItem(id) {

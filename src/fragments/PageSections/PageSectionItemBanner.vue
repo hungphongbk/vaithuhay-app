@@ -1,13 +1,40 @@
 <template lang="pug">
-  div.media
+  div.media(v-if="data")
     img.mr-3(src="../../images/icon-banner.png")
     .media-body
       h6.card-title.mb-1 Banner
+        i(v-if="!hasImage") &nbsp;(Chưa có hình ảnh)
+      .btn.btn-primary.btn-sm.mt-2 Tải ảnh Banner
+    modal(v-if="showModal" @dismiss="showModal=false" title="Tải hình ảnh Banner")
+      .modal-body
+      .modal-footer
 </template>
 <script>
+import Modal from '../../components/modal.vue'
+
 export default {
+  components: { Modal },
+  props: {
+    data: {
+      validator: val => typeof val === 'object' || val === null,
+      required: true
+    }
+  },
+  data: () => ({
+    showModal: false
+  }),
+  computed: {
+    hasImage() {
+      return this.data.image && JSON.stringify(this.data.image) !== '{}'
+    }
+  },
   mounted() {
-    this.$emit('update', { version: 1 })
+    if (!this.data) {
+      this.$emit('update', {
+        id: 0,
+        image: {}
+      })
+    }
   }
 }
 </script>

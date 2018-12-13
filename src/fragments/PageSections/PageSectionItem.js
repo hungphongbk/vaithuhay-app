@@ -15,7 +15,7 @@ export default {
   render: (h, { props, listeners }) => {
     const Type = Types[props.item.type]
     return (
-      <div class="card">
+      <div class="card mt-2">
         <div class="card-body p-3">
           <button class="close">
             <span aria-hidden={'true'} onClick={listeners.remove}>
@@ -30,9 +30,9 @@ export default {
   props: {
     item: {
       type: Object,
-      validator(value) {
-        return should(value).have.properties(['type', 'data'])
-      }
+      // validator(value) {
+      //   return should(value).have.properties(['type', 'data'])
+      // }
     }
   }
 }
