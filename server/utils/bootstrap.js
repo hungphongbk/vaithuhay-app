@@ -32,7 +32,10 @@ export default () =>
     )
     await Promise.all(
       collections.map(({ id, collectionType, handle }) => {
-        return cache.setAsync(`collection:${collectionType}:${handle}`, id)
+        return Promise.all([
+          cache.setAsync(`collection:${collectionType}:${handle}`, id),
+          cache.setAsync(`collection:${id}`, collectionType)
+        ])
       })
     )
 

@@ -102,3 +102,4 @@ export default {
   }
 }
 </script>
+<docs> ### Hướng dẫn sử dụng chức năng tuỳ biến trang chủ </docs>

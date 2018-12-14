@@ -82,7 +82,8 @@ const setMetafield = (
         : {}
     )
 
-  for (const [key, value] of Object.entries(metafields)) {
+  for (const [key, _value] of Object.entries(metafields)) {
+    const value = JSON.stringify(_value)
     if (typeof _metafields[key] === 'undefined' || !_metafields[key]) {
       //POST request
       console.log('post')
@@ -104,10 +105,12 @@ const setMetafield = (
         })
       })
       await apiClear(subUrl)
+      await apiGet(subUrl, false)
     }
   }
   // clear caches
   await apiClear(url)
+  await apiGet(url, false)
 }
 const setMetafieldForProduct = (id, metafields) =>
   setMetafield('products', id).call(null, metafields)
@@ -213,7 +216,11 @@ async function _getCollectionByHandle(handle) {
   }
   return await _getCollectionById(id, type)
 }
-function getCollection(handle) {
+async function getCollection(handle) {
+  if (handle.match(/^[0-9]+$/)) {
+    const type = await cache.getAsync('collection:' + handle)
+    return _getCollectionById(handle, type).then(postProcessCollection)
+  }
   return _getCollectionByHandle(handle).then(postProcessCollection)
 }
 

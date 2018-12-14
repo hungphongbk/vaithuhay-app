@@ -87,6 +87,7 @@ const compress = async (img, options) => {
   //   else imagemin.buffer(data, { plugins }).then(resolve)
   // })
   const buffer = await gmToBuffer(gmStream)
+  console.log(buffer.length)
   return imagemin.buffer(buffer, { plugins })
 }
 

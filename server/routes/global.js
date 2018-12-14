@@ -12,6 +12,7 @@ import range from 'lodash/range'
 import flatten from 'lodash/flatten'
 import { admin as adminMiddleware } from '@server/routes/middlewares'
 import HaravanClientApi from '@server/utils/HaravanClientAPI'
+import MetafieldsEventHook from '@server/hooks/Metafields/Metafields'
 
 moment.tz.setDefault('Asia/Ho_Chi_Minh')
 moment.locale('vi')
@@ -303,7 +304,12 @@ router.post('/meta', async (req, res) => {
           value: JSON.stringify(req.body)
         }
       })
-    apiClear(url + '&key=' + key)
+    await apiClear(url + '&key=' + key)
+    MetafieldsEventHook.emit('hook', {
+      url: req.url,
+      method: 'post',
+      payload: req.body
+    })
     res.json({})
   } catch (e) {
     console.log(e.message)

@@ -64,6 +64,7 @@
           .col-4
             upload(v-model="newImage")
       .modal-footer
+        .btn.btn-success(:class="{ disabled: !tmpValue }" @click="selectImage") Chọn hình ảnh này
 </template>
 <script>
 import Modal from '@client/components/modal.vue'
@@ -123,6 +124,10 @@ export default {
   methods: {
     deleteImage({ _id }) {
       this.$socket.emit('deleteImage', { uuid: this.uuid, _id })
+    },
+    selectImage() {
+      this.$emit('input', this.tmpValue)
+      this.$emit('close')
     }
   }
 }

@@ -15,7 +15,9 @@ const flex = obj => {
   return rs
 }
 
-const cache = Redis.createClient(),
+const cache = Redis.createClient({
+    prefix: 'vth'
+  }),
   delayFn = ms =>
     new Promise(resolve => {
       console.log(`delay ${ms}ms`)
@@ -128,9 +130,9 @@ export async function apiGet(url, _cache = true) {
     value = await cache.getAsync(url)
     if (!value) {
       value = await pushQueue(url)
-      await cache.setAsync(url, value)
     }
   } else value = await pushQueue(url)
+  await cache.setAsync(url, value)
   return flex(value)
 }
 
@@ -147,7 +149,7 @@ export async function apiDel(url) {
 }
 
 export async function apiClear(url) {
-  if (typeof url === 'undefined') await cache.reset()
+  if (typeof url === 'undefined') await cache.flushdb()
   else await cache.del(url)
 }
 

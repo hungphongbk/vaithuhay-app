@@ -1,4 +1,3 @@
-import memoize from 'async-decorators/memoize'
 import path from 'path'
 import gm$ from 'gm'
 import imagemin from 'imagemin'
@@ -14,10 +13,6 @@ export default class BaseUploader {
     this.gm = gm$.subClass({ imageMagick: true })
     this.plugins = [
       jpegtran({ progressive: true }),
-      // mozjpeg({quality: 90}),
-      ...(process.env.NODE_ENV === 'production'
-        ? [__non_webpack_require__('imagemin-mozjpeg')({ quality: 90 })]
-        : []),
       pngquant({ quality: '65-80' })
     ]
   }

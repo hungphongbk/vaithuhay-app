@@ -39,7 +39,6 @@
     "i18n-mongo": "^1.0.18",
     "imagemin": "^5.3.1",
     "imagemin-jpegtran": "^5.0.2",
-    "imagemin-mozjpeg": "^7.0.0",
     "imagemin-pngquant": "^5.1.0",
     "kue": "^0.11.6",
     "lru-cache": "^4.1.2",
@@ -64,9 +63,7 @@
     "socket.io": "^2.1.0",
     "tunnel": "^0.0.6",
     "tunnel-ssh": "^4.1.4",
-    "webpack-node-externals": "^1.7.2"
-  },
-  "devDependencies": {
+    "webpack-node-externals": "^1.7.2",
     "@fortawesome/fontawesome": "^1.1.5",
     "@fortawesome/fontawesome-free-solid": "^5.0.10",
     "@fortawesome/vue-fontawesome": "0.1.1",
@@ -130,7 +127,6 @@
     "memoizee": "^0.4.12",
     "mongoose-paginate": "^5.0.3",
     "node-loader": "^0.6.0",
-    "node-sass": "^4.9.0",
     "object-recursive-iterator": "^1.0.2",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
@@ -157,7 +153,6 @@
     "text-encoder-lite": "^1.0.1",
     "ts-loader": "^3.5.0",
     "typescript": "^2.8.3",
-    "utf-8-validate": "^4.0.1",
     "util.promisify": "^1.0.0",
     "uuid": "^3.3.0",
     "vue": "2.5.17",
@@ -179,6 +174,10 @@
     "webpack-merge": "^4.1.2",
     "webpack-notifier": "^1.6.0",
     "websocket": "^1.0.25"
+  },
+  "devDependencies": {
+    "utf-8-validate": "^4.0.1",
+    "node-sass": "^4.9.0"
   },
   "browser": {
     "canvas": false,

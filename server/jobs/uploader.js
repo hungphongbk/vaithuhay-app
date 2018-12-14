@@ -1,7 +1,3 @@
-import aws from 'aws-sdk'
-import memoize from 'async-decorators/memoize'
-import path from 'path'
-
 import BaseUploader from './classes/BaseUploader'
 
 class LocalUploader extends BaseUploader {}
