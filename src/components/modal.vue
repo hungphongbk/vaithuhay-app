@@ -28,7 +28,10 @@
 export default {
   props: {
     title: String,
-    size: String,
+    size: {
+      type: String,
+      default: ''
+    },
     dismissable: {
       type: Boolean,
       default: true
@@ -37,7 +40,7 @@ export default {
   computed: {
     classes() {
       const cls = []
-      if (this.size) cls.push(`modal-${this.size}`)
+      if (this.size.length > 0) cls.push(`modal-${this.size}`)
 
       return cls
     }

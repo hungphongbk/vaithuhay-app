@@ -85,13 +85,7 @@ module.exports = merge(base, {
       )
     }
   },
-  externals: [
-    nodeExternals({
-      modulesFromFile: {
-        exclude: ['devDependencies']
-      }
-    })
-  ],
+  externals: [nodeExternals()],
   performance: {
     hints: false
   }

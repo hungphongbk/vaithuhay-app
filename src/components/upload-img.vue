@@ -64,6 +64,7 @@
 import { postForm } from '../plugins/jquery-ajax'
 
 export default {
+  name: 'Upload',
   props: {
     value: null,
     thumbnail: {
@@ -81,7 +82,7 @@ export default {
   },
   sockets: {
     connect() {
-      console.log('connected to socket.io')
+      // console.log('connected to socket.io')
       this.ready = true
     },
     uploadImageStatus({ uuid, percentage }) {

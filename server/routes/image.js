@@ -96,6 +96,7 @@ async function generateSet(
   buffer = null,
   callback = () => {}
 ) {
+  image.storage = []
   const [filenameWithoutExt, ext] = filename.split('.'),
     transform = (w, index) =>
       new Promise((resolve, reject) => {
@@ -113,9 +114,12 @@ async function generateSet(
         })
           .then(buf => {
             fs.writeFileSync(filePath, buf)
+            // add path to image storage for easier delete
+            image.storage.push(filePath)
+
             if (!image.thumbnails) image.thumbnails = {}
             image.thumbnails[`${w}w`] =
-              'https://server.vaithuhay.com/uploads/' + newFilename
+              global.APP_HOST + '/uploads/' + newFilename
             // if (process.env.NODE_ENV === 'production')
             //     imagemin.buffer(data, {
             //         plugins: [

@@ -4,16 +4,14 @@
     .media-body
       h6.card-title.mb-1 Banner
         i(v-if="!hasImage") &nbsp;(Chưa có hình ảnh)
-      .btn.btn-primary.btn-sm.mt-2 Tải ảnh Banner
-    modal(v-if="showModal" @dismiss="showModal=false" title="Tải hình ảnh Banner")
-      .modal-body
-      .modal-footer
+      .btn.btn-primary.btn-sm.mt-2(@click="showModal=true") Tải ảnh Banner
+    select-img-dialog(:show="showModal" @close="showModal=false")
 </template>
 <script>
-import Modal from '../../components/modal.vue'
+import SelectImgDialog from '@client/components/select-img-dialog.vue'
 
 export default {
-  components: { Modal },
+  components: { SelectImgDialog },
   props: {
     data: {
       validator: val => typeof val === 'object' || val === null,

@@ -1,3 +1,4 @@
+require('dotenv').config()
 import UploadImages from '@server/socket-routes/UploadImages'
 
 process
@@ -10,7 +11,7 @@ process
   })
 
 const express = require('express')
-const mongoose = require('mongoose')
+import connectMongoose from './core/mongoose'
 const path = require('path')
 const logger = require('morgan')
 const cookieParser = require('cookie-parser')
@@ -38,20 +39,7 @@ import { createServer } from './utils'
 import './auth/facebook'
 
 // mongoose
-mongoose.Promise = global.Promise
-// if (process.env.NODE_ENV === 'production')
-mongoose
-  .connect(
-    process.env.NODE_ENV === 'production'
-      ? 'mongodb://hungphongbk:hungPhong1*!%40@localhost/vaithuhay'
-      : 'mongodb://hungphongbk:hungPhong1*!%40@188.166.177.127/vaithuhay',
-    {
-      useNewUrlParser: true,
-      // useMongoClient: true,
-      poolSize: 2,
-      promiseLibrary: global.Promise
-    }
-  )
+connectMongoose()
   .then(() => {
     console.log('Completed setup Vaithuhay MongoDB')
   })

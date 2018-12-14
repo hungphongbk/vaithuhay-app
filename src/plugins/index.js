@@ -7,6 +7,7 @@ import PageTabs from '../components/page-tabs.vue'
 import PageTab from '../components/page-tab.vue'
 import ListManagement from '../components/list-management'
 import Modal from '../components/modal.vue'
+import Upload from '../components/upload-img.vue'
 import patch from './patch'
 import store from '../store'
 import moment from 'moment'
@@ -33,6 +34,7 @@ Vue.component('page-tabs', PageTabs)
 Vue.component('page-tab', PageTab)
 Vue.component('list-management', ListManagement)
 Vue.component('modal', Modal)
+Vue.component('upload', Upload)
 
 Vue.mixin(patch)
 

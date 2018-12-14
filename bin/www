@@ -19,6 +19,12 @@ global.APP_PORT = (function normalizePort(val) {
 
   return false
 })(process.env.PORT || '8089')
+
+global.APP_HOST =
+  process.env.NODE_ENV === 'development'
+    ? 'https://localhost:8089'
+    : 'https://server.vaithuhay.com'
+
 const debug = require('debug')('download-manager:server')
 
 const server =
