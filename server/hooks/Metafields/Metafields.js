@@ -34,7 +34,8 @@ class MetafieldsEventHookClass extends EventEmitter {
           type: 'CollectionSlider',
           collections: await Promise.all(
             item.data.collections.map(id => HaravanClientApi.getCollection(id))
-          )
+          ),
+          ui: item.data.ui
         })
       } else if (item.type === 'Banner') {
         //refine images

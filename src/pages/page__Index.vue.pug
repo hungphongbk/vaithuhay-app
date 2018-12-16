@@ -8,7 +8,7 @@ div
       p.text-danger
         i Tính năng đang trong giai đoạn phát triển :)
       dropdown(caption="Thêm một Section mới" :list="admin.newLayout" @action="addNewLayout")
-      .w-100.mt-4(v-if="layout!==null && layout.length>0")
+      .w-75.mt-4.pb-4(v-if="layout!==null && layout.length>0")
         draggable(v-model="layout")
           page-section-item(v-for="item in layout" :key="item.id" :item="item" @update="data=>updateLayoutItem(item.id, data)" @remove="()=>removeLayoutItem(item.id)")
     page-tab#slide-panel(title="slider")

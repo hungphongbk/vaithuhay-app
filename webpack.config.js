@@ -40,7 +40,7 @@ module.exports = merge(base, {
             // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
             // the "scss" and "sass" values for the lang attribute to the right configs here.
             // other preprocessors should work out of the box, no loader config like this necessary.
-            scss: 'vue-style-loader!css-loader!sass-loader',
+            scss: 'cache-loader!vue-style-loader!css-loader!sass-loader',
             sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
             docs: require.resolve(
               path.join(__dirname, 'webpack/docs-loader.js')
@@ -63,6 +63,19 @@ module.exports = merge(base, {
       {
         test: /\.css$/,
         use: cssLoader(['css-loader'])
+      },
+      {
+        test: /\.m-scss$/,
+        use: cssLoader([
+          'cache-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true
+            }
+          },
+          'sass-loader'
+        ])
       },
       {
         test: /\.scss$/,

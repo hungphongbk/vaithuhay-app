@@ -36,6 +36,7 @@
         span.text-primary(v-for="cat in categories") {{cat.title}}
       br
       .btn.btn-primary.btn-sm(@click="showCollectionSelector = true") Chỉnh sửa
+      .btn.btn-secondary.btn-sm.ml-2(@click="()=>this.$refs.ui.show()") Giao diện
     modal(v-if="showCollectionSelector" title="Chọn danh mục sản phẩm" @dismiss="dismiss")
       .modal-body
         collection-selector(v-model="tmpCollections")
@@ -44,14 +45,16 @@
         input.form-control(type="text" v-model="tmpMaxItems")
       .modal-footer
         .btn.btn-success(@click="ok") OK
+    ui-settings(ref="ui" v-model="tmpUi")
 </template>
 <script>
 import Modal from '../../components/modal.vue'
 import CollectionSelector from '../../components/collection-selector.vue'
+import UiSettings from './UISettings.vue'
 import { mapState } from 'vuex'
 export default {
   name: 'PageSectionItemCollectionSlider',
-  components: { Modal, CollectionSelector },
+  components: { Modal, CollectionSelector, UiSettings },
   props: {
     data: {
       validator: val => typeof val === 'object' || val === null,
@@ -61,7 +64,8 @@ export default {
   data: () => ({
     showCollectionSelector: false,
     tmpCollections: [],
-    tmpMaxItems: 20
+    tmpMaxItems: 20,
+    tmpUi: {}
   }),
   computed: {
     categories() {
@@ -74,6 +78,7 @@ export default {
     reset() {
       this.tmpCollections = this.data.collections
       this.tmpMaxItems = this.data.maxItems
+      this.tmpUi = this.data.ui || {}
     },
     dismiss() {
       this.showCollectionSelector = false
@@ -83,6 +88,7 @@ export default {
       this.showCollectionSelector = false
       this.data.collections = this.tmpCollections
       this.data.maxItems = this.tmpMaxItems
+      this.data.ui = this.tmpUi || {}
       this.$emit('update', this.data)
     }
   },

@@ -1,6 +1,8 @@
 <template lang="pug">
-  div
-    h6.card-title Khuyến mãi
+  div.media
+    img.mr-3(src="../../images/icon-discount.png")
+    .media-body
+      h6.card-title Khuyến mãi
 </template>
 <script>
 export default {}

@@ -2,6 +2,7 @@ import CollectionSlider from './PageSectionItemCollectionSlider.vue'
 import Promotions from './PageSectionItemPromotions.vue'
 import Banner from './PageSectionItemBanner.vue'
 import should from 'should'
+import styles from './PageSectionItem.m-scss'
 
 const Types = {
   CollectionSlider,
@@ -15,9 +16,9 @@ export default {
   render: (h, { props, listeners }) => {
     const Type = Types[props.item.type]
     return (
-      <div class="card mt-2">
+      <div class={`card mt-2 ${styles.card}`}>
         <div class="card-body p-3">
-          <button class="close">
+          <button class={`close ${styles.close}`}>
             <span aria-hidden={'true'} onClick={listeners.remove}>
               &times;
             </span>
@@ -29,7 +30,7 @@ export default {
   },
   props: {
     item: {
-      type: Object,
+      type: Object
       // validator(value) {
       //   return should(value).have.properties(['type', 'data'])
       // }

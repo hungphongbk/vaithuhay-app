@@ -1,0 +1,21 @@
+@import "../../scss/inc/mixins";
+
+.card {
+  background-color: #fafafa;
+  @include material-box-shadow(1);
+  :global(.media > img){
+    width: 40px;
+    height:40px;
+  }
+}
+.close{
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  &:hover{
+    background:rgba(red,.12%);
+    span {
+      color:red;
+    }
+  }
+}
