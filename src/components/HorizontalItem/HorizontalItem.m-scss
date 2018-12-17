@@ -1,5 +1,8 @@
 .card{
   composes: d-flex from global;
+  border-radius: .7rem;
+  border: 1px solid #d7d7d7;
+  overflow:hidden;
 }
 .cardImage{
   width: 80px;
@@ -11,4 +14,5 @@
 }
 .cardContent{
   flex-grow: 1;
+  padding: .7rem 1rem;
 }

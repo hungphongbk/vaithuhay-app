@@ -9,8 +9,10 @@
         .row
           .col-5
             display-guard(:conditional="tmpList.length>0" text="Chưa có CTKM nào!")
-              horizontal-item(v-for="(item,index) in tmpList" :key="index" :img="item.img[lang].thumbnails['300w']")
-                h6 Ahihi
+              horizontal-item.mb-2(v-for="(item,index) in tmpList" :key="index" :img="item.img[lang].thumbnails['300w']")
+                h6(v-if="item.code.length>0") {{item.code}}
+                p
+                  strong {{index+1}}. {{item.title}}
           .col-7
             form-group(title="Tên chương trình khuyến mãi")
               input.form-control(v-model="newPromo.title")
