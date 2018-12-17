@@ -103,6 +103,12 @@ module.exports.plugins = [
           'process.env': {
             NODE_ENV: '"production"'
           }
+        }),
+        new webpack.optimize.UglifyJsPlugin({
+          sourceMap: true,
+          compress: {
+            warnings: false
+          }
         })
         // require('./webpack/completed')
       ]

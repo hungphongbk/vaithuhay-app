@@ -7,6 +7,7 @@ import { multiLang, d } from '../helpers/mixins'
 import { get, post } from '../plugins/jquery-ajax'
 import pick from 'lodash/pick'
 import Upload from '../components/upload-img.vue'
+import SelectImgDialog from '@client/components/select-img-dialog.vue'
 import PageSectionItem from '../fragments/PageSections/PageSectionItem'
 import Dropdown from '../components/dropdown.vue'
 import uuid from 'uuid/v4'
@@ -34,10 +35,12 @@ const newLayout = type => {
 }
 
 export default {
-  components: { Upload, PageSectionItem, Dropdown },
+  components: { Upload, PageSectionItem, Dropdown, SelectImgDialog },
   mixins: [multiLang],
   data() {
     return {
+      showModal: false,
+      showModalMobile: false,
       commit: d(() => [{ text: '' }, { text: '' }, { text: '' }, { text: '' }]),
       fanpage: '',
       slider: [],

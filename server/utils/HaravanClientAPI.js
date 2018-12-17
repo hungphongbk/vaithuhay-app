@@ -17,7 +17,15 @@ const pickFields = (_fields = null, type = 'product') => obj => {
   if (_fields === null) return obj
   let fields = _fields.split(',')
   const defaults = {
-    product: ['id', 'title', 'handle', 'url', 'thumbnail', 'price']
+    product: [
+      'id',
+      'title',
+      'description',
+      'handle',
+      'url',
+      'thumbnail',
+      'price'
+    ]
   }
   fields.push(...defaults[type])
   return pick(obj, uniq(fields))
@@ -83,7 +91,7 @@ const setMetafield = (
     )
 
   for (const [key, _value] of Object.entries(metafields)) {
-    const value = JSON.stringify(_value)
+    const value = typeof _value === 'string' ? _value : JSON.stringify(_value)
     if (typeof _metafields[key] === 'undefined' || !_metafields[key]) {
       //POST request
       console.log('post')
@@ -139,6 +147,11 @@ function postProcessProduct(product) {
       en: ''
     }
   }
+
+  // assign description from body, by extract first 20 words
+  product.description = product.metafields.desc
+    ? product.metafields.desc.desc
+    : { en: '', vi: '' }
 
   // assign url to product
   product.url = '/products/' + product.handle

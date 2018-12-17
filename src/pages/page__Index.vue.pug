@@ -18,13 +18,19 @@ div
             label
               i.fa.fa-desktop.fa-lg.mr-2
               | Phiên bản Desktop
-            upload(v-model="props.current.image[lang]", v-ml="lang")
+            br
+            .btn.btn-primary.btn-sm.mt-2(@click="showModal=true") Tải ảnh Slider (Desktop)
+            img.mt-1(v-if="props.current.image[lang]" :src="props.current.image[lang].thumbnails['300w']")
+            select-img-dialog(:show="showModal" @close="showModal=false" v-model="props.current.image[lang]")
             p.font-italic Kích thước hình ảnh nên là 870x470px hoặc tỉ lệ tương đương
           .col-sm-4
             label
               i.fa.fa-mobile.fa-lg.mr-2
               | Phiên bản Mobile
-            upload(v-model="props.current.mobile[lang]", v-ml="lang")
+            br
+            .btn.btn-primary.btn-sm.mt-2(@click="showModalMobile=true") Tải ảnh Banner (Mobile)
+            img.mt-1(v-if="props.current.mobile[lang]" :src="props.current.mobile[lang].thumbnails['300w']")
+            select-img-dialog(:show="showModalMobile" @close="showModalMobile=false" v-model="props.current.mobile[lang]")
             p.font-italic Tỉ lệ hình ảnh nên là 5:4
           .col-sm-8
             .form-group

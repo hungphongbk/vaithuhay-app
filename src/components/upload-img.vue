@@ -53,12 +53,12 @@
     div(:class="$style.formGroup")
       label.sr-only File upload
       input.text-primary.font-weight-bold(ref="input", type="file", accept="image/*", :data-title="value$", @change="uploadV2($event)")
-    .row(v-if="value")
-      .col-sm-8.offset-sm-2
-        img(:src="(typeof value==='object')?value.thumbnails[thumbnail]:''")
     .row
       .col-sm-12
         p.small.text-warning <b>Lưu ý</b>: chỉ up ảnh định dạng JPEG!
+    .row(v-if="showPreview && previewImg.length>0")
+      .col-sm-8.offset-sm-2
+        img(:src="previewImg")
 </template>
 <script>
 import { postForm } from '../plugins/jquery-ajax'
@@ -67,9 +67,17 @@ export default {
   name: 'Upload',
   props: {
     value: null,
+    preview: {
+      type: null,
+      default: () => null
+    },
     thumbnail: {
       type: String,
       default: '600w'
+    },
+    showPreview: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -98,6 +106,21 @@ export default {
       if (this.value && this.value.url && this.value.url.length > 0)
         return this.value.url.split('/').pop()
       else return 'Hoặc kéo thả một ảnh vào đây'
+    },
+    previewImg() {
+      if (
+        typeof this.preview !== 'undefined' &&
+        this.preview !== null &&
+        this.preview.thumbnails
+      )
+        return this.preview.thumbnails[this.thumbnail]
+      if (
+        typeof this.value !== 'undefined' &&
+        this.value !== null &&
+        this.value.thumbnails
+      )
+        return this.value.thumbnails[this.thumbnail]
+      return ''
     }
   },
   methods: {

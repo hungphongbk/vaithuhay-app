@@ -46,7 +46,7 @@
               label Đường dẫn khi click vào ô khuyến mãi
               input.form-control(v-model="newPromo.url")
           .col-sm-6
-            upload(v-model="newPromo.img[lang]", v-ml="lang")
+            select-img(v-model="newPromo.img[lang]" title="Chọn ảnh CT Khuyến mãi")
           .col-sm-12
             .btn.btn-success(@click="add") {{mode==='new'?'Thêm CT khuyến mãi':'Cập nhật'}}
         hr
@@ -67,7 +67,7 @@
 import { multiLang, d } from '../helpers/mixins'
 import { get, post } from '../plugins/jquery-ajax'
 import Help from '../components/help.vue'
-import Upload from '../components/upload-img.vue'
+import SelectImg from '../components/select-img.vue'
 import PageTabs from '../components/page-tabs.vue'
 import PageTab from '../components/page-tab.vue'
 
@@ -81,8 +81,8 @@ const newPromo = () => ({
 
 export default {
   page: 'promotions',
+  components: { Help, SelectImg, PageTabs, PageTab },
   mixins: [multiLang],
-  components: { Help, Upload, PageTabs, PageTab },
   data() {
     return {
       list: [],

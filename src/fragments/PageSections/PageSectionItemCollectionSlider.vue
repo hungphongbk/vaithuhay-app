@@ -30,8 +30,9 @@
   div.media(v-if="data")
     img.mr-3(src="../../images/icon-collections.png")
     .media-body
-      h6.card-title.mb-1 Slider danh mục
-        i(v-if="data.collections.length===0") &nbsp;(trống)
+      h6.card-title.mb-1 Slider danh mục&nbsp;
+        i(v-if="data.collections.length===0") (trống)
+        .badge.badge-pill.badge-primary(v-else) {{data.collections.length}}
       small.mb-2.d-inline-block(:class="$style.categories" v-if="data.collections.length>0")
         span.text-primary(v-for="cat in categories") {{cat.title}}
       br

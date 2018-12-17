@@ -48,13 +48,22 @@ class MetafieldsEventHookClass extends EventEmitter {
           type: 'Banner',
           banner: image
         })
+      } else if (item.type === 'Promotions') {
+        layoutJSON.push({
+          type: 'Promotions'
+        })
       }
     }
-    console.log(JSON.stringify(layoutJSON).length)
-
-    await HaravanClientApi.setMetafield(null, null, null, null)({
-      layoutJSON
+    if (process.env.NODE_ENV === 'development')
+      console.log(JSON.stringify(layoutJSON).length)
+    const parts = JSON.stringify(layoutJSON).match(/.{1,79999}/g),
+      layoutJSONParts = {}
+    parts.forEach((part, index) => {
+      layoutJSONParts[`layoutJSON${index + 1}`] = part
     })
+    console.log(Object.keys(layoutJSONParts))
+
+    await HaravanClientApi.setMetafield(null, null, null, null)(layoutJSONParts)
     console.log('Successfully update index page')
   }
 }

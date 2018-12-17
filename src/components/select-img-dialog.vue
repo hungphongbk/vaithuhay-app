@@ -1,8 +1,11 @@
 <style lang="scss" module>
 @import '../scss/inc/mixins';
+.container :global(.modal-lg) {
+  max-width: 1000px;
+}
 .image {
   @include aspect-ratio(1, 1);
-  flex-basis: percentage(1/5);
+  flex-basis: percentage(1/6);
   img {
     width: 100%;
     height: 100%;
@@ -43,9 +46,27 @@
     border: 3px solid #007bff !important;
   }
 }
+.uploadPanel {
+  background: #f6f6f6;
+  border: 1px solid #eee;
+  border-radius: 0.7rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.info {
+  table {
+    width: 100%;
+    max-width: 100%;
+    word-break: break-word;
+  }
+  table tr td:first-child {
+    padding-right: 1.3rem;
+    word-break: keep-all;
+  }
+}
 </style>
 <template lang="pug">
-  div
+  div(:class="$style.container")
     modal(v-if="show" size="lg" @dismiss="$emit('close')" :title="title")
       .modal-body
         .row
@@ -55,19 +76,28 @@
             template(v-else-if="images.length===0")
               p.text-center.text-muted Kho ảnh rỗng.
             template(v-else)
-              .d-flex
+              .d-flex.flex-wrap
                 div(:class="$style.image" v-for="image in images" :key="image._id")
                   div(:class="{ [$style.content]: true, [$style.selected]: tmpValue && tmpValue._id && image._id===tmpValue._id }" @click="tmpValue=image")
                     div
                       img(:src="image.thumbnails['300w']")
                       span(:class="$style.remove" @click="()=>deleteImage(image)") &times;
           .col-4
-            upload(v-model="newImage")
+            div(:class="$style.uploadPanel")
+              upload(v-model="newImage" :preview="tmpValue" :showPreview="false")
+            img.img-fluid(:src="tmpValue && tmpValue.thumbnails && tmpValue.thumbnails['300w']")
+            div.mt-4(v-if="tmpValue && tmpValue.thumbnails" :class="$style.info")
+              h6 Thông tin tệp ảnh
+              table
+                tr
+                  td Tên
+                  td.text-primary <i>{{tmpValue.filename}}</i>
       .modal-footer
         .btn.btn-success(:class="{ disabled: !tmpValue }" @click="selectImage") Chọn hình ảnh này
 </template>
 <script>
 import Modal from '@client/components/modal.vue'
+import { mapState } from 'vuex'
 export default {
   name: 'SelectImgDialog',
   components: { Modal },
@@ -87,38 +117,27 @@ export default {
   },
   data: () => ({
     ready: false,
-    fetched: false,
-    images: [],
     newImage: '',
     tmpValue: null
   }),
-  sockets: {
-    connect() {
-      this.ready = true
-    },
-    fetchImagesCompleted({ uuid, images }) {
-      if (this.uuid === uuid) {
-        this.images = images
-        this.fetched = true
-      }
-    },
-    deleteImageSucceeded({ uuid, _id }) {
-      if (this.uuid === uuid) {
-        const index = this.images.findIndex(img => img._id === _id)
-        this.images.splice(index, 1)
-      }
-    }
+  computed: {
+    ...mapState({
+      images: state => state.images.images,
+      stat: state => state.images.stat,
+      fetched: state => state.images.loaded
+    })
   },
   watch: {
     show(value) {
-      console.log(value)
       if (value) {
-        this.$socket.emit('fetchImages', { uuid: this.uuid })
         this.tmpValue = this.value
       }
     },
     newImage(value) {
-      this.images.push(value)
+      if (value !== '') {
+        this.images.push(value)
+        this.newImage = ''
+      }
     }
   },
   methods: {
@@ -128,6 +147,11 @@ export default {
     selectImage() {
       this.$emit('input', this.tmpValue)
       this.$emit('close')
+    }
+  },
+  mounted() {
+    if (!this.fetched) {
+      this.$socket.emit('fetchImages')
     }
   }
 }

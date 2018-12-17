@@ -15,6 +15,7 @@ import 'moment/locale/vi'
 import VueMoment from 'vue-moment'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
 import './socket'
+import FormGroup from '@client/components/form-group'
 
 Vue.use(VueAsyncComputed)
 Vue.use(VueMoment, { moment })
@@ -35,6 +36,7 @@ Vue.component('page-tab', PageTab)
 Vue.component('list-management', ListManagement)
 Vue.component('modal', Modal)
 Vue.component('upload', Upload)
+Vue.component('form-group', FormGroup)
 
 Vue.mixin(patch)
 

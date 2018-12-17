@@ -5,6 +5,7 @@ import categories from './categories'
 import articles from './articles'
 import notifications from './notifications'
 import auth from './auth'
+import images from './images'
 import qs from 'query-string'
 import { getXhr } from '../plugins/jquery-ajax'
 import VuexPersistence from 'vuex-persist'
@@ -68,7 +69,8 @@ const store = new Vuex.Store({
     categories,
     articles,
     auth,
-    notifications
+    notifications,
+    images
   },
   plugins: [vuexLocal]
 })
