@@ -8,6 +8,9 @@
       .modal-body
         .row
           .col-5
+            display-guard(:conditional="tmpList.length>0" text="Chưa có CTKM nào!")
+              horizontal-item(v-for="(item,index) in tmpList" :key="index" :img="item.img[lang].thumbnails['300w']")
+                h6 Ahihi
           .col-7
             form-group(title="Tên chương trình khuyến mãi")
               input.form-control(v-model="newPromo.title")
@@ -28,14 +31,19 @@
               input.form-control(v-model="newPromo.url")
             .form-group
               select-img(v-model="newPromo.img[lang]" title="Chọn ảnh CT Khuyến mãi")
+            .form-group
+              .btn.btn-success(@click="add") {{mode==='new'?'Thêm CT khuyến mãi':'Cập nhật'}}
       .modal-footer
 </template>
 <script>
 import Modal from '../../components/modal.vue'
 import SelectImg from '../../components/select-img.vue'
-import { d } from '@client/helpers/mixins'
+import HorizontalItem from '@client/components/HorizontalItem/HorizontalItem'
+import { d, multiLang } from '@client/helpers/mixins'
+import uuid from 'uuid/v4'
 
 const newPromo = () => ({
+  id: uuid(),
   title: '',
   code: '',
   url: '',
@@ -44,7 +52,8 @@ const newPromo = () => ({
 })
 
 export default {
-  components: { Modal, SelectImg },
+  components: { Modal, SelectImg, HorizontalItem },
+  mixins: [multiLang],
   props: {
     data: {
       validator: val => typeof val === 'object' || val === null,
@@ -56,6 +65,13 @@ export default {
     newPromo: newPromo(),
     tmpList: [],
     mode: 'new'
-  })
+  }),
+  methods: {
+    add() {
+      if (this.mode === 'new') this.tmpList.push(this.newPromo)
+      else this.mode = 'new'
+      this.newPromo = newPromo()
+    }
+  }
 }
 </script>

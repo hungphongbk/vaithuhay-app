@@ -16,6 +16,7 @@ import VueMoment from 'vue-moment'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
 import './socket'
 import FormGroup from '@client/components/form-group'
+import DisplayGuard from '@client/components/DisplayGuard'
 
 Vue.use(VueAsyncComputed)
 Vue.use(VueMoment, { moment })
@@ -37,6 +38,7 @@ Vue.component('list-management', ListManagement)
 Vue.component('modal', Modal)
 Vue.component('upload', Upload)
 Vue.component('form-group', FormGroup)
+Vue.component('display-guard', DisplayGuard)
 
 Vue.mixin(patch)
 
