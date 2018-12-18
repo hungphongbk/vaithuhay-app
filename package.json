@@ -174,7 +174,8 @@
     "webpack-merge": "^4.1.2",
     "webpack-node-externals": "^1.7.2",
     "webpack-notifier": "^1.6.0",
-    "websocket": "^1.0.25"
+    "websocket": "^1.0.25",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "node-sass": "^4.9.0",

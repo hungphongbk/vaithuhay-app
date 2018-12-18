@@ -58,6 +58,7 @@ class MetafieldsEventHookClass extends EventEmitter {
       console.log(JSON.stringify(layoutJSON).length)
     const parts = JSON.stringify(layoutJSON).match(/.{1,79999}/g),
       layoutJSONParts = {}
+    for (let i = 0; i < 4 - parts.length; i++) parts.push('')
     parts.forEach((part, index) => {
       layoutJSONParts[`layoutJSON${index + 1}`] = part
     })
