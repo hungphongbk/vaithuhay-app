@@ -386,10 +386,10 @@
     "@types/bson" "*"
     "@types/node" "*"
 
-"@types/mongoose@^5.0.10":
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.3.1.tgz#97112342e9d5930b75fe60121f820a310f98b6b7"
-  integrity sha512-4ASViFpeE9LLE+VLs/NgPy1gSS6nlUA5Iz9UBm1X5VMLqgGURvGfqML3liRrzna6WUt5kNTcLf245GQHxCxuBQ==
+"@types/mongoose@^5.3.5":
+  version "5.3.5"
+  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.3.5.tgz#9e84a5ddebfb404adc3b5afa90b41e7474397870"
+  integrity sha512-SLnO5co2keWe1PLuf9mVm3WSZGUH+JNSOjw/szJEWUelTKwRt/+FaTvfgc9j+XIlHs8zZSfRbvFIh/PC+3KJhA==
   dependencies:
     "@types/mongodb" "*"
     "@types/node" "*"
@@ -4998,6 +4998,12 @@ fd-slicer@~1.1.0:
   integrity sha1-JcfInLH5B3+IkbvmHY85Dq4lbx4=
   dependencies:
     pend "~1.2.0"
+
+"ffmpeg@https://github.com/hungphongbk/node-ffmpeg":
+  version "0.0.4"
+  resolved "https://github.com/hungphongbk/node-ffmpeg#0f720777be78f61502d935ca15e2b49884b74c8b"
+  dependencies:
+    when ">= 0.0.1"
 
 figgy-pudding@^3.1.0, figgy-pudding@^3.5.1:
   version "3.5.1"
@@ -13717,6 +13723,11 @@ websocket@^1.0.25:
     nan "^2.11.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
+
+"when@>= 0.0.1", when@^3.7.8:
+  version "3.7.8"
+  resolved "https://registry.yarnpkg.com/when/-/when-3.7.8.tgz#c7130b6a7ea04693e842cdc9e7a1f2aa39a39f82"
+  integrity sha1-xxMLan6gRpPoQs3J56Hyqjmjn4I=
 
 whet.extend@~0.9.9:
   version "0.9.9"
