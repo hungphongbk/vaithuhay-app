@@ -40,7 +40,7 @@ function saveVideo(videoBuffer, fileName) {
 async function processVideo(instance) {
   const video = await new ffmpeg(instance.videoPath),
     files = await video.fnExtractFrameToJPG(instance.assetsDirectoryPath, {
-      frame_rate: 25,
+      number: 360,
       quality: 3
     })
 

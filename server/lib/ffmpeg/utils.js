@@ -139,5 +139,7 @@ export function in_array(value, array) {
  */
 export function addQuotes(filename) {
   // Add quotes
+  if (filename[0] === "'" && filename[filename.length - 1] === "'")
+    return filename
   return JSON.stringify(filename)
 }

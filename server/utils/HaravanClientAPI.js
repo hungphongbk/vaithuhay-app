@@ -213,11 +213,21 @@ async function _getCollectionById(id, type) {
   // pick all collects, map them to products
   const { collects } = await apiGet(`/admin/collects.json?collection_id=${id}`)
   // then attach to collection
-  collection.products = await Promise.all(
+  collection.products = (await Promise.all(
     collects.map(collect =>
-      getProduct(collect.product_id).then(pickFields('', 'product'))
+      getProduct(collect.product_id).then(
+        pickFields('published_at,published_scope', 'product')
+      )
     )
+  )).filter(
+    product =>
+      typeof product !== 'undefined' &&
+      product !== null &&
+      typeof product.published_at !== 'undefined' &&
+      product.published_at !== null
+    // () => true
   )
+  // console.log(Object.keys(collection.products[0]))
   return collection
 }
 async function _getCollectionByHandle(handle) {

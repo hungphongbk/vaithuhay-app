@@ -439,7 +439,7 @@ export default function(filePath, settings, infoConfiguration, infoFile) {
     if (arguments[2] == undefined || arguments[2] == null) {
       if (options.video == undefined) options.video = new Object()
       // Set the new option
-      options.video.watermark = { path: watermarkPath, overlay: overlay }
+      options.video.watermark = { path: watermarkPath, overlay }
       return this
     } else if (arguments[2] != undefined && arguments[2] === true) {
       this.addInput(watermarkPath)
@@ -635,7 +635,7 @@ export default function(filePath, settings, infoConfiguration, infoFile) {
       aspect.string = aspect.x + ':' + aspect.y
     }
 
-    return { width: width, height: height, aspect: aspect }
+    return { width, height, aspect }
   }
 
   /**
