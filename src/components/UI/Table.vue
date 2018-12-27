@@ -1,6 +1,13 @@
-<style lang="scss" module></style>
+<style lang="scss" module>
+.table {
+  td,
+  th {
+    padding: 0.55rem;
+  }
+}
+</style>
 <template lang="pug">
-  table.table
+  table.table(:class="$style.table")
     thead
       tr
         th(v-for="field in fields" :key="field.key") {{field.label}}

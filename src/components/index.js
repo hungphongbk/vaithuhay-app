@@ -1,9 +1,11 @@
 import Vue from 'vue'
 
 import BsTable from './UI/Table.vue'
+import FaLayers from '@client/components/UI/FaLayers'
 
 const defaultComponents = {
-  BsTable
+  BsTable,
+  FaLayers
 }
 Object.entries(defaultComponents).forEach(([key, value]) => {
   Vue.component(key, value)

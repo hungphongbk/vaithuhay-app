@@ -10,22 +10,43 @@
 <script>
 export default {
   name: 'Metafields',
-  data: () => ({
-    fields: [
-      { key: 'id', label: 'ID' },
-      { key: 'key', label: 'Key' },
-      {
-        key: 'value',
-        label: 'Value',
-        transform: item => ({
-          render: h => <div class="btn btn-secondary btn-sm">Xem giá trị</div>
-        })
-      }
-    ]
-  }),
+  data() {
+    return {
+      fields: [
+        { key: 'id', label: 'ID' },
+        { key: 'key', label: 'Key' },
+        {
+          key: 'value',
+          label: 'Value',
+          transform: item => ({
+            render: h => <div class="btn btn-secondary btn-sm">Xem giá trị</div>
+          })
+        },
+        {
+          key: 'action',
+          label: '',
+          transform: item => ({
+            render: h => (
+              <div
+                class="btn btn-warning btn-sm"
+                onClick={() => this.remove(item)}
+              >
+                Xoá
+              </div>
+            )
+          })
+        }
+      ]
+    }
+  },
   computed: {
     metafields() {
       return this.$store.state.metafields.list
+    }
+  },
+  methods: {
+    remove(item) {
+      this.$socket.emit('deleteMetafield', { resource: null, id: item.id })
     }
   }
 }

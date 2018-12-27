@@ -39,14 +39,14 @@ class MetafieldsEventHookClass extends EventEmitter {
         })
       } else if (item.type === 'Banner') {
         //refine images
-        const image = { ...item.data.image }
+        const banner = { ...item.data }
         ;['uuid', 'storage', 'host', '_id'].forEach(prop => {
-          delete image.desktop[prop]
-          delete image.mobile[prop]
+          delete banner.image.desktop[prop]
+          delete banner.image.mobile[prop]
         })
         layoutJSON.push({
           type: 'Banner',
-          banner: image
+          banner
         })
       } else if (item.type === 'Promotions') {
         layoutJSON.push({

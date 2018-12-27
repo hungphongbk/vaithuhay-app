@@ -13,7 +13,10 @@ import store from '../store'
 import moment from 'moment'
 import 'moment/locale/vi'
 import VueMoment from 'vue-moment'
-import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers
+} from '@fortawesome/vue-fontawesome'
 import './socket'
 import FormGroup from '@client/components/UI/form-group'
 import DisplayGuard from '@client/components/UI/DisplayGuard'

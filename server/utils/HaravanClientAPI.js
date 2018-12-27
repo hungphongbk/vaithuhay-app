@@ -1,4 +1,11 @@
-import { apiClear, apiGet, apiPost, apiPut, cache } from '@server/utils/index'
+import {
+  apiClear,
+  apiDel,
+  apiGet,
+  apiPost,
+  apiPut,
+  cache
+} from '@server/utils/index'
 import pick from 'lodash/pick'
 import uniq from 'lodash/uniq'
 
@@ -30,8 +37,9 @@ const pickFields = (_fields = null, type = 'product') => obj => {
   fields.push(...defaults[type])
   return pick(obj, uniq(fields))
 }
-const compressMetafields = (metafields, withId = false) =>
-  (metafields.metafields || metafields)
+const compressMetafields = (metafields, withId = false) => {
+  if (!(metafields.metafields || metafields).map) return {}
+  return (metafields.metafields || metafields)
     .map(({ id, key, value }) => ({
       [key]: withId
         ? {
@@ -41,6 +49,8 @@ const compressMetafields = (metafields, withId = false) =>
         : flex(value)
     }))
     .reduce((acc, metafield) => Object.assign({}, acc, metafield), {})
+}
+
 function buildMetafieldUrl(...args) {
   const toSingular = resource => resource.slice(0, -1)
 
@@ -49,8 +59,8 @@ function buildMetafieldUrl(...args) {
   if (resource1 && !resource2) {
     url += `/${resource1}/${id1}`
   }
-  url += '/metafields.json?namespace=vaithuhay'
-  if (!resource1) {
+  url += `/metafields${id1 ? '/' + id1 : ''}.json?namespace=vaithuhay`
+  if (typeof resource1 === 'undefined' || resource1 === null) {
     url += '&owner_resource=shop'
   }
   if (resource2)
@@ -130,6 +140,17 @@ const setMetafieldForProductVariant = (productId, variantId, metafields) =>
     null,
     metafields
   )
+const deleteMetafield = (resource, id) => {
+  let listUrl = buildMetafieldUrl(resource),
+    url = buildMetafieldUrl(resource, id)
+  console.log(listUrl)
+  console.log(url)
+  return apiDel(url).then(() => {
+    return Promise.all([apiClear(listUrl), apiClear(url)]).then(() =>
+      apiGet(listUrl, false)
+    )
+  })
+}
 const attachMetafields = (resource, id) => resourceObj =>
   getMetafields(resource, id).then(metafields => ({
     ...resourceObj,
@@ -255,6 +276,7 @@ const HaravanClientApi = {
   setMetafield,
   setMetafieldForProduct,
   setMetafieldForProductVariant,
+  deleteMetafield,
   getProduct,
   getCollection
 }
