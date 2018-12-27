@@ -9,7 +9,7 @@ import pick from 'lodash/pick'
 import Upload from '../components/upload-img.vue'
 import SelectImgDialog from '@client/components/select-img-dialog.vue'
 import PageSectionItem from '../fragments/PageSections/PageSectionItem'
-import Dropdown from '../components/dropdown.vue'
+import Dropdown from '../components/UI/dropdown.vue'
 import uuid from 'uuid/v4'
 
 const $ = jQuery

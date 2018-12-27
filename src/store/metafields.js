@@ -5,7 +5,12 @@ export default {
   }),
   mutations: {
     SOCKET_getMetafieldsCompleted(state, metafields) {
-      console.log(metafields)
+      state.list = Object.entries(metafields).map(([key, obj]) => {
+        return {
+          key,
+          ...obj
+        }
+      })
       state.loaded = true
     }
   }

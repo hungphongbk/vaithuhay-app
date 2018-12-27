@@ -15,8 +15,8 @@ import 'moment/locale/vi'
 import VueMoment from 'vue-moment'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
 import './socket'
-import FormGroup from '@client/components/form-group'
-import DisplayGuard from '@client/components/DisplayGuard'
+import FormGroup from '@client/components/UI/form-group'
+import DisplayGuard from '@client/components/UI/DisplayGuard'
 
 Vue.use(VueAsyncComputed)
 Vue.use(VueMoment, { moment })
