@@ -58,6 +58,12 @@ const routes = [
     name: 'page.logs',
     component: Log
   },
+  {
+    path: '/metafields',
+    name: 'page.metafields',
+    component: () =>
+      import(/* webpackChunkName: "page-metafields" */ './pages/metafields.js.vue')
+  },
   ...transformRoutes(
     [prefixFn('/product/faq')],
     [
@@ -159,5 +165,6 @@ export const pages = {
   'articles.list': { title: 'Bài viết' },
   'images.list': { title: 'Hình ảnh' },
   'page.logs': { title: 'Nhật kí' },
-  'page.noti': { title: 'Thông báo đẩy' }
+  'page.noti': { title: 'Thông báo đẩy' },
+  'page.metafields': { title: 'Metafields' }
 }

@@ -1,3 +1,5 @@
+import MetafieldsSocketRouter from '@server/socket-routes/Metafields'
+
 require('dotenv').config()
 import UploadImages from '@server/socket-routes/UploadImages'
 
@@ -53,6 +55,7 @@ const app = express(),
   { server, io } = createServer(app, [promotionsBootstrap])
 
 UploadImages.create(io, 'upload')
+MetafieldsSocketRouter.create(io, 'metafields')
 
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 sessionComponent(app)

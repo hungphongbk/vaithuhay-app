@@ -94,28 +94,29 @@ const orderMiddleware = (req, res, next) => {
     res.status(500).send(e.message)
   }
 }
-router.post('/processOrder', orderMiddleware, (req, res) => {
-  if (
-    req.order.status === 'orders/cancelled' &&
-    req.order.financial_status === 'pending'
-  ) {
-    req.order.financial_status = 'voided'
-  }
-  try {
-    syncQueue
-      .create('sync', req.order)
-      .priority('normal')
-      .attempts(3)
-      .removeOnComplete(true)
-      .save(err => {
-        if (err) throw err
-      })
-    res.json({})
-  } catch (e) {
-    console.log(e.message)
-    res.json({})
-  }
-})
+if (process.env.NODE_ENV === 'production')
+  router.post('/processOrder', orderMiddleware, (req, res) => {
+    if (
+      req.order.status === 'orders/cancelled' &&
+      req.order.financial_status === 'pending'
+    ) {
+      req.order.financial_status = 'voided'
+    }
+    try {
+      syncQueue
+        .create('sync', req.order)
+        .priority('normal')
+        .attempts(3)
+        .removeOnComplete(true)
+        .save(err => {
+          if (err) throw err
+        })
+      res.json({})
+    } catch (e) {
+      console.log(e.message)
+      res.json({})
+    }
+  })
 
 router.post('/manual', async (req, res) => {
   const params = {

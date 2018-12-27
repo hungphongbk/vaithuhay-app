@@ -6,6 +6,7 @@ import articles from './articles'
 import notifications from './notifications'
 import auth from './auth'
 import images from './images'
+import metafields from './metafields'
 import qs from 'query-string'
 import { getXhr } from '../plugins/jquery-ajax'
 import VuexPersistence from 'vuex-persist'
@@ -70,7 +71,8 @@ const store = new Vuex.Store({
     articles,
     auth,
     notifications,
-    images
+    images,
+    metafields
   },
   plugins: [vuexLocal]
 })

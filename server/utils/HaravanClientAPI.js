@@ -50,6 +50,9 @@ function buildMetafieldUrl(...args) {
     url += `/${resource1}/${id1}`
   }
   url += '/metafields.json?namespace=vaithuhay'
+  if (!resource1) {
+    url += '&owner_resource=shop'
+  }
   if (resource2)
     url += `&metafield[owner_id]=${id2}&metafield[owner_resource]=${toSingular(
       resource1

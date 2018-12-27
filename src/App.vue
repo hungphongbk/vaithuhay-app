@@ -81,17 +81,19 @@ main {
             router-link.nav-link(v-if="permissions['images.list']", :to="{name: 'images.list'}") Quản lý hình ảnh
           li.nav-item
             router-link.nav-link(v-if="permissions['page.logs']", :to="{name: 'page.logs'}") Nhật kí hoạt động
+          li.nav-item
+            router-link.nav-link(v-if="permissions['page.metafields']" :to="{name: 'page.metafields'}") Metafields
         ul.nav.nav-pills.flex-column
           li.nav-item
             router-link.nav-link(v-if="permissions['page.noti']", :to="{name: 'page.noti'}") Thông báo đẩy
           li.nav-item
-            router-link.nav-link(v-if="permissions['product.faq']", :to="{name: 'product.faq'}") Metadata sản phẩm
+            router-link.nav-link(v-if="permissions['product.faq']", :to="{name: 'product.faq'}") Danh sách sản phẩm
+          li.nav-item
+            router-link.nav-link(v-if="permissions['cat']", :to="{name: 'cat'}") Danh sách collections
           li.nav-item
             router-link.nav-link(v-if="permissions['product.wholesale']", :to="{name: 'product.wholesale'}") Chức năng bán sỉ
           li.nav-item
             router-link.nav-link(v-if="permissions['product.promo']", :to="{name: 'product.promo'}") Khuyến mãi
-          li.nav-item
-            router-link.nav-link(v-if="permissions['cat']", :to="{name: 'cat'}") Danh mục sản phẩm
         ul.nav.nav-pills.flex-column
           li.nav-item
             router-link.nav-link(v-if="permissions['articles.list']", :to="{name: 'article.list'}") Các bài viết
@@ -143,12 +145,14 @@ export default {
       preloadStatus: {
         products: false,
         categories: false,
-        articles: false
+        articles: false,
+        metafields: false
       },
       preloadLabels: {
         products: preload('Danh sách sản phẩm'),
         categories: preload('Danh mục sản phẩm'),
-        articles: preload('Danh sách bài viết')
+        articles: preload('Danh sách bài viết'),
+        metafields: preload('Metafields')
       },
       fetchingRelated: false
     }
@@ -198,6 +202,9 @@ export default {
         onProgress: progressCb(this.preloadLabels.articles)
       })
       this.preloadStatus.articles = true
+    },
+    metafieldsFetch() {
+      this.$socket.emit('getMetafields')
     },
     async autoSyncTopProduct() {
       const { diff } = await get('/g/lastUpdated?q=topProduct')
@@ -293,15 +300,22 @@ export default {
           keyboard: false
         })
         await this.configFetch()
-        await Promise.all([this.productsFetch(), this.categoriesFetch()])
+        await Promise.all([
+          this.metafieldsFetch(),
+          this.productsFetch(),
+          this.categoriesFetch()
+        ])
         await this.articlesFetch()
         await delay(500)
         $(this.$refs.loadingModal).modal('hide')
         $(document.body).removeClass('modal-open')
         $('.modal-backdrop').remove()
         await delay(100)
-        await this.autoSyncTopProduct()
-        await this.autoSyncRelatedProducts()
+        // await this.autoSyncTopProduct()
+        // await this.autoSyncRelatedProducts()
+      }
+      if (type === 'SOCKET_getMetafieldsCompleted') {
+        this.preloadStatus.metafields = true
       }
     })
     await this.checkLogin()
