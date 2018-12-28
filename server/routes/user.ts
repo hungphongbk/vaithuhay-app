@@ -88,6 +88,7 @@ router.post('/', async (req: Request, res: Response) => {
 })
 router.post('/verify', async (req: Request, res: Response) => {
   const { email, name, avatar } = req.body
+  console.log(email)
   const user = AppUser.findOne({ email })
   if (user) {
     await user.update({

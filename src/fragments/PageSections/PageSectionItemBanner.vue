@@ -68,10 +68,13 @@ export default {
   },
   watch: {
     showModalLink(value) {
+      const data = { ...this.data }
+      console.log(data)
       if (!value) {
-        const data = { ...this.data }
         data.link = this.tmpLink
         this.$emit('update', data)
+      } else if (data.link && data.link.url) {
+        this.tmpLink = data.link
       }
     }
   },

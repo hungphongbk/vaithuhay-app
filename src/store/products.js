@@ -74,15 +74,24 @@ export default {
             Promise.all([
               get(`/meta/products/${p.id}`),
               get(`/meta-v2/products/${p.id}`)
-            ]).then(rs => {
-              if (onProgress)
-                onProgress({
-                  percentage: Math.round(
-                    (++stat.counter * 100) / products.length
-                  )
-                })
-              return rs
-            })
+            ])
+              .then(rs => {
+                if (onProgress)
+                  onProgress({
+                    percentage: Math.round(
+                      (++stat.counter * 100) / products.length
+                    )
+                  })
+                return rs
+              })
+              .catch(e => {
+                console.error(
+                  `Something wrong happened while fetch products, \n
+                  url = https://localhost:8089/meta/products/${p.id} \n
+                  url-V2 = https://localhost:8089/meta-v2/products/${p.id}`,
+                  e
+                )
+              })
           )
         )
 

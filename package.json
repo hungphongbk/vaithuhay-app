@@ -177,10 +177,11 @@
     "webpack-node-externals": "^1.7.2",
     "webpack-notifier": "^1.6.0",
     "websocket": "^1.0.25",
-    "yamljs": "^0.3.0",
-    "when": "latest"
+    "when": "latest",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "eslint-plugin-promise": "^4.0.1",
     "node-sass": "^4.9.0",
     "uglifyjs-webpack-plugin": "^2.0.1",
     "utf-8-validate": "^4.0.1"

@@ -6,7 +6,7 @@ import {
 } from '@server/routes/collections'
 import HaravanClientApi from '@server/utils/HaravanClientAPI'
 
-export default () =>
+export const serverReload = () =>
   new Promise(async resolve => {
     // fetch product list & collection list
     const [products$1, products$2, collections] = await Promise.all([
@@ -41,6 +41,11 @@ export default () =>
 
     // fetch top products collection
     // await updateTopProductsCollection()
-    console.log('fetch all products completed')
+    console.info('fetch all products completed')
     resolve()
+  })
+
+export default () =>
+  new Promise(async resolve => {
+    serverReload().then(resolve)
   })

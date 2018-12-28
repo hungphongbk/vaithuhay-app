@@ -13,6 +13,7 @@ import flatten from 'lodash/flatten'
 import { admin as adminMiddleware } from '@server/routes/middlewares'
 import HaravanClientApi from '@server/utils/HaravanClientAPI'
 import MetafieldsEventHook from '@server/hooks/Metafields/Metafields'
+import { serverReload } from '@server/utils/bootstrap'
 
 moment.tz.setDefault('Asia/Ho_Chi_Minh')
 moment.locale('vi')
@@ -33,7 +34,8 @@ function search(metafields, meta) {
 
 router.post('/c/reset', (req, res) => {
   apiClear()
-  res.json({ status: 'ok' })
+    .then(serverReload)
+    .then(() => res.json({ status: 'ok' }))
 })
 router.get('/c/stat', (req, res) => {
   res.json({ size: cache.length })

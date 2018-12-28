@@ -181,15 +181,20 @@ function postProcessProduct(product) {
   product.url = '/products/' + product.handle
 
   // omit unneeded fields in images
-  if (product.images) {
+  if (
+    product.images &&
+    Array.isArray(product.images) &&
+    product.images.length > 0
+  ) {
     // set feature image (which position = 1)
-    product.thumbnail = product.images.filter(
-      img => img.position * 1 === 1
-    )[0].src
+    let thumbnail = product.images.filter(img => img.position * 1 === 1)[0]
+    if (!thumbnail) thumbnail = product.images[0]
+    product.thumbnail = thumbnail.src
 
-    product.images = product.images.map(img =>
-      pick(img, ['src', 'variant_ids'])
-    )
+    // console.log(product.images)
+    // product.images = product.images.map(img =>
+    //   pick(img, ['src', 'variant_ids'])
+    // )
   }
 
   // pick variant with position=1
@@ -244,11 +249,17 @@ async function _getCollectionById(id, type) {
       )
     )
   )).filter(
-    product =>
-      typeof product !== 'undefined' &&
-      product !== null &&
-      typeof product.published_at !== 'undefined' &&
-      product.published_at !== null
+    product => {
+      const cond =
+        typeof product !== 'undefined' &&
+        product !== null &&
+        typeof product.published_at !== 'undefined' &&
+        product.published_at !== null
+      if (!cond) return false
+      return (
+        ['global', 'web'].findIndex(s => s === product.published_scope) >= 0
+      )
+    }
     // () => true
   )
   // console.log(Object.keys(collection.products[0]))
