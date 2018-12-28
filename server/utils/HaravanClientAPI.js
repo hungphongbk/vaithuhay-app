@@ -54,12 +54,14 @@ const compressMetafields = (metafields, withId = false) => {
 function buildMetafieldUrl(...args) {
   const toSingular = resource => resource.slice(0, -1)
 
-  const [resource1, id1, resource2, id2] = args
+  const [resource1, id1, resource2, id2, metafieldId] = args
   let url = '/admin'
   if (resource1 && !resource2) {
     url += `/${resource1}/${id1}`
   }
-  url += `/metafields${id1 ? '/' + id1 : ''}.json?namespace=vaithuhay`
+  url += `/metafields${
+    metafieldId ? '/' + metafieldId : ''
+  }.json?namespace=vaithuhay`
   if (typeof resource1 === 'undefined' || resource1 === null) {
     url += '&owner_resource=shop'
   }
@@ -79,6 +81,7 @@ function getMetafields(
   id2 = null
 ) {
   let url = buildMetafieldUrl(resource, id, resource2, id2)
+  console.log(url)
   return apiGet(url).then(metafields => compressMetafields(metafields, withId))
 }
 const setMetafield = (
@@ -141,6 +144,7 @@ const setMetafieldForProductVariant = (productId, variantId, metafields) =>
     metafields
   )
 const deleteMetafield = (resource, id) => {
+  // TODO: fix parameter order
   let listUrl = buildMetafieldUrl(resource),
     url = buildMetafieldUrl(resource, id)
   console.log(listUrl)
