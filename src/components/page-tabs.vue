@@ -69,6 +69,7 @@ export default {
     },
     add(tab) {
       this.tabs.push(tab)
+      if (this.local.length === 0) this.local = tab.$attrs.id
     }
   }
 }

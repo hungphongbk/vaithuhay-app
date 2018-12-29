@@ -18,6 +18,7 @@ import Help from '../components/help.vue'
 import debounce from 'lodash/debounce'
 import ArticleSelector from '../components/article-selector.vue'
 import CircularJSON from 'circular-json'
+import SelectImg from '@client/components/select-img.vue'
 
 const fetch = async id =>
   Promise.all([
@@ -29,7 +30,7 @@ const fetch = async id =>
 
 export default {
   mixins: [multiLang],
-  components: { Help, ArticleSelector },
+  components: { Help, ArticleSelector, SelectImg },
   data() {
     return {
       mode: 'new',
@@ -40,7 +41,8 @@ export default {
       faq: [],
       desc: d(() => ''),
       title: '',
-      relatedArticles: []
+      relatedArticles: [],
+      imageSphere: null
     }
   },
   computed: {

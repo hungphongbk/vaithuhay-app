@@ -18,7 +18,7 @@
         .modal-dialog(role="document", :class="classes")
           .modal-content
             template(v-if="title")
-              .modal-header
+              .modal-header(:class="{'border-bottom-0 pb-0': !borderBottom}")
                 h5.modal-title {{title}}
                 button.close(v-if="dismissable" type="button", aria-label="Close", @click="$emit('dismiss')")
                   span(aria-hidden="true") ×
@@ -33,6 +33,10 @@ export default {
       default: ''
     },
     dismissable: {
+      type: Boolean,
+      default: true
+    },
+    borderBottom: {
       type: Boolean,
       default: true
     }

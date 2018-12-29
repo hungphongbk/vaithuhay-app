@@ -9,6 +9,7 @@ import minBy from 'lodash/minBy'
 import sortBy from 'lodash/sortBy'
 import { UploadPathIntoUrl, verbose } from '@server/utils'
 import { memoize } from 'async-decorators'
+import { SOCKET_EV } from '@universal/consts'
 
 const IMAGES_3D_PATH = path.resolve(
   global.APP_PATH || path.resolve(__dirname, '../'),
@@ -43,7 +44,10 @@ function saveVideo(videoBuffer, fileName) {
   return [assetDirectoryPath, videoPath]
 }
 
-async function processVideo(instance) {
+async function processVideo(instance, socket) {
+  const socketLog = (eventName, message) =>
+    socket && socket.emit(eventName, { message })
+
   // extract video frames into images
   let video = await new ffmpeg(instance.videoPath),
     files = await video.fnExtractFrameToJPG(instance.assetsDirectoryPath, {
@@ -55,6 +59,10 @@ async function processVideo(instance) {
     imgFiles = sortBy(files.slice(1), file => /_(\d+)\.jpg$/.exec(file)[1] * 1)
 
   verbose(`Total ${imgFiles.length} frames have been extracted :)`)
+  socketLog(
+    SOCKET_EV.Image3d.UploadProgress,
+    `Total ${imgFiles.length} frames have been extracted :)`
+  )
 
   // detect duplication frames
   const compare = (img1, img2) =>
@@ -88,17 +96,24 @@ async function processVideo(instance) {
       analyzedFrames.map((compareFrame, index) =>
         compare(lastFrame, compareFrame).then(value => {
           ++proceeded
-          verbose.update(
-            Math.round((proceeded * 1000) / analyzedFrames.length) / 10 +
-              '% analyzed...'
-          )
+
+          // report percentage
+          const p = Math.round((proceeded * 1000) / analyzedFrames.length) / 10
+          verbose.update(p + '% analyzed...')
+          socketLog(SOCKET_EV.Image3d.UploadProgress, p + '% analyzed...')
+
           return { index, value }
         })
       )
     ),
     analyzedDupe = minBy(analyzedData, 'value')
   verbose(`Last frame is`, lastFrame)
+  socketLog(SOCKET_EV.Image3d.UploadProgress, `Last frame is` + lastFrame)
   verbose(`Best matched with last frame is`, imgFiles[analyzedDupe.index])
+  socketLog(
+    SOCKET_EV.Image3d.UploadProgress,
+    `Best matched with last frame is ` + imgFiles[analyzedDupe.index]
+  )
 
   // remove every files from 0 to index (imgFiles)
   const toRemove = analyzedDupe.index + 1
@@ -111,13 +126,13 @@ async function processVideo(instance) {
   instance.urls = files.map(UploadPathIntoUrl)
 }
 
-Images3DSchema.statics.upload = async function(videoBuffer, fileName) {
+Images3DSchema.statics.upload = async function(videoBuffer, fileName, socket) {
   // console.log(fileName)
   const [assetsDirectoryPath, videoPath] = saveVideo(videoBuffer, fileName)
 
   const instance = new this({ assetsDirectoryPath, videoPath })
 
-  await processVideo(instance)
+  await processVideo(instance, socket)
 
   await instance.save()
 

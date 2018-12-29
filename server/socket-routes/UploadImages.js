@@ -1,14 +1,17 @@
 import SocketBase from '@server/socket-routes/SocketBase'
 import Image from '@server/models/VthImages'
+import Image3D from '@server/models/Images3D'
 import { generateSet } from '@server/routes/image'
 import fs from 'fs'
 import path from 'path'
 import { bytesToSize } from '@universal/helpers'
+import { SOCKET_EV } from '@universal/consts'
 
 class UploadImages extends SocketBase {
   constructor(io, socket) {
     super(io, socket)
     socket.on('uploadImage', this.uploadImage.bind(this))
+    socket.on(SOCKET_EV.Image3d.OnUpload, this.uploadSphereImage.bind(this))
     socket.on('fetchImages', this.fetchImages.bind(this))
     socket.on('deleteImage', this.deleteImage.bind(this))
     socket.on('storageStatus', this.storageStatus.bind(this))
@@ -50,6 +53,13 @@ class UploadImages extends SocketBase {
       uuid,
       ...imageObj.toJSON()
     })
+  }
+
+  async uploadSphereImage({ filename, buf }) {
+    const { socket } = this,
+      imageSphere = await Image3D.upload(buf, filename, socket)
+
+    socket.emit(SOCKET_EV.Image3d.UploadCompleted, { imageSphere })
   }
 
   async deleteImage({ uuid, _id }) {

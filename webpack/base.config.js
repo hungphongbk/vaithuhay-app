@@ -6,7 +6,8 @@ module.exports = {
     alias: {
       '@client': path.resolve(__dirname, '../src'),
       '@server': path.resolve(__dirname, '../server'),
-      '@universal': path.resolve(__dirname, '../universal')
+      '@universal': path.resolve(__dirname, '../universal'),
+      '@vth': path.resolve(__dirname, '../vth')
     }
   }
 }
