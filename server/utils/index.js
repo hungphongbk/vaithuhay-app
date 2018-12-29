@@ -2,6 +2,7 @@ import request from 'request-promise-native'
 import Redis from 'redis'
 import Bluebird from 'bluebird'
 import './polyfill'
+import logUpdate from 'log-update'
 // import 'colors'
 Bluebird.promisifyAll(Redis)
 
@@ -165,3 +166,8 @@ export { default as createServer } from './createServer'
 export { default as diffArray } from './diffArray'
 export { default as MutexLock } from './mutexLock'
 export { cache }
+export const verbose = (...args) => global.VERBOSE && console.log(...args)
+verbose.update = (...args) => global.VERBOSE && logUpdate(...args)
+
+export const UploadPathIntoUrl = path =>
+  path.replace(/^.*?uploads/, global.APP_HOST + '/uploads')

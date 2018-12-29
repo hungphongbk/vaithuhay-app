@@ -7,7 +7,7 @@ export default async () => {
   await Promise.all(exists.map(f => f.remove()))
 
   const image3d = await Images3D.upload(
-    fs.readFileSync('/Users/myowngrave/video.mp4'),
+    fs.readFileSync('/Users/myowngrave/video2.mp4'),
     'video-demo.mp4'
   )
   console.log(image3d.toJSON())

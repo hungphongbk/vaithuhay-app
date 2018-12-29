@@ -1,8 +1,6 @@
-global.APP_HOST =
-  process.env.NODE_ENV === 'development'
-    ? 'https://localhost:8089'
-    : 'https://server.vaithuhay.com'
+global.APP_HOST = 'https://localhost:8089'
 global.APP_PATH = __dirname
+global.VERBOSE = true
 
 import program from 'commander'
 import * as tests from '@server/test'
