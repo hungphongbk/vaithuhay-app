@@ -303,9 +303,9 @@ export default {
         await Promise.all([
           this.metafieldsFetch(),
           this.productsFetch(),
-          this.categoriesFetch()
+          this.categoriesFetch(),
+          this.articlesFetch()
         ])
-        await this.articlesFetch()
         await delay(500)
         $(this.$refs.loadingModal).modal('hide')
         $(document.body).removeClass('modal-open')

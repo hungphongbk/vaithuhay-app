@@ -24,7 +24,7 @@
             fa-layers(:icon="FaLink")
             i.ml-2(:class="$style.editLink" @click="showModalLink = true")
               small
-                template(v-if="!data.link.url") Chưa có link
+                template(v-if="!(data.link && data.link.url)") Chưa có link
                 template(v-else) {{data.link.url}}
     select-img-dialog(:show="showModal" @close="showModal=false" v-model="data.image.desktop")
     select-img-dialog(:show="showModalMobile" @close="showModalMobile=false" v-model="data.image.mobile")
