@@ -24,7 +24,11 @@ const Images3DSchema = new mongoose.Schema({
   videoPath: String,
   imagesPath: [String],
   assetsDirectoryPath: String,
-  urls: [String]
+  urls: [String],
+  size: {
+    width: Number,
+    height: Number
+  }
 })
 Images3DSchema.set('toJSON', { virtuals: true })
 
@@ -65,6 +69,8 @@ async function processVideo(instance, socket) {
   )
 
   // detect duplication frames
+  let width = 0,
+    height = 0
   const compare = (img1, img2) =>
     new Promise(resolve => {
       const fn = memoize(
@@ -82,6 +88,10 @@ async function processVideo(instance, socket) {
           )
       )
       Promise.all([fn(img1), fn(img2)]).then(([img$1, img$2]) => {
+        if (!(width && height)) {
+          width = img$1.width
+          height = img$1.height
+        }
         // console.log(img$1)
         resolve(
           pixelmatch(img$1.data, img$2.data, null, img$1.width, img$1.height)
@@ -122,6 +132,7 @@ async function processVideo(instance, socket) {
   files = imgFiles
 
   // update and transform images into URLs
+  instance.size = { width, height }
   instance.imagesPath = files
   instance.urls = files.map(UploadPathIntoUrl)
 }

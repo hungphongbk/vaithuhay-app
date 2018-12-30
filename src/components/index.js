@@ -2,10 +2,12 @@ import Vue from 'vue'
 
 import BsTable from './UI/Table.vue'
 import FaLayers from '@client/components/UI/FaLayers'
+import UploadBase from './UI/UploadBase.vue'
 
 const defaultComponents = {
   BsTable,
-  FaLayers
+  FaLayers,
+  UploadBase
 }
 Object.entries(defaultComponents).forEach(([key, value]) => {
   Vue.component(key, value)
