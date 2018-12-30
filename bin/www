@@ -24,6 +24,7 @@ global.APP_HOST =
   process.env.NODE_ENV === 'development'
     ? 'https://localhost:8089'
     : 'https://server.vaithuhay.com'
+global.VERBOSE = process.env.NODE_ENV === 'development'
 
 const debug = require('debug')('download-manager:server')
 

@@ -1,22 +1,9 @@
 import kue from 'kue'
 import spreadsheet from '../components/Spreadsheet'
+import createQueue from '@server/jobs/classes/createQueue'
 // import logging from './Logging'
 
-const syncQueue = kue.createQueue()
-
-syncQueue
-  .on('job enqueue', function(id, type) {
-    console.log('Job %s got queued of type %s', id, type)
-  })
-  .on('job complete', function(id, result) {
-    kue.Job.get(id, function(err, job) {
-      if (err) return
-      job.remove(function(err) {
-        if (err) throw err
-        console.log('removed completed job #%d', job.id)
-      })
-    })
-  })
+const syncQueue = createQueue()
 process.once('SIGTERM', function(sig) {
   syncQueue.shutdown(5000, function(err) {
     console.log('Kue shutdown: ', err || '')

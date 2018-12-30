@@ -5,6 +5,44 @@ const webpack = require('webpack'),
   nodeExternals = require('webpack-node-externals')
 const isProd = process.env.NODE_ENV === 'production'
 
+const babelLoaders = [
+  {
+    loader: 'babel-loader?cacheDirectory',
+    options: {
+      babelrc: false,
+      presets: [
+        [
+          'env',
+          {
+            loose: true
+          }
+        ],
+        [
+          'es2015',
+          {
+            loose: true
+          }
+        ]
+      ],
+      plugins: [
+        'transform-object-rest-spread',
+        'transform-runtime',
+        'transform-regenerator',
+        'transform-async-functions',
+        'transform-decorators-legacy',
+        'transform-flow-strip-types',
+        [
+          'transform-class-properties',
+          {
+            spec: true
+          }
+        ]
+      ]
+    }
+  },
+  'remove-hashbag-loader'
+]
+
 module.exports = merge(base, {
   target: 'node',
   entry: {
@@ -19,54 +57,38 @@ module.exports = merge(base, {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        include: [
-          path.resolve(__dirname, 'server'), // your scripts
-          path.resolve(__dirname, 'node_modules/query-string')
-          // path.resolve(__dirname, "node_modules/query-string")
-        ],
-        use: [
+        oneOf: [
           {
-            loader: 'babel-loader?cacheDirectory',
-            options: {
-              babelrc: false,
-              presets: [
-                [
-                  'env',
-                  {
-                    loose: true
-                  }
-                ],
-                [
-                  'es2015',
-                  {
-                    loose: true
-                  }
-                ]
-              ],
-              plugins: [
-                'transform-object-rest-spread',
-                'transform-runtime',
-                'transform-regenerator',
-                'transform-async-functions',
-                'transform-decorators-legacy',
-                'transform-flow-strip-types',
-                [
-                  'transform-class-properties',
-                  {
-                    spec: true
-                  }
-                ]
-              ]
-            }
+            test: /\.process\.js$/,
+            use: [
+              {
+                loader: 'file-loader',
+                options: {
+                  name:
+                    '[name]' +
+                    (process.env.NODE_ENV === 'development' ? '.dev' : '') +
+                    '.[ext]',
+                  publicPath: path.resolve(__dirname, './server-dist')
+                }
+              },
+              ...babelLoaders
+            ]
           },
-          'remove-hashbag-loader'
+          {
+            test: /\.js$/,
+            include: [
+              path.resolve(__dirname, 'server'), // your scripts
+              path.resolve(__dirname, 'node_modules/query-string')
+              // path.resolve(__dirname, "node_modules/query-string")
+            ],
+            use: babelLoaders
+          },
+          {
+            // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
+            test: /\.tsx?$/,
+            loader: 'cache-loader!ts-loader'
+          }
         ]
-      },
-      {
-        // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
-        test: /\.tsx?$/,
-        loader: 'cache-loader!ts-loader'
       }
     ]
   },

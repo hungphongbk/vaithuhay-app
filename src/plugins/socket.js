@@ -10,7 +10,7 @@ export const SocketInstance = socketio(
   dev
     ? {}
     : {
-        path: '/b/socket.io'
+        path: '/b/socket.io',
       }
 )
 

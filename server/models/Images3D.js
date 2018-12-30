@@ -10,6 +10,9 @@ import sortBy from 'lodash/sortBy'
 import { UploadPathIntoUrl, verbose } from '@server/utils'
 import { memoize } from 'async-decorators'
 import { SOCKET_EV } from '@universal/consts'
+import { sleep } from 'sleep'
+import analyzeDiffImages from '@server/jobs/analyzeDiffImages.process'
+import { fork } from 'child_process'
 
 const IMAGES_3D_PATH = path.resolve(
   global.APP_PATH || path.resolve(__dirname, '../'),
@@ -49,14 +52,25 @@ function saveVideo(videoBuffer, fileName) {
 }
 
 async function processVideo(instance, socket) {
-  const socketLog = (eventName, message) =>
-    socket && socket.emit(eventName, { message })
+  const fps = 5
+
+  const socketLog = (eventName, message) => {
+    if (socket) {
+      verbose('emit to frontend')
+      socket.emit(eventName, { message })
+    }
+  }
+
+  socketLog(
+    SOCKET_EV.Image3d.UploadProgress,
+    `Video has been uploaded.\nfps = 5. Begin extracting frames...`
+  )
 
   // extract video frames into images
   let video = await new ffmpeg(instance.videoPath),
     files = await video.fnExtractFrameToJPG(instance.assetsDirectoryPath, {
       // number: 360,
-      frame_rate: 5,
+      frame_rate: fps,
       quality: 3
     }),
     // sort file names by its index
@@ -67,56 +81,35 @@ async function processVideo(instance, socket) {
     SOCKET_EV.Image3d.UploadProgress,
     `Total ${imgFiles.length} frames have been extracted :)`
   )
+  socketLog(
+    SOCKET_EV.Image3d.UploadProgress,
+    `Begin analyzed extracted frames. Please wait...`
+  )
 
   // detect duplication frames
   let width = 0,
     height = 0
-  const compare = (img1, img2) =>
-    new Promise(resolve => {
-      const fn = memoize(
-        img =>
-          new Promise((resolve$1, reject$1) =>
-            fs.readFile(img, (err, data) => {
-              if (err) {
-                console.error('Unexpected when processing ' + img, err)
-                reject$1(err)
-                return
-              }
-              // console.log(data)
-              resolve$1(jpeg.decode(data))
-            })
-          )
-      )
-      Promise.all([fn(img1), fn(img2)]).then(([img$1, img$2]) => {
-        if (!(width && height)) {
-          width = img$1.width
-          height = img$1.height
-        }
-        // console.log(img$1)
-        resolve(
-          pixelmatch(img$1.data, img$2.data, null, img$1.width, img$1.height)
-        )
-      })
-    })
 
   const lastFrame = imgFiles[imgFiles.length - 1]
-  let proceeded = 0
   const analyzedFrames = imgFiles.slice(0, Math.floor(imgFiles.length / 3)),
-    analyzedData = await Promise.all(
-      analyzedFrames.map((compareFrame, index) =>
-        compare(lastFrame, compareFrame).then(value => {
-          ++proceeded
-
-          // report percentage
-          const p = Math.round((proceeded * 1000) / analyzedFrames.length) / 10
-          verbose.update(p + '% analyzed...')
-          socketLog(SOCKET_EV.Image3d.UploadProgress, p + '% analyzed...')
-
-          return { index, value }
-        })
-      )
-    ),
-    analyzedDupe = minBy(analyzedData, 'value')
+    analyzedDupe = await new Promise(resolve => {
+      const job = fork(analyzeDiffImages)
+      job.send({
+        frames: analyzedFrames,
+        lastFrame
+      })
+      job.on('message', ({ event, data }) => {
+        switch (event) {
+          case 'progress':
+            socketLog(SOCKET_EV.Image3d.UploadProgress, data.message)
+            break
+          case 'completed':
+            width = data.width
+            height = data.height
+            resolve(data.analyzedDupe)
+        }
+      })
+    })
   verbose(`Last frame is`, lastFrame)
   socketLog(SOCKET_EV.Image3d.UploadProgress, `Last frame is` + lastFrame)
   verbose(`Best matched with last frame is`, imgFiles[analyzedDupe.index])
