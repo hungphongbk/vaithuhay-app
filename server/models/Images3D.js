@@ -2,12 +2,8 @@ import mongoose from 'mongoose'
 import fs from 'fs'
 import path from 'path'
 import rimraf from 'rimraf'
-import ffmpeg from '@server/lib/ffmpeg/ffmpeg'
-import sortBy from 'lodash/sortBy'
-import { UploadPathIntoUrl, verbose } from '@server/utils'
+import { newProcess, UploadPathIntoUrl, verbose } from '@server/utils'
 import { SOCKET_EV } from '@universal/consts'
-import analyzeDiffImages from '@server/jobs/analyzeDiffImages.process'
-import { fork } from 'child_process'
 
 const IMAGES_3D_PATH = path.resolve(
   global.APP_PATH || path.resolve(__dirname, '../'),
@@ -48,82 +44,29 @@ function saveVideo(videoBuffer, fileName) {
 
 async function processVideo(instance, socket) {
   console.log('process video')
-  const fps = 5
+  const fps = 4
 
   const socketLog = (eventName, message) => {
     if (socket) {
-      verbose('emit to frontend')
       socket.emit(eventName, { message })
     }
   }
 
-  socketLog(
-    SOCKET_EV.Image3d.UploadProgress,
-    `Video has been uploaded.\nfps = 5. Begin extracting frames...`
-  )
-
-  // extract video frames into images
-  let video = await new ffmpeg(instance.videoPath),
-    files = await video.fnExtractFrameToJPG(instance.assetsDirectoryPath, {
-      // number: 360,
-      frame_rate: fps,
-      quality: 3
-    }),
-    // sort file names by its index
-    imgFiles = sortBy(files.slice(1), file => /_(\d+)\.jpg$/.exec(file)[1] * 1)
-
-  verbose(`Total ${imgFiles.length} frames have been extracted :)`)
-  socketLog(
-    SOCKET_EV.Image3d.UploadProgress,
-    `Total ${imgFiles.length} frames have been extracted :)`
-  )
-  socketLog(
-    SOCKET_EV.Image3d.UploadProgress,
-    `Begin analyzed extracted frames. Please wait...`
-  )
-
-  // detect duplication frames
-  let width = 0,
-    height = 0
-
-  const lastFrame = imgFiles[imgFiles.length - 1]
-  const analyzedFrames = imgFiles.slice(0, Math.floor(imgFiles.length / 3)),
-    analyzedDupe = await new Promise(resolve => {
-      const job = fork(analyzeDiffImages)
-      job.send({
-        frames: analyzedFrames,
-        lastFrame
-      })
-      job.on('message', ({ event, data }) => {
-        switch (event) {
-          case 'progress':
-            socketLog(SOCKET_EV.Image3d.UploadProgress, data.message)
-            break
-          case 'completed':
-            width = data.width
-            height = data.height
-            resolve(data.analyzedDupe)
-        }
-      })
+  const newInstance = await new Promise(resolve => {
+    const job = newProcess('make-image-sphere')
+    job.send({ videoObj: instance, options: { fps } })
+    job.on('message', ({ event, data }) => {
+      switch (event) {
+        case SOCKET_EV.Image3d.UploadProgress:
+          socketLog(event, data.message)
+          break
+        case SOCKET_EV.Image3d.UploadProcessed:
+          resolve(data)
+      }
     })
-  verbose(`Last frame is`, lastFrame)
-  socketLog(SOCKET_EV.Image3d.UploadProgress, `Last frame is` + lastFrame)
-  verbose(`Best matched with last frame is`, imgFiles[analyzedDupe.index])
-  socketLog(
-    SOCKET_EV.Image3d.UploadProgress,
-    `Best matched with last frame is ` + imgFiles[analyzedDupe.index]
-  )
+  })
 
-  // remove every files from 0 to index (imgFiles)
-  const toRemove = analyzedDupe.index + 1
-  imgFiles.slice(0, toRemove).forEach(f => fs.unlinkSync(f))
-  imgFiles = imgFiles.slice(toRemove)
-  files = imgFiles
-
-  // update and transform images into URLs
-  instance.size = { width, height }
-  instance.imagesPath = files
-  instance.urls = files.map(UploadPathIntoUrl)
+  Object.assign(instance, newInstance)
 }
 
 Images3DSchema.statics.upload = async function(videoBuffer, fileName, socket) {

@@ -3,6 +3,7 @@ import Redis from 'redis'
 import Bluebird from 'bluebird'
 import './polyfill'
 import logUpdate from 'log-update'
+import { fork } from 'child_process'
 // import 'colors'
 Bluebird.promisifyAll(Redis)
 
@@ -170,4 +171,16 @@ export const verbose = (...args) => global.VERBOSE && console.log(...args)
 verbose.update = (...args) => global.VERBOSE && logUpdate(...args)
 
 export const UploadPathIntoUrl = path =>
-  path.replace(/^.*?uploads/, global.APP_HOST + '/uploads')
+  path.replace(
+    /^.*?uploads/,
+    (process.env.NODE_ENV === 'development'
+      ? 'https://localhost:8089'
+      : 'https://server.vaithuhay.com') + '/uploads'
+  )
+
+export const newProcess = entry => {
+  const entryFullPath = `./server-dist/${entry}.${
+    process.env.NODE_ENV === 'development' ? 'dev' : 'prod'
+  }.js`
+  return fork(entryFullPath)
+}

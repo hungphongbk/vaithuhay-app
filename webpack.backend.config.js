@@ -2,53 +2,70 @@ const path = require('path')
 const webpack = require('webpack'),
   merge = require('webpack-merge'),
   base = require('./webpack/base.config.js'),
-  nodeExternals = require('webpack-node-externals')
+  nodeExternals = require('webpack-node-externals'),
+  glob = require('glob')
 const isProd = process.env.NODE_ENV === 'production'
 
+function camelToKebab(input) {
+  return input.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
 const babelLoaders = (additionalBabelPlugins = []) => [
-  {
-    loader: 'babel-loader?cacheDirectory',
-    options: {
-      babelrc: false,
-      presets: [
-        [
-          'env',
-          {
-            loose: true
-          }
+    {
+      loader: 'babel-loader?cacheDirectory',
+      options: {
+        babelrc: false,
+        presets: [
+          [
+            'env',
+            {
+              loose: true
+            }
+          ],
+          [
+            'es2015',
+            {
+              loose: true
+            }
+          ],
+          ...additionalBabelPlugins
         ],
-        [
-          'es2015',
-          {
-            loose: true
-          }
-        ],
-        ...additionalBabelPlugins
-      ],
-      plugins: [
-        'transform-object-rest-spread',
-        'transform-runtime',
-        'transform-regenerator',
-        'transform-async-functions',
-        'transform-decorators-legacy',
-        'transform-flow-strip-types',
-        [
-          'transform-class-properties',
-          {
-            spec: true
-          }
+        plugins: [
+          'transform-object-rest-spread',
+          'transform-runtime',
+          'transform-regenerator',
+          'transform-async-functions',
+          'transform-decorators-legacy',
+          'transform-flow-strip-types',
+          [
+            'transform-class-properties',
+            {
+              spec: true
+            }
+          ]
         ]
-      ]
-    }
-  },
-  'remove-hashbag-loader'
-]
+      }
+    },
+    'remove-hashbag-loader'
+  ],
+  processEntries = glob
+    .sync('./server/**/*.process.js')
+    .reduce((entries, entry) => {
+      const match = /\/([\w\d-_]+)\.process\.js$/.exec(entry)
+      // console.log(match)
+      if (match !== null && typeof match[1] !== 'undefined') {
+        entries[camelToKebab(match[1])] = entry
+      }
+      return entries
+    }, {})
+// console.log(processEntries)
 
 module.exports = merge(base, {
   target: 'node',
   entry: {
     'app-build': './server/app.js',
-    test: './server/testcli.js'
+    test: './server/testcli.js',
+    ...processEntries
   },
   output: {
     path: path.resolve(__dirname, './server-dist'),
@@ -59,24 +76,6 @@ module.exports = merge(base, {
     rules: [
       {
         oneOf: [
-          {
-            test: /\.process\.js$/,
-            use: [
-              {
-                loader: 'file-loader',
-                options: {
-                  name:
-                    '[name]' +
-                    (process.env.NODE_ENV === 'development' ? '.dev' : '') +
-                    '.[ext]',
-                  publicPath: './server-dist'
-                }
-              },
-              ...babelLoaders(
-                process.env.NODE_ENV === 'development' ? [] : ['minify']
-              )
-            ]
-          },
           {
             test: /\.js$/,
             include: [
