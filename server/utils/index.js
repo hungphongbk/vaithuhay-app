@@ -8,6 +8,13 @@ import { HrvAPISelector } from '@server/core/haravan-api'
 // import 'colors'
 Bluebird.promisifyAll(Redis)
 
+export const newProcess = entry => {
+  const entryFullPath = `./server-dist/${entry}.${
+    process.env.NODE_ENV === 'development' ? 'dev' : 'prod'
+  }.js`
+  return fork(entryFullPath)
+}
+
 const flex = obj => {
   let rs
   try {
@@ -19,101 +26,36 @@ const flex = obj => {
 }
 
 const cache = Redis.createClient({
-    prefix: 'vth'
-  }),
-  delayFn = ms =>
-    new Promise(resolve => {
-      console.log(`delay ${ms}ms`)
-      setTimeout(resolve, ms)
-    }),
-  _getQueue = [],
-  opts = {
-    delay: 0,
-    delayDefaultInterval: 2000,
-    retryCounter: 0,
-    reset() {
-      opts.delayDefaultInterval = 2000
-    },
-    maxQueue() {
-      if (opts.delay === 0) return 7
-      else {
-        if (opts.retryCounter === 0) opts.retryCounter = 4
-        if (--opts.retryCounter > 0) return 1
-        else {
-          opts.delay = 0
-          return 7
-        }
-      }
-    }
+  prefix: 'vth'
+})
+
+// new API EventLoop
+const apiPool = new Map(),
+  apiThread = newProcess('haravan-api')
+apiThread.on('message', ({ err, timestamp, payload }) => {
+  if (err) {
+    console.error(err)
+    return
   }
-
-function loop() {
-  const handle = setInterval(async () => {
-    const fns = [],
-      resolveQueue = async request => {
-        const { url, type, data, resolve } = request
-        let promise
-        switch (type) {
-          case 'get':
-            promise = () => HrvAPISelector().get(url)
-            break
-          case 'post':
-            promise = () =>
-              HrvAPISelector()
-                .post(url)
-                .json(data)
-            break
-          case 'put':
-            promise = () =>
-              HrvAPISelector()
-                .put(url)
-                .json(data)
-            break
-          case 'del':
-            promise = () => HrvAPISelector().delete(url)
-            break
-        }
-        try {
-          const rs = await promise()
-          opts.reset()
-          resolve(rs)
-        } catch (e) {
-          //push request back to queue to resolve later
-          if (/^429/.test(e.message)) {
-            console.log('Retry due to "too many request"')
-            opts.delay = opts.delayDefaultInterval += 100
-            _getQueue.unshift(request)
-          } else {
-            console.log(
-              `${
-                e.message
-              }\n Ignore due to unhandled error\n URL: [${type.toUpperCase()}] ${url}`
-            )
-            resolve({})
-          }
-        }
-      }
-
-    let i = opts.maxQueue()
-    if (opts.delay > 0) {
-      // await delayFn(opts.delay);
-      clearInterval(handle)
-      await delayFn(opts.delay)
-      loop()
-    } else {
-      while (--i > 0 && _getQueue.length > 0) fns.push(_getQueue.shift())
-      if (fns.length > 0)
-        console.log('Process ' + fns.length + ' tasks in queue')
-      await Promise.all(fns.map(resolveQueue))
-    }
-  }, 300)
-}
-
-loop()
+  const resolve = apiPool.get(timestamp)
+  resolve(payload)
+  apiPool.delete(timestamp)
+  // process.nextTick(() => apiPool.delete(timestamp))
+})
 
 const pushQueue = (url, type = 'get', data = {}) =>
   new Promise(resolve => {
-    _getQueue.push({ url, type, data, resolve })
+    // _getQueue.push({ url, type, data, resolve })
+    const timestamp =
+      Math.random()
+        .toString(36)
+        .substring(2, 15) +
+      Math.random()
+        .toString(36)
+        .substring(2, 15)
+
+    apiPool.set(timestamp, resolve)
+    apiThread.send({ timestamp, url, type, data })
   })
 
 export async function apiGet(url, _cache = true) {
@@ -159,10 +101,3 @@ export { default as MutexLock } from './mutexLock'
 export { cache }
 export const verbose = (...args) => global.VERBOSE && console.log(...args)
 verbose.update = (...args) => global.VERBOSE && logUpdate(...args)
-
-export const newProcess = entry => {
-  const entryFullPath = `./server-dist/${entry}.${
-    process.env.NODE_ENV === 'development' ? 'dev' : 'prod'
-  }.js`
-  return fork(entryFullPath)
-}
