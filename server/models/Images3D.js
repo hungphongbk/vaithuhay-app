@@ -44,7 +44,8 @@ function saveVideo(videoBuffer, fileName) {
 
 async function processVideo(instance, socket) {
   console.log('process video')
-  const fps = 4
+  const fps = 4,
+    quality = 15
 
   const socketLog = (eventName, message) => {
     if (socket) {
@@ -54,7 +55,7 @@ async function processVideo(instance, socket) {
 
   const newInstance = await new Promise(resolve => {
     const job = newProcess('make-image-sphere')
-    job.send({ videoObj: instance, options: { fps } })
+    job.send({ videoObj: instance, options: { fps, quality } })
     job.on('message', ({ event, data }) => {
       switch (event) {
         case SOCKET_EV.Image3d.UploadProgress:

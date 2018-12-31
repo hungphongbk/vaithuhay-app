@@ -19,6 +19,7 @@ import debounce from 'lodash/debounce'
 import ArticleSelector from '../components/article-selector.vue'
 import CircularJSON from 'circular-json'
 import SelectImg from '@client/components/select-img.vue'
+import ImageSphere from '@vth/ImageSphere.vue'
 
 const fetch = async id =>
   Promise.all([
@@ -31,7 +32,7 @@ const fetch = async id =>
 
 export default {
   mixins: [multiLang],
-  components: { Help, ArticleSelector, SelectImg },
+  components: { Help, ArticleSelector, SelectImg, ImageSphere },
   data() {
     return {
       mode: 'new',

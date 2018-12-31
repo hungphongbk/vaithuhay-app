@@ -36,7 +36,11 @@ div
             button.btn.btn-light(@click="mode='edit';newFAQ=f") Chỉnh sửa
             button.btn.btn-danger(@click="faq.splice(index, 1)") Xóa
     .tab-pane.fade#sphere-panel
-      select-img(:sphere="true" v-model="imageSphere")
+      select-img(:sphere="true" v-model="imageSphere" :allow-remove="true")
+      .row.mt-3(v-if="imageSphere")
+        .col-8
+          image-sphere(:image="imageSphere")
+        .col-4
     .tab-pane.fade#desc-panel
       .form
         .form-group

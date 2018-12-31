@@ -49,7 +49,7 @@ export default {
         { width, height } = this.image.size
 
       this.ctx.clearRect(0, 0, width, height)
-      console.log(index)
+      // console.log(index)
       this.ctx.drawImage(this.imgs[index], 0, 0)
     }
   },

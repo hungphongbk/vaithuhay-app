@@ -11,12 +11,6 @@ import fs from 'fs'
 import gm$ from 'gm'
 import zipObject from 'lodash/zipObject'
 
-import Uploader from '@server/jobs/uploader'
-
-const awsUploader = Uploader.select('aws', {
-  widthSet: [80, 150, 300, 400, 600, 1200, 1920]
-})
-
 const gm = gm$.subClass({ imageMagick: true }),
   router = Router(),
   imageUrl = url => path.join(global.APP_PATH, url),
@@ -74,11 +68,13 @@ function gmToBuffer(data) {
   })
 }
 
-const compress = async (img, options) => {
-  const { w, format } = options
-  const gmStream = gm(img)
-    .setFormat(format)
-    .resize(w)
+const compress = async (img, options = {}) => {
+  const { w, format = 'jpeg' } = options
+
+  let gmStream = gm(img).setFormat(format)
+  if (w) gmStream = gmStream.resize(w)
+
+  gmStream = gmStream
     .noProfile()
     .sharpen(3, 0.8)
     .compress(format)

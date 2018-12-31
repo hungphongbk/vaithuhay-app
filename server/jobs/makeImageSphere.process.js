@@ -3,10 +3,12 @@ import fs from 'fs'
 import jpeg from 'jpeg-js'
 import pixelmatch from 'pixelmatch'
 import minBy from 'lodash/minBy'
+import chunk from 'lodash/chunk'
 import ffmpeg from '@server/lib/ffmpeg/ffmpeg'
 import sortBy from 'lodash/sortBy'
 import { SOCKET_EV } from '@universal/consts'
 import { UploadPathIntoUrl } from '@universal/helpers'
+import { compress } from '@server/routes/image'
 
 let width, height
 const send = (event, data) => process.send({ event, data })
@@ -41,9 +43,14 @@ const compare = (img1, img2) =>
 
 process.on('message', async ({ videoObj, options }) => {
   const { videoPath, assetsDirectoryPath } = videoObj,
-    { fps } = Object.assign({}, options, {
-      fps: 4
-    })
+    { fps, quality } = Object.assign(
+      {},
+      {
+        fps: 4,
+        quality: 5
+      },
+      options
+    )
 
   send(SOCKET_EV.Image3d.UploadProgress, {
     message: `Video has been uploaded.`
@@ -56,7 +63,7 @@ process.on('message', async ({ videoObj, options }) => {
     files = await video.fnExtractFrameToJPG(assetsDirectoryPath, {
       // number: 360,
       frame_rate: fps,
-      quality: 3
+      quality
     }),
     // sort file names by its index
     imgFiles = sortBy(files.slice(1), file => /_(\d+)\.jpg$/.exec(file)[1] * 1),
@@ -95,6 +102,30 @@ process.on('message', async ({ videoObj, options }) => {
   imgFiles.slice(0, toRemove).forEach(f => fs.unlinkSync(f))
   imgFiles = imgFiles.slice(toRemove)
   files = imgFiles
+
+  // send(SOCKET_EV.Image3d.UploadProgress, {
+  //   message: 'Compressing image sphere...'
+  // })
+  // const chunks = chunk(files, 5)
+  // for (const chunk of chunks) {
+  //   await Promise.all(
+  //     chunk.map(async imgPath => {
+  //       const buf = await compress(imgPath)
+  //       await new Promise((resolve, reject) => {
+  //         fs.writeFile(imgPath, buf, err => {
+  //           if (err) {
+  //             console.error(err)
+  //             reject(err)
+  //           } else resolve()
+  //         })
+  //       })
+  //     })
+  //   )
+  //   console.log('done chunk')
+  // }
+  // send(SOCKET_EV.Image3d.UploadProgress, {
+  //   message: 'Completed...'
+  // })
 
   const newVideoObj = Object.assign({}, videoObj, {
     size: { width, height },
