@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 import fs from 'fs'
 import path from 'path'
 import rimraf from 'rimraf'
-import { newProcess, UploadPathIntoUrl, verbose } from '@server/utils'
+import { newProcess, verbose } from '@server/utils'
 import { SOCKET_EV } from '@universal/consts'
 
 const IMAGES_3D_PATH = path.resolve(

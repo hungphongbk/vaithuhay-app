@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { apiDel, apiGet, apiPost, apiPut, HaravanAPI } from '../utils'
+import { apiDel, apiGet, apiPost, apiPut } from '../utils'
 import syncQueue from '../jobs/sync-spreadsheet-v2'
 import range from 'lodash/range'
 import flatten from 'lodash/flatten'
@@ -7,6 +7,7 @@ import moment from 'moment-timezone'
 import qs from 'query-string'
 import chunk from 'lodash/chunk'
 import spreadsheet from '@server/components/Spreadsheet'
+import { HaravanAPI } from '@server/core/haravan-api'
 
 const router = new Router(),
   CARTS_CREATE_ADDRESS = 'https://server.vaithuhay.com/b/callback/createCart',

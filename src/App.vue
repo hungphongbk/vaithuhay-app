@@ -132,6 +132,7 @@ import faSync from '@fortawesome/fontawesome-free-solid/faSync'
 import faCheckCircle from '@fortawesome/fontawesome-free-solid/faCheckCircle'
 import chunk from 'lodash/chunk'
 import { retry } from '@client/helpers'
+import { endMeasureTime, startMeasureTime } from '@universal/helpers'
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms)),
   preload = (label, percentage = 0) => ({ label, percentage }),
@@ -154,7 +155,8 @@ export default {
         articles: preload('Danh sách bài viết'),
         metafields: preload('Metafields')
       },
-      fetchingRelated: false
+      fetchingRelated: false,
+      once: false
     }
   },
   computed: {
@@ -294,11 +296,18 @@ export default {
   async mounted() {
     this.$store.subscribe(async ({ type, payload }) => {
       // console.log(type, payload);
-      if (type === 'auth/updateUserStatus' && payload.isLoggedIn === true) {
+      if (
+        type === 'auth/updateUserStatus' &&
+        payload.isLoggedIn === true &&
+        !this.once
+      ) {
+        this.once = true
         $(this.$refs.loadingModal).modal({
           backdrop: 'static',
           keyboard: false
         })
+        // start measure time
+        const handler = startMeasureTime()
         await this.configFetch()
         await Promise.all([
           this.metafieldsFetch(),
@@ -306,6 +315,9 @@ export default {
           this.categoriesFetch(),
           this.articlesFetch()
         ])
+        endMeasureTime(handler, elapsed => {
+          console.info(`Preload consumes ${elapsed} seconds`)
+        })
         await delay(500)
         $(this.$refs.loadingModal).modal('hide')
         $(document.body).removeClass('modal-open')

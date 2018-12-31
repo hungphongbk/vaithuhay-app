@@ -4,6 +4,7 @@ import Bluebird from 'bluebird'
 import './polyfill'
 import logUpdate from 'log-update'
 import { fork } from 'child_process'
+import { HrvAPISelector } from '@server/core/haravan-api'
 // import 'colors'
 Bluebird.promisifyAll(Redis)
 
@@ -45,17 +46,6 @@ const cache = Redis.createClient({
       }
     }
   }
-
-export const HaravanAPI = request.defaults({
-  baseUrl:
-    'https://c96aab241903b825360305142e40a08a:66921be54a74fe0e36d2671d0c5fb77e@vai-thu-hay-i-something-nice.myharavan.com/'
-})
-const HaravanAPIAlternative = request.defaults({
-    baseUrl:
-      'https://0960be1b285c555d784594798247dae8:213dee7cc59da754bd713f633fd48275@vai-thu-hay-i-something-nice.myharavan.com/'
-  }),
-  HrvAPISelector = () =>
-    Math.random() > 0.5 ? HaravanAPI : HaravanAPIAlternative
 
 function loop() {
   const handle = setInterval(async () => {
@@ -169,14 +159,6 @@ export { default as MutexLock } from './mutexLock'
 export { cache }
 export const verbose = (...args) => global.VERBOSE && console.log(...args)
 verbose.update = (...args) => global.VERBOSE && logUpdate(...args)
-
-export const UploadPathIntoUrl = path =>
-  path.replace(
-    /^.*?uploads/,
-    (process.env.NODE_ENV === 'development'
-      ? 'https://localhost:8089'
-      : 'https://server.vaithuhay.com') + '/uploads'
-  )
 
 export const newProcess = entry => {
   const entryFullPath = `./server-dist/${entry}.${

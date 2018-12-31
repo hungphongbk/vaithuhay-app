@@ -1,4 +1,5 @@
-import { HaravanAPI, apiGet, apiPost } from '../utils/index'
+import { apiGet, apiPost } from '../utils/index'
+import { HrvAPISelector } from '@server/core/haravan-api'
 
 const updateTopProducts = async (arr, namespace, resources = '') => {
   const { metafields } = await apiGet(
@@ -10,7 +11,7 @@ const updateTopProducts = async (arr, namespace, resources = '') => {
         ({ id, namespace: _namespace }) =>
           new Promise(async resolve => {
             if (namespace === _namespace)
-              await HaravanAPI.delete(
+              await HrvAPISelector().delete(
                 `/admin${resources}/metafields/${id}.json`
               )
             resolve()

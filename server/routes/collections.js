@@ -1,4 +1,4 @@
-import { HaravanAPI, apiGet, apiPost, apiClear, cache } from '../utils/index'
+import { apiGet, apiPost, apiClear, cache } from '../utils/index'
 import { Router } from 'express'
 import Setting from '../models/Settings'
 import sort from 'lodash/sortBy'
@@ -6,6 +6,7 @@ import maxBy from 'lodash/maxBy'
 import pickBy from 'lodash/filter'
 import reverse from 'lodash/reverse'
 import { getFeaturedProducts } from '@server/routes/google'
+import { HrvAPISelector } from '@server/core/haravan-api'
 
 const router = Router()
 function search(metafields, meta) {
@@ -71,7 +72,7 @@ const updateTopProductsCollection = async () => {
 
   // remove old products (by collect)
   await Promise.all(
-    exists.map(({ id }) => HaravanAPI.del(`/admin/collects/${id}.json`))
+    exists.map(({ id }) => HrvAPISelector().del(`/admin/collects/${id}.json`))
   )
 
   // and push new
@@ -120,11 +121,11 @@ router.post('/new', async (req, res) => {
   // then create post request to update san-pham-moi collection
   // along with it, delete old collects by add a property to remains
   await Promise.all(
-    exists.map(({ id }) => HaravanAPI.del(`/admin/collects/${id}.json`))
+    exists.map(({ id }) => HrvAPISelector().del(`/admin/collects/${id}.json`))
   )
   await Promise.all(
     products.slice(0, 20).map(({ id: product_id }) =>
-      HaravanAPI.post(`/admin/collects.json`).json({
+      HrvAPISelector().post(`/admin/collects.json`).json({
         collect: { product_id, collection_id }
       })
     )
@@ -166,10 +167,10 @@ router.post('/promo', async (req, res) => {
   // then create post request to update san-pham-moi collection
   // along with it, delete old collects by add a property to remains
   await Promise.all(
-    exists.map(({ id }) => HaravanAPI.del(`/admin/collects/${id}.json`))
+    exists.map(({ id }) => HrvAPISelector().del(`/admin/collects/${id}.json`))
   )
   for (const product of saleProducts) {
-    await HaravanAPI.post(`/admin/collects.json`).json({
+    await HrvAPISelector().post(`/admin/collects.json`).json({
       collect: {
         product_id: product.id,
         collection_id

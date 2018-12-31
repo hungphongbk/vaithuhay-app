@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
-import { HaravanAPI, apiGet } from '../utils/index'
+import { apiGet } from '../utils/index'
 import genetator from 'generate-password'
 import btoa from 'btoa'
+import { HrvAPISelector } from '@server/core/haravan-api'
 
 const searchCustomerByEmailOrCreate = async (
   _email,
@@ -9,25 +10,27 @@ const searchCustomerByEmailOrCreate = async (
 ) => {
   const create = async email => {
     console.log('time to create')
-    const { customer } = await HaravanAPI.post('/admin/customers.json').json({
-      customer: {
-        first_name,
-        last_name,
-        email,
-        verified_email: true,
-        password,
-        password_confirmation: password,
-        tags: 'facebook',
-        metafields: [
-          {
-            key: 'facebook',
-            value: id,
-            value_type: String,
-            namespace: 'vaithuhay'
-          }
-        ]
-      }
-    })
+    const { customer } = await HrvAPISelector()
+      .post('/admin/customers.json')
+      .json({
+        customer: {
+          first_name,
+          last_name,
+          email,
+          verified_email: true,
+          password,
+          password_confirmation: password,
+          tags: 'facebook',
+          metafields: [
+            {
+              key: 'facebook',
+              value: id,
+              value_type: String,
+              namespace: 'vaithuhay'
+            }
+          ]
+        }
+      })
     return customer
   }
 

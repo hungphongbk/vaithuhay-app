@@ -6,7 +6,7 @@ import minBy from 'lodash/minBy'
 import ffmpeg from '@server/lib/ffmpeg/ffmpeg'
 import sortBy from 'lodash/sortBy'
 import { SOCKET_EV } from '@universal/consts'
-import { UploadPathIntoUrl } from '@server/utils'
+import { UploadPathIntoUrl } from '@universal/helpers'
 
 let width, height
 const send = (event, data) => process.send({ event, data })

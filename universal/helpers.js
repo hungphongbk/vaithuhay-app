@@ -5,4 +5,28 @@ function bytesToSize(bytes) {
   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i]
 }
 
-export { bytesToSize }
+const wm = new Map()
+function startMeasureTime() {
+  const obj = { sec: 0 },
+    handler = setInterval(function() {
+      obj.sec += 0.1
+    }, 100)
+  wm.set(handler, obj)
+  return handler
+}
+function endMeasureTime(handler, callback) {
+  const obj = wm.get(handler)
+  clearInterval(handler)
+  callback(obj.sec)
+}
+
+function UploadPathIntoUrl(path) {
+  return path.replace(
+    /^.*?uploads/,
+    (process.env.NODE_ENV === 'development'
+      ? 'https://localhost:8089'
+      : 'https://server.vaithuhay.com') + '/uploads'
+  )
+}
+
+export { bytesToSize, startMeasureTime, endMeasureTime, UploadPathIntoUrl }
