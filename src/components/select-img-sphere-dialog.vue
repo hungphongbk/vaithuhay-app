@@ -4,7 +4,7 @@
   background: #fbfbfb;
   p {
     font-size: 0.85rem;
-    margin-bottom: .3rem;
+    margin-bottom: 0.3rem;
     font-family: monospace;
   }
 }
@@ -19,16 +19,20 @@
               template(v-if="!value")
                 upload-base.align-self-center(ref="upload" title="Tải lên video (*.mp4)" acceptTypes="video/mp4" :upload-fn="upload" btnClasses="btn-lg" :withProgress="uploading")
               template(v-else)
+                image-sphere(:image="value")
             template(v-if="logs.length>0")
               div(:class="$style.log")
                 p(v-for="(log,index) in logs" :key="index") {{log}}
+      .modal-footer
+        .btn.btn-success(@click="ok") Chọn ảnh
 </template>
 <script>
 import UploadBase from '@client/components/UI/UploadBase.vue'
 import { SOCKET_EV } from '@universal/consts'
+import ImageSphere from '@vth/ImageSphere.vue'
 export default {
   name: 'SelectImgSphereDialog',
-  components: { UploadBase },
+  components: { ImageSphere, UploadBase },
   props: {
     title: {
       type: String,
@@ -62,6 +66,9 @@ export default {
   methods: {
     upload(fileObj) {
       this.$socket.emit(SOCKET_EV.Image3d.OnUpload, fileObj)
+    },
+    ok() {
+      this.$emit('close')
     }
   }
 }

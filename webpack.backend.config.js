@@ -5,7 +5,7 @@ const webpack = require('webpack'),
   nodeExternals = require('webpack-node-externals')
 const isProd = process.env.NODE_ENV === 'production'
 
-const babelLoaders = [
+const babelLoaders = (additionalBabelPlugins = []) => [
   {
     loader: 'babel-loader?cacheDirectory',
     options: {
@@ -22,7 +22,8 @@ const babelLoaders = [
           {
             loose: true
           }
-        ]
+        ],
+        ...additionalBabelPlugins
       ],
       plugins: [
         'transform-object-rest-spread',
@@ -68,10 +69,12 @@ module.exports = merge(base, {
                     '[name]' +
                     (process.env.NODE_ENV === 'development' ? '.dev' : '') +
                     '.[ext]',
-                  publicPath: path.resolve(__dirname, './server-dist')
+                  publicPath: './server-dist'
                 }
               },
-              ...babelLoaders
+              ...babelLoaders(
+                process.env.NODE_ENV === 'development' ? [] : ['minify']
+              )
             ]
           },
           {
@@ -81,7 +84,7 @@ module.exports = merge(base, {
               path.resolve(__dirname, 'node_modules/query-string')
               // path.resolve(__dirname, "node_modules/query-string")
             ],
-            use: babelLoaders
+            use: babelLoaders()
           },
           {
             // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`

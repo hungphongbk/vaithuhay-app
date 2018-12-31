@@ -3,14 +3,9 @@ import fs from 'fs'
 import path from 'path'
 import rimraf from 'rimraf'
 import ffmpeg from '@server/lib/ffmpeg/ffmpeg'
-import pixelmatch from 'pixelmatch'
-import jpeg from 'jpeg-js'
-import minBy from 'lodash/minBy'
 import sortBy from 'lodash/sortBy'
 import { UploadPathIntoUrl, verbose } from '@server/utils'
-import { memoize } from 'async-decorators'
 import { SOCKET_EV } from '@universal/consts'
-import { sleep } from 'sleep'
 import analyzeDiffImages from '@server/jobs/analyzeDiffImages.process'
 import { fork } from 'child_process'
 
@@ -52,6 +47,7 @@ function saveVideo(videoBuffer, fileName) {
 }
 
 async function processVideo(instance, socket) {
+  console.log('process video')
   const fps = 5
 
   const socketLog = (eventName, message) => {

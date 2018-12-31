@@ -25,6 +25,7 @@ const fetch = async id =>
     get(`/products/${id}/vaithuhay-faq`),
     get(`/products/${id}/desc`),
     get(`/products/${id}/title`),
+    get(`/products/${id}/imageSphere`),
     get(`/products/${id}/relatedArticles?id=true`)
   ])
 
@@ -60,23 +61,46 @@ export default {
     }
   },
   async beforeRouteEnter({ params }, {}, next) {
-    const [{ faq }, { desc }, title, relatedArticles] = await fetch(params.id)
+    const [
+      { faq },
+      { desc },
+      title,
+      { imageSphere },
+      relatedArticles
+    ] = await fetch(params.id)
     next(vm => {
       vm.faq = faq || []
       vm.desc = desc || d(() => '')
       vm.title = title || ''
       vm.relatedArticles.push(...(relatedArticles || []))
-      // debugger;
-      console.log('fetch related articles before')
+      if (
+        imageSphere &&
+        typeof imageSphere === 'object' &&
+        !Array.isArray(imageSphere)
+      ) {
+        vm.imageSphere = imageSphere
+      }
     })
   },
   async beforeRouteUpdate({ params }, {}, next) {
-    const [{ faq }, { desc }, title, relatedArticles] = await fetch(params.id)
+    const [
+      { faq },
+      { desc },
+      title,
+      { imageSphere },
+      relatedArticles
+    ] = await fetch(params.id)
     this.faq = faq || []
     this.desc = desc || d(() => '')
     this.title = title || ''
     this.relatedArticles.push(...(relatedArticles || []))
-    console.log('fetch related articles')
+    if (
+      imageSphere &&
+      typeof imageSphere === 'object' &&
+      !Array.isArray(imageSphere)
+    ) {
+      this.imageSphere = imageSphere
+    }
     next()
   },
   methods: {
@@ -89,12 +113,13 @@ export default {
       }))
     },
     async save() {
-      const { id, faq, desc, title, relatedArticles } = this
+      const { id, faq, desc, title, relatedArticles, imageSphere } = this
       await Promise.all([
         post(`/products/${id}/vaithuhay-faq`, { faq }),
         post(`/products/${id}/desc`, { desc }),
         postText(`/products/${id}/title`, title),
-        this.current.updateMeta('relatedArticles', relatedArticles)
+        this.current.updateMeta('relatedArticles', relatedArticles),
+        this.current.updateMeta('imageSphere', imageSphere)
       ])
     }
   }
