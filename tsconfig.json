@@ -3,28 +3,17 @@
     "module": "esnext",
     "target": "es5",
     "sourceMap": true,
+    "declaration": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "lib": [
-      "es6",
-      "dom",
-      "scripthost"
-    ],
+    "lib": ["es6", "dom", "scripthost"],
     "baseUrl": ".",
     "paths": {
-      "@server/*": [
-        "server/*"
-      ]
+      "@server/*": ["server/*"]
     },
     "experimentalDecorators": true
   },
-  "include": [
-    "server/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "files": [
-    "./typings.d.ts"
-  ]
+  "include": ["server/**/*.ts"],
+  "exclude": ["node_modules"],
+  "files": ["./typings.d.ts"]
 }

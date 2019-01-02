@@ -290,4 +290,6 @@ const ffmpeg = function(/* inputFilepath, settings, callback */) {
 // configurable path to ffmpeg binaries. Default uses ffmpeg on PATH
 ffmpeg.bin = 'ffmpeg'
 
-export default ffmpeg
+const createFFMPEG = (...args) => new ffmpeg(...args)
+
+export default createFFMPEG

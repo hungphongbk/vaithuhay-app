@@ -80,7 +80,7 @@ export default {
         !Array.isArray(imageSphere)
       ) {
         vm.imageSphere = imageSphere
-      }
+      } else vm.imageSphere = null
     })
   },
   async beforeRouteUpdate({ params }, {}, next) {
@@ -101,7 +101,7 @@ export default {
       !Array.isArray(imageSphere)
     ) {
       this.imageSphere = imageSphere
-    }
+    } else this.imageSphere = null
     next()
   },
   methods: {
