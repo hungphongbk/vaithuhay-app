@@ -11,7 +11,7 @@ const fn = async args => {
       fs.readFileSync('/Users/myowngrave/video2.mp4'),
       'video-demo.mp4'
     )
-    console.log(image3d.toJSON())
+    // console.log(image3d.toJSON())
   }
 }
 

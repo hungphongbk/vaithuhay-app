@@ -11,7 +11,12 @@ import { UploadPathIntoUrl } from '@universal/helpers'
 import { compress } from '@server/routes/image'
 
 let width, height, video
-const send = (event, data) => process.send({ event, data })
+const send = (event, data) => {
+  process.env.APP_RUNTIME_ENV === 'cli' &&
+    data.message &&
+    console.log(data.message)
+  process.send({ event, data })
+}
 
 const compare = (img1, img2, seed = 0) =>
   new Promise(resolve => {
@@ -167,6 +172,5 @@ process.on('message', async ({ videoObj, options }) => {
     imagesPath: files,
     urls: files.map(UploadPathIntoUrl)
   })
-
   send(SOCKET_EV.Image3d.UploadProcessed, newVideoObj)
 })

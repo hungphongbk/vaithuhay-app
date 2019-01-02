@@ -1,4 +1,4 @@
-require('@server/core/env')('server')
+require('@server/core/env')('web')
 
 import MetafieldsSocketRouter from '@server/socket-routes/Metafields'
 import UploadImages from '@server/socket-routes/UploadImages'

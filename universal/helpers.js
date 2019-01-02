@@ -21,12 +21,7 @@ function endMeasureTime(handler, callback) {
 }
 
 function UploadPathIntoUrl(path) {
-  return path.replace(
-    /^.*?uploads/,
-    (process.env.NODE_ENV === 'development'
-      ? 'https://localhost:8089'
-      : 'https://server.vaithuhay.com') + '/uploads'
-  )
+  return path.replace(/^.*?uploads/, process.env.APP_HOST + '/uploads')
 }
 
 export { bytesToSize, startMeasureTime, endMeasureTime, UploadPathIntoUrl }

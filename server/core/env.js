@@ -1,23 +1,26 @@
 import path from 'path'
-import * as dotenv from 'dotenv'
+const yenv = require('yenv')
 
-function loadEnv(environment) {
-  const stage = process.env.NODE_ENV === 'development' ? 'dev' : 'production',
-    envFilePath = path.resolve(
-      process.cwd(),
-      `config/.env.${environment}.${stage}`
-    ),
-    envBootstrapPath = path.resolve(process.cwd(), `config/.env.${stage}`)
+function loadEnv(_environment) {
+  const environment = _environment || 'web',
+    stage = process.env.NODE_ENV === 'development' ? 'dev' : 'production'
 
-  console.log(`load env file: ${envBootstrapPath}`)
-  console.log(`load env file: ${envFilePath}`)
-  dotenv.config({ path: envBootstrapPath })
-  dotenv.config({ path: envFilePath })
+  const envs = yenv(path.resolve(process.cwd(), 'config/env.yaml'), {
+    env: `${environment}-${stage}`
+  })
+  Object.keys(envs).forEach(function(key) {
+    if (!process.env.hasOwnProperty(key) || !process.env[key]) {
+      process.env[key] = envs[key]
+    }
+  })
+  console.log('Load env from env.yaml, env = ' + `${environment}-${stage}`)
 
-  const merges = ['APP_HOST']
+  const merges = ['APP_HOST', 'APP_RUNTIME_ENV']
   merges.forEach(envVar => {
     global[envVar] = process.env[envVar]
   })
+
+  return envs
 }
 
 module.exports = loadEnv

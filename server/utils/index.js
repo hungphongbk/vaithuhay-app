@@ -5,14 +5,18 @@ import './polyfill'
 import logUpdate from 'log-update'
 import { fork } from 'child_process'
 import { HrvAPISelector } from '@server/core/haravan-api'
+const loadEnv = require('@server/core/env')
 // import 'colors'
 Bluebird.promisifyAll(Redis)
 
 export const newProcess = entry => {
+  console.log(`start new fork (${entry}) ...`)
   const entryFullPath = `./server-dist/${entry}.${
     process.env.NODE_ENV === 'development' ? 'dev' : 'prod'
   }.js`
-  return fork(entryFullPath)
+  return fork(entryFullPath, {
+    env: loadEnv(process.env.APP_RUNTIME_ENV)
+  })
 }
 
 const flex = obj => {
