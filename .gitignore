@@ -54,4 +54,5 @@ fabric.properties
 /dist
 /uploads
 /server-dist
-.env
+/config/*
+!/config/.env.example

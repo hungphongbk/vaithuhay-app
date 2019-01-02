@@ -1,4 +1,4 @@
-global.APP_HOST = 'https://localhost:8089'
+require('@server/core/env')('cli')
 global.APP_PATH = __dirname
 global.VERBOSE = true
 

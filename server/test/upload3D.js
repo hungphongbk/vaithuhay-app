@@ -3,7 +3,7 @@ import fs from 'fs'
 
 const fn = async args => {
   // clean before test
-  const exists = await Images3D.find({ host: 'https://localhost:8089' })
+  const exists = await Images3D.find({ host: global.APP_HOST })
   await Promise.all(exists.map(f => f.remove()))
 
   if (args.create) {

@@ -1,6 +1,6 @@
-import MetafieldsSocketRouter from '@server/socket-routes/Metafields'
+require('@server/core/env')('server')
 
-require('dotenv').config()
+import MetafieldsSocketRouter from '@server/socket-routes/Metafields'
 import UploadImages from '@server/socket-routes/UploadImages'
 
 process
