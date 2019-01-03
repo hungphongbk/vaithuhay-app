@@ -1,7 +1,7 @@
 import kue from 'kue'
 
-const createQueue = () => {
-  const queue = kue.createQueue()
+const createQueue = (prefix = 'q', redis = {}) => {
+  const queue = kue.createQueue({ prefix, redis })
 
   queue
     .on('job enqueue', function(id, type) {

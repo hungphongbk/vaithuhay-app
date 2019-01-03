@@ -11,6 +11,7 @@ const filterAsync = (array, filter) =>
   )
 
 const test1 = async () => {
+  console.log('run sync')
   const params = {
       created_at_min: moment()
         .subtract(30, 'days')

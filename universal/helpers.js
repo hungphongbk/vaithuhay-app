@@ -24,4 +24,18 @@ function UploadPathIntoUrl(path) {
   return path.replace(/^.*?uploads/, process.env.APP_HOST + '/uploads')
 }
 
-export { bytesToSize, startMeasureTime, endMeasureTime, UploadPathIntoUrl }
+const _obj = { logOnce: false }
+function logOnce(arg) {
+  if (!_obj.logOnce) {
+    _obj.logOnce = true
+    console.log(arg)
+  }
+}
+
+export {
+  bytesToSize,
+  startMeasureTime,
+  endMeasureTime,
+  UploadPathIntoUrl,
+  logOnce
+}

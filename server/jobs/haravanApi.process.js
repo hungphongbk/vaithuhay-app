@@ -4,7 +4,7 @@ import { HrvAPISelector } from '@server/core/haravan-api'
 const latency = 50,
   concurrencySize = 8
 
-const queue = createQueue()
+const queue = createQueue(`api-${process.env.APP_RUNTIME_ENV}`)
 
 queue.process('request', concurrencySize, async (job, done) => {
   function processDone(err, payload) {
@@ -16,11 +16,15 @@ queue.process('request', concurrencySize, async (job, done) => {
       delayDone(err)
     } else {
       process.send(payload)
+      process.env.APP_RUNTIME_ENV === 'cli' &&
+        console.log(`[haravan-api] #${job.data.timestamp} has done`)
       delayDone()
     }
   }
 
   const { url, type, data, timestamp } = job.data
+  process.env.APP_RUNTIME_ENV === 'cli' &&
+    console.log(`[haravan-api] #${timestamp} is processed now`)
   let promise
   switch (type) {
     case 'get':
@@ -63,8 +67,20 @@ queue.process('request', concurrencySize, async (job, done) => {
 })
 
 process.on('message', payload => {
-  queue.create('request', payload).save(err => {
-    if (err) process.send({ err })
-    // else console.log(payload.timestamp)
-  })
+  process.env.APP_RUNTIME_ENV === 'cli' &&
+    console.log(
+      `[haravan-api] #${payload.timestamp} being queued: ${payload.type} ${
+        payload.url
+      }`
+    )
+  queue
+    .create('request', payload)
+    .removeOnComplete(true)
+    .save(err => {
+      if (err) {
+        console.error(err)
+        process.send({ err })
+      }
+      // else console.log(payload.timestamp)
+    })
 })

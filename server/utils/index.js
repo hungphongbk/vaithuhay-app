@@ -42,7 +42,7 @@ apiThread.on('message', ({ err, timestamp, payload }) => {
     return
   }
   const resolve = apiPool.get(timestamp)
-  resolve(payload)
+  if (resolve) resolve(payload)
   apiPool.delete(timestamp)
   // process.nextTick(() => apiPool.delete(timestamp))
 })
@@ -59,6 +59,8 @@ const pushQueue = (url, type = 'get', data = {}) =>
         .substring(2, 15)
 
     apiPool.set(timestamp, resolve)
+    //for debug
+    // process.env.APP_RUNTIME_ENV === 'cli' && console.log(apiPool.keys())
     apiThread.send({ timestamp, url, type, data })
   })
 
