@@ -25,8 +25,7 @@ syncQueue.process('sync', 1, async ({ data: order }, done) => {
           } has been updated, time elapsed: ${sec} seconds`
         )
       })
-    else
-      console.log(`[SYNC] Order ${order.order_number} has been updated`)
+    else console.log(`[SYNC] Order ${order.order_number} has been updated`)
     // await logging.logOrderInfo(order, spreadsheet.emitLog());
     done()
   } catch (e) {

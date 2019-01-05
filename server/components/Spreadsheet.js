@@ -202,10 +202,11 @@ class Spreadsheet {
       }
     }
     this.logs = []
+    this._makeAuth = memoize(this._makeAuthFn.bind(this))
+    this._cacheHeaders = memoize(this._cacheHeadersFn.bind(this))
   }
 
-  @memoize()
-  async _makeAuth() {
+  async _makeAuthFn() {
     console.log('create auth')
     const jwt = new googleapis.auth.JWT(
       credentials.client_email,
@@ -249,8 +250,7 @@ class Spreadsheet {
     }
   }
 
-  @memoize()
-  async _cacheHeaders() {
+  async _cacheHeadersFn() {
     const headers = []
     const result = await this.spreadsheets.values.get(
       await this._params({

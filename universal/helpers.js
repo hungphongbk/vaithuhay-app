@@ -25,7 +25,7 @@ function startMeasureTime() {
 function endMeasureTime(handler, callback) {
   const before = wm.get(handler),
     diff = Date.now() - before
-  callback(Math.round(diff * 1000) / 1000)
+  callback(diff / 1000)
 }
 
 function UploadPathIntoUrl(path) {
