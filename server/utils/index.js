@@ -5,6 +5,7 @@ import './polyfill'
 import logUpdate from 'log-update'
 import { fork } from 'child_process'
 import { HrvAPISelector } from '@server/core/haravan-api'
+import { randomHash } from '@universal/helpers'
 const loadEnv = require('@server/core/env')
 // import 'colors'
 Bluebird.promisifyAll(Redis)
@@ -50,13 +51,7 @@ apiThread.on('message', ({ err, timestamp, payload }) => {
 const pushQueue = (url, type = 'get', data = {}) =>
   new Promise(resolve => {
     // _getQueue.push({ url, type, data, resolve })
-    const timestamp =
-      Math.random()
-        .toString(36)
-        .substring(2, 15) +
-      Math.random()
-        .toString(36)
-        .substring(2, 15)
+    const timestamp = randomHash()
 
     apiPool.set(timestamp, resolve)
     //for debug

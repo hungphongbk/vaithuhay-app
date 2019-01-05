@@ -5,19 +5,27 @@ function bytesToSize(bytes) {
   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i]
 }
 
+function randomHash() {
+  return (
+    Math.random()
+      .toString(36)
+      .substring(2, 15) +
+    Math.random()
+      .toString(36)
+      .substring(2, 15)
+  )
+}
+
 const wm = new Map()
 function startMeasureTime() {
-  const obj = { sec: 0 },
-    handler = setInterval(function() {
-      obj.sec += 0.1
-    }, 100)
-  wm.set(handler, obj)
+  const handler = randomHash()
+  wm.set(handler, Date.now())
   return handler
 }
 function endMeasureTime(handler, callback) {
-  const obj = wm.get(handler)
-  clearInterval(handler)
-  callback(obj.sec)
+  const before = wm.get(handler),
+    diff = Date.now() - before
+  callback(Math.round(diff * 1000) / 1000)
 }
 
 function UploadPathIntoUrl(path) {
@@ -37,5 +45,6 @@ export {
   startMeasureTime,
   endMeasureTime,
   UploadPathIntoUrl,
-  logOnce
+  logOnce,
+  randomHash
 }

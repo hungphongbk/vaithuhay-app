@@ -8,6 +8,7 @@ import qs from 'query-string'
 import chunk from 'lodash/chunk'
 import spreadsheet from '@server/components/Spreadsheet'
 import { HaravanAPI } from '@server/core/haravan-api'
+import { startMeasureTime } from '@universal/helpers'
 
 const router = new Router(),
   CARTS_CREATE_ADDRESS = 'https://server.vaithuhay.com/b/callback/createCart',
@@ -103,6 +104,10 @@ if (process.env.NODE_ENV === 'production')
     ) {
       req.order.financial_status = 'voided'
     }
+
+    // add timestamp to req.order to measure timing
+    req.order.__timestamp = startMeasureTime()
+
     try {
       syncQueue
         .create('sync', req.order)
