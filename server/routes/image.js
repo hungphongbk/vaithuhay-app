@@ -116,7 +116,7 @@ async function generateSet(
 
             if (!image.thumbnails) image.thumbnails = {}
             image.thumbnails[`${w}w`] =
-              global.APP_HOST + '/uploads/' + newFilename
+              process.env.APP_HOST + '/uploads/' + newFilename
             // if (process.env.NODE_ENV === 'production')
             //     imagemin.buffer(data, {
             //         plugins: [

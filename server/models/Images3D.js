@@ -13,7 +13,7 @@ const IMAGES_3D_PATH = path.resolve(
 const Images3DSchema = new mongoose.Schema({
   host: {
     type: String,
-    default: global.APP_HOST || 'https://localhost:8089'
+    default: process.env.APP_HOST || 'https://localhost:8089'
   },
   videoPath: String,
   imagesPath: [String],

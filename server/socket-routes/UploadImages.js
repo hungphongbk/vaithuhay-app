@@ -27,14 +27,14 @@ class UploadImages extends SocketBase {
       rs ||
       new Image({
         filename,
-        host: global.APP_HOST,
-        url: global.APP_HOST + '/uploads/' + filename
+        host: process.env.APP_HOST,
+        url: process.env.APP_HOST + '/uploads/' + filename
       })
     )
   }
 
   async fetchImages() {
-    const images = await Image.find({ host: global.APP_HOST })
+    const images = await Image.find({ host: process.env.APP_HOST })
     this.socket.emit('fetchImagesCompleted', { images })
     this.storageStatus()
   }

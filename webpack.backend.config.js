@@ -3,7 +3,16 @@ const webpack = require('webpack'),
   merge = require('webpack-merge'),
   base = require('./webpack/base.config.js'),
   nodeExternals = require('webpack-node-externals'),
-  glob = require('glob')
+  glob = require('glob'),
+  yenv = require('yenv')
+
+const _envs = yenv(path.resolve(process.cwd(), 'config/env.yaml'), {
+    env: 'web-production'
+  }),
+  envs = {}
+for (const env of ['APP_HOST', 'NODE_ENV']) {
+  envs[env] = JSON.stringify(_envs[env])
+}
 const isProd = process.env.NODE_ENV === 'production'
 
 function camelToKebab(input) {
@@ -124,9 +133,7 @@ module.exports.plugins = [
   ...(isProd
     ? [
         new webpack.DefinePlugin({
-          'process.env': {
-            NODE_ENV: '"production"'
-          }
+          'process.env': envs
         }),
         new webpack.optimize.UglifyJsPlugin({
           sourceMap: true,
