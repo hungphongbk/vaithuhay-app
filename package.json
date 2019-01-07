@@ -5,6 +5,7 @@
   "author": "Trương Phong <programmingd32@gmail.com>",
   "private": true,
   "scripts": {
+    "test": "NODE_ENV=development mocha tests/",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --hot --https --cert=/Users/myowngrave/server.crt --key=/Users/myowngrave/server.key --port 8081 --progress",
     "dev:node": "NODE_ENV=development nodemon --trace-warnings $NODE_DEBUG_OPTION --watch server-dist bin/www",
     "dev:test": "NODE_ENV=development nodemon --trace-warnings $NODE_DEBUG_OPTION --watch server server/test.dev.js",
@@ -54,6 +55,7 @@
     "bson": "^2.0.5",
     "btoa": "^1.2.1",
     "cache-loader": "^1.2.2",
+    "chai": "^4.2.0",
     "circular-json": "^0.5.4",
     "colors": "^1.2.1",
     "commander": "^2.15.1",
@@ -108,6 +110,7 @@
     "marked": "^0.3.19",
     "memoizee": "^0.4.12",
     "mime-types": "^2.1.18",
+    "mocha": "^5.2.0",
     "moment": "^2.22.1",
     "moment-timezone": "^0.5.16",
     "mongodb": "^3.0.7",

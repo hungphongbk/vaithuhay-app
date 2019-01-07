@@ -53,7 +53,15 @@ export default function(app, bootstrapCallbacks = []) {
     .then(() => Promise.all(bootstrapCallbacks.map(f => f())))
     .then(() => {
       console.log('ready now')
-      server.listen(port)
+      const httpServer = server.listen(port)
+      server.on('vthAppClose', (cb = () => {}) => {
+        console.log('Terminate vaithuhay.com server. Good bye :)')
+        httpServer.close(() => {
+          cb()
+          process.exit(0)
+        })
+      })
+      server.emit('vthAppReady')
     })
 
   return { server, io }
