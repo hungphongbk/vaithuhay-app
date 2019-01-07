@@ -26,7 +26,10 @@ for (const name in tests)
     if (typeof test.options === 'object')
       for (const op in test.options)
         command = command.option(op, test.options[op])
-    command = command.action(args => test(args).then(() => process.exit(0)))
+    command = command.action(args => {
+      console.info(`[cli] start ${name}`)
+      test(args).then(() => process.exit(0))
+    })
   }
 
 program.parse(process.argv)

@@ -15,9 +15,15 @@ export const newProcess = entry => {
   const entryFullPath = `./server-dist/${entry}.${
     process.env.NODE_ENV === 'development' ? 'dev' : 'prod'
   }.js`
-  return fork(entryFullPath, {
+  const childProc = fork(entryFullPath, {
     env: loadEnv(process.env.APP_RUNTIME_ENV)
   })
+  process.on('exit', () => {
+    console.log(`process [${entry}] will be terminated soon.`)
+    childProc.kill()
+  })
+
+  return childProc
 }
 
 const flex = obj => {
@@ -43,8 +49,12 @@ apiThread.on('message', ({ err, timestamp, payload }) => {
     return
   }
   const resolve = apiPool.get(timestamp)
-  if (resolve) resolve(payload)
-  apiPool.delete(timestamp)
+  if (resolve) {
+    resolve(payload)
+    apiPool.delete(timestamp)
+  } else {
+    console.log(`#${timestamp} not found!`)
+  }
   // process.nextTick(() => apiPool.delete(timestamp))
 })
 
