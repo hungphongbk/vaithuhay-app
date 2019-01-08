@@ -1,7 +1,14 @@
+import './_global'
 import io from 'socket.io-client'
-import { expect } from 'chai'
+import chai from 'chai'
 import path from 'path'
 import fs from 'fs'
+import chaiHttp from 'chai-http'
+import chaiAsPromise from 'chai-as-promised'
+chai.use(chaiHttp)
+chai.use(chaiAsPromise)
+
+const expect = chai.expect
 // import sinon from 'sinon'
 //
 // sinon.stub(console, 'log')
@@ -59,6 +66,34 @@ describe('Upload image using socket.io', function() {
   it('Image object must have _id property', function() {
     expect(img).to.have.property('_id')
     // done()
+  })
+
+  it('Image object must exists in Database', function(done) {
+    server.models.Image.findById(img._id, (err, obj) => {
+      if (err) {
+        done(err)
+        return
+      }
+      console.log(obj)
+      expect(obj).to.be.an('object')
+      done()
+    })
+  })
+
+  describe('Checking generated thumbnail URLs', function() {
+    it('all must formed valid images URL', function() {
+      return Promise.all(
+        Object.values(img.thumbnails).map(url =>
+          chai
+            .request(img.host)
+            .get(url.replace(img.host, ''))
+            .then(res => {
+              expect(res).to.have.status(200)
+              expect(res.type).to.equal('image/jpeg')
+            })
+        )
+      )
+    })
   })
 
   // it('Checking URI', done => {
