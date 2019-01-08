@@ -55,13 +55,16 @@ export default function(app, bootstrapCallbacks = []) {
       console.log('ready now')
       const httpServer = server.listen(port)
       server.on('vthAppClose', (cb = () => {}) => {
-        console.log('Terminate vaithuhay.com server. Good bye :)')
-        httpServer.close(() => {
+        console.log('Terminate vaithuhay.com server at next 500ms. Good bye :)')
+        httpServer.close()
+        setTimeout(() => {
           cb()
           process.exit(0)
-        })
+        }, 500)
       })
+      // setTimeout(() => {
       server.emit('vthAppReady')
+      // }, 1000)
     })
 
   return { server, io }

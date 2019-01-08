@@ -20,6 +20,7 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 import sessionComponent from './components/session'
 import cors from 'cors'
+import * as models from '@server/models'
 import index from '@server/routes/global'
 import products from '@server/routes/products'
 import translate from '@server/routes/translate'
@@ -124,5 +125,8 @@ app.use(function(err, req, res, next) {
     error: err
   })
 })
+
+// attach models to server
+server.models = models
 
 module.exports = server
