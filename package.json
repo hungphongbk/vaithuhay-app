@@ -5,7 +5,7 @@
   "author": "Trương Phong <programmingd32@gmail.com>",
   "private": true,
   "scripts": {
-    "test": "NODE_ENV=development mocha tests/",
+    "test": "NODE_ENV=development mocha",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --hot --https --cert=/Users/myowngrave/server.crt --key=/Users/myowngrave/server.key --port 8081 --progress",
     "dev:node": "NODE_ENV=development nodemon --trace-warnings $NODE_DEBUG_OPTION --watch server-dist bin/www",
     "dev:test": "NODE_ENV=development nodemon --trace-warnings $NODE_DEBUG_OPTION --watch server server/test.dev.js",
