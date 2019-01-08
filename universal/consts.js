@@ -4,5 +4,9 @@ export const SOCKET_EV = {
     UploadProgress: 'image3d:upload:progress',
     UploadProcessed: 'image3d:upload:processed',
     UploadCompleted: 'image3d:upload:completed'
+  },
+  Util: {
+    OnPatchPrice: 'util:patchPrice',
+    PatchPriceCompleted: 'util:patchPrice:completed'
   }
 }

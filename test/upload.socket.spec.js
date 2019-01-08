@@ -1,10 +1,10 @@
-import './_global'
-import io from 'socket.io-client'
 import chai from 'chai'
 import path from 'path'
 import fs from 'fs'
 import chaiHttp from 'chai-http'
 import chaiAsPromise from 'chai-as-promised'
+import { server, socket } from './setup'
+
 chai.use(chaiHttp)
 chai.use(chaiAsPromise)
 
@@ -16,27 +16,7 @@ const expect = chai.expect
 describe('Upload image using socket.io', function() {
   this.timeout(0)
 
-  const server = require('../bin/www')
-  let img,
-    socket,
-    ioOptions = {
-      forceNew: true,
-      key: fs.readFileSync('/Users/myowngrave/server.key'),
-      cert: fs.readFileSync('/Users/myowngrave/server.crt'),
-      rejectUnauthorized: false
-    }
-  before(function(done) {
-    server.on('vthAppReady', function() {
-      socket = io('https://localhost:8089', ioOptions)
-      socket.on('error', done)
-      socket.on('connect', done)
-    })
-  })
-  after(function(done) {
-    if (socket.connected) socket.disconnect()
-    // receiver.disconnect()
-    server.emit('vthAppClose', done)
-  })
+  let img
 
   it('MongoDB models have been exported inside server instance', () => {
     expect(server).to.have.property('models')
@@ -90,6 +70,20 @@ describe('Upload image using socket.io', function() {
             .then(res => {
               expect(res).to.have.status(200)
               expect(res.type).to.equal('image/jpeg')
+            })
+        )
+      )
+    })
+    it('all generated thumbs must exist & valid on drive', function() {
+      return Promise.all(
+        img.storage.map(
+          uri =>
+            new Promise(resolve => {
+              fs.stat(uri, (err, stat) => {
+                expect(err).to.be.null
+                expect(stat.size).to.be.at.least(512, 'wtf image size < 512B?')
+                resolve()
+              })
             })
         )
       )
