@@ -1,10 +1,15 @@
 import SocketBase from '@server/socket-routes/SocketBase'
 import HaravanClientApi from '@server/utils/HaravanClientAPI'
 import { SOCKET_EV } from '@universal/consts'
-import { cache } from '@server/utils'
+import { apiGet, cache } from '@server/utils'
 import YAML from 'yamljs'
 import keyBy from 'lodash/keyBy'
 import request from 'request-promise-native'
+import moment from 'moment-timezone'
+import qs from 'query-string'
+import flatten from 'lodash/flatten'
+import range from 'lodash/range'
+import spreadsheet from '@server/components/Spreadsheet'
 
 class MetafieldsSocketRouter extends SocketBase {
   constructor(io, socket) {
@@ -12,6 +17,7 @@ class MetafieldsSocketRouter extends SocketBase {
     socket.on('getMetafields', this.getMetafields.bind(this))
     socket.on('deleteMetafield', this.deleteMetafield.bind(this))
     socket.on(SOCKET_EV.Util.OnPatchPrice, this.patchPrice.bind(this))
+    socket.on(SOCKET_EV.Util.OnSyncSheet, this.syncSheet.bind(this))
   }
 
   getMetafields() {
@@ -71,6 +77,40 @@ class MetafieldsSocketRouter extends SocketBase {
         resolve()
       })
     })
+  }
+
+  async syncSheet() {
+    this.socket.emit(SOCKET_EV.Util.SyncSheetProgress, 'run sync')
+    const params = {
+        created_at_min: moment()
+          .subtract(7, 'days')
+          .format('YYYY-M-D HH:MM')
+      },
+      { count } = await apiGet(
+        '/admin/orders/count.json?' + qs.stringify(params),
+        false
+      )
+
+    const orders = flatten(
+      await Promise.all(
+        range(Math.ceil(count / 50)).map(i =>
+          apiGet(
+            '/admin/orders.json?' +
+              qs.stringify({
+                ...params,
+                page: i + 1
+              }),
+            false
+          ).then(({ orders }) => orders)
+        )
+      )
+    )
+    this.socket.emit(
+      SOCKET_EV.Util.SyncSheetProgress,
+      `process ${orders.length} orders`
+    )
+    await spreadsheet.write(orders.reverse())
+    this.socket.emit(SOCKET_EV.Util.SyncSheetCompleted)
   }
 }
 

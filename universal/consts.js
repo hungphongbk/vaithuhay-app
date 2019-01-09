@@ -7,6 +7,9 @@ export const SOCKET_EV = {
   },
   Util: {
     OnPatchPrice: 'util:patchPrice',
-    PatchPriceCompleted: 'util:patchPrice:completed'
+    PatchPriceCompleted: 'util:patchPrice:completed',
+    OnSyncSheet: 'util:syncSheet',
+    SyncSheetProgress: 'util:syncSheet:progress',
+    SyncSheetCompleted: 'util:syncSheet:completed'
   }
 }

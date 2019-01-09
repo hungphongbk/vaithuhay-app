@@ -18,6 +18,7 @@
     .card-columns
       dashboard-section(title="Chạy lệnh")
         command(watch='patchPrice' @click="patchPrice") Đồng bộ lại giá sản phẩm
+        command(watch='syncSheet' @click="syncSheet") Đồng bộ đơn hàng (7 ngày gần nhất)
 </template>
 <script>
 import { get, post } from '../plugins/jquery-ajax'
@@ -70,7 +71,8 @@ export default {
         updatedAt: null
       },
       runningCommands: {
-        patchPrice: false
+        patchPrice: false,
+        syncSheet: false
       }
     }
   },
@@ -103,6 +105,17 @@ export default {
         'patchPrice',
         SOCKET_EV.Util.OnPatchPrice,
         SOCKET_EV.Util.PatchPriceCompleted
+      )
+    },
+    syncSheet() {
+      this.sockets.subscribe(SOCKET_EV.Util.SyncSheetProgress, data => {})
+      this.pushCommand(
+        'syncSheet',
+        SOCKET_EV.Util.OnSyncSheet,
+        SOCKET_EV.Util.SyncSheetCompleted,
+        data => {
+          this.sockets.unsubscribe(SOCKET_EV.Util.SyncSheetProgress)
+        }
       )
     }
   },
