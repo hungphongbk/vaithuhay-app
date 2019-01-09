@@ -19,6 +19,8 @@ const Images3DSchema = new mongoose.Schema({
   imagesPath: [String],
   assetsDirectoryPath: String,
   urls: [String],
+  zipUrl: String,
+  zipPath: String,
   size: {
     width: Number,
     height: Number

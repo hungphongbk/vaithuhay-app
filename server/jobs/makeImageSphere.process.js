@@ -1,5 +1,6 @@
 import { memoize } from 'async-decorators'
 import fs from 'fs'
+import path from 'path'
 import jpeg from 'jpeg-js'
 import pixelmatch from 'pixelmatch'
 import minBy from 'lodash/minBy'
@@ -8,7 +9,8 @@ import FFMPEG from '@server/lib/ffmpeg/ffmpeg'
 import sortBy from 'lodash/sortBy'
 import { SOCKET_EV } from '@universal/consts'
 import { UploadPathIntoUrl } from '@universal/helpers'
-import { compress } from '@server/routes/image'
+// import { compress } from '@server/routes/image'
+import JSZip from 'jszip'
 
 let width, height, video
 const send = (event, data) => {
@@ -44,6 +46,28 @@ const compare = (img1, img2, seed = 0) =>
         pixelmatch(img$1.data, img$2.data, null, img$1.width, img$1.height)
       )
     })
+  })
+
+const compress = (videoPath, files = []) =>
+  new Promise(resolve => {
+    const zip = new JSZip(),
+      assetsPath = path.dirname(files[0]),
+      baseName = path.basename(videoPath, '.mp4')
+    for (const filePath of files)
+      zip.file(path.basename(filePath), fs.createReadStream(filePath))
+    zip
+      .generateNodeStream({
+        type: 'nodebuffer',
+        streamFiles: true,
+        compression: 'DEFLATE',
+        compressionOptions: {
+          level: 9
+        }
+      })
+      .pipe(fs.createWriteStream(path.resolve(assetsPath, baseName + '.zip')))
+      .on('finish', () => {
+        resolve(videoPath.replace('.mp4', '.zip'))
+      })
   })
 
 const generateFrameImages = async (
@@ -132,10 +156,6 @@ process.on('message', async ({ videoObj, options }) => {
     assetsDirectoryPath,
     generateThumbnailOptions
   )
-  send(SOCKET_EV.Image3d.UploadProgress, {
-    message: `Completed!`
-  })
-  await compare(lastFrame, lastFrame, 1) // force recalculate width & height
 
   // remove every files from 0 to index (imgFiles)
   const toRemove = analyzedDupe.index + 1
@@ -143,34 +163,23 @@ process.on('message', async ({ videoObj, options }) => {
   imgFiles = imgFiles.slice(toRemove)
   files = imgFiles
 
-  // send(SOCKET_EV.Image3d.UploadProgress, {
-  //   message: 'Compressing image sphere...'
-  // })
-  // const chunks = chunk(files, 5)
-  // for (const chunk of chunks) {
-  //   await Promise.all(
-  //     chunk.map(async imgPath => {
-  //       const buf = await compress(imgPath)
-  //       await new Promise((resolve, reject) => {
-  //         fs.writeFile(imgPath, buf, err => {
-  //           if (err) {
-  //             console.error(err)
-  //             reject(err)
-  //           } else resolve()
-  //         })
-  //       })
-  //     })
-  //   )
-  //   console.log('done chunk')
-  // }
-  // send(SOCKET_EV.Image3d.UploadProgress, {
-  //   message: 'Completed...'
-  // })
+  // compress generated images
+  send(SOCKET_EV.Image3d.UploadProgress, {
+    message: 'Compress generated frames into zip file...'
+  })
+  const zipPath = await compress(videoPath, files)
+
+  send(SOCKET_EV.Image3d.UploadProgress, {
+    message: `Completed!`
+  })
+  await compare(lastFrame, lastFrame, 1) // force recalculate width & height
 
   const newVideoObj = Object.assign({}, videoObj, {
     size: { width, height },
     imagesPath: files,
-    urls: files.map(UploadPathIntoUrl)
+    urls: files.map(UploadPathIntoUrl),
+    zipPath,
+    zipUrl: UploadPathIntoUrl(zipPath)
   })
   send(SOCKET_EV.Image3d.UploadProcessed, newVideoObj)
 })

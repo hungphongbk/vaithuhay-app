@@ -19,7 +19,7 @@ describe('Patch products price job', function() {
   })
 })
 
-describe('Sync spreadsheet job', function() {
+describe.skip('Sync spreadsheet job', function() {
   this.timeout(1000 * 300) // must not longer than 5 minutes
   this.slow(1000 * 20)
 

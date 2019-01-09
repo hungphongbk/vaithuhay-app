@@ -95,3 +95,4 @@ describe('Upload image using socket.io', function() {
   // })
   // it('Remove uploaded images', function(done) {})
 })
+describe('Upload image 3D', function() {})
