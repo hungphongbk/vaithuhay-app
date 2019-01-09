@@ -1,33 +1,33 @@
 <style lang="scss" scoped>
 @import './header.scss';
 </style>
+<style lang="scss" module>
+.command {
+  composes: text-primary from global;
+  cursor: pointer;
+}
+.running {
+  composes: text-info from global;
+}
+</style>
 <template lang="pug">
   div
     div.clearfix.header
       h1.page-title Dashboard
     hr
     .card-columns
-      dashboard-section(title="Vaithuhay.com development status")
-        template(v-if="assetHash.value")
-          p.card-text
-            i.fa.fa-hashtag.mr-2
-            | Mã phát triển:&nbsp;
-            strong {{assetHash.value}}
-          p.card-text
-            i.fa.fa-clock-o.mr-2
-            | Cập nhật lần cuối:&nbsp;
-            strong {{assetHash.updatedAt | moment("from")}}
-          hr
-          p.card-text
-            i.small Sử dụng mã phát triển để kiểm tra cache của vaithuhay.com bằng cách View HTML và tìm
-          p
-            .btn.btn-secondary(@click="updateHash") Cập nhật mã phát triển
+      dashboard-section(title="Chạy lệnh")
+        command(watch='patchPrice' @click="patchPrice") Đồng bộ lại giá sản phẩm
 </template>
 <script>
 import { get, post } from '../plugins/jquery-ajax'
 import uuid from 'uuid/v4'
+import { SOCKET_EV } from '@universal/consts'
+import faPlay from '@fortawesome/fontawesome-free-solid/faPlay'
+import faSpin from '@fortawesome/fontawesome-free-solid/faSpinner'
 
 export default {
+  name: 'PageDashboard',
   components: {
     DashboardSection: {
       functional: true,
@@ -39,6 +39,28 @@ export default {
           </div>
         )
       }
+    },
+    Command: {
+      functional: true,
+      render(h, { parent, props, listeners, children }) {
+        const { $style, runningCommands } = parent,
+          { watch } = props,
+          isRunning = runningCommands[watch],
+          classes = {
+            [$style.command]: true,
+            [$style.running]: isRunning
+          }
+        return (
+          <p class={classes} onClick={listeners.click}>
+            {isRunning ? (
+              <fa-icon class="mr-2" icon={faSpin} spin />
+            ) : (
+              <fa-icon class="mr-2" icon={faPlay} />
+            )}
+            {children}
+          </p>
+        )
+      }
     }
   },
   data() {
@@ -46,6 +68,9 @@ export default {
       assetHash: {
         value: null,
         updatedAt: null
+      },
+      runningCommands: {
+        patchPrice: false
       }
     }
   },
@@ -63,6 +88,22 @@ export default {
         }
       await post('/meta?key=assetHash', asset)
       await this.fetch()
+    },
+    pushCommand(label, commandName, completedEventName, onComplete = () => {}) {
+      this.runningCommands[label] = true
+      this.sockets.subscribe(completedEventName, async data => {
+        await onComplete(data)
+        this.sockets.unsubscribe(completedEventName)
+        this.runningCommands[label] = false
+      })
+      this.$socket.emit(commandName)
+    },
+    patchPrice() {
+      this.pushCommand(
+        'patchPrice',
+        SOCKET_EV.Util.OnPatchPrice,
+        SOCKET_EV.Util.PatchPriceCompleted
+      )
     }
   },
   async mounted() {
