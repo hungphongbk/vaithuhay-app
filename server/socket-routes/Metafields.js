@@ -10,6 +10,7 @@ import qs from 'query-string'
 import flatten from 'lodash/flatten'
 import range from 'lodash/range'
 import spreadsheet from '@server/components/Spreadsheet'
+import { endMeasureTime, startMeasureTime } from '@universal/helpers'
 
 class MetafieldsSocketRouter extends SocketBase {
   constructor(io, socket) {
@@ -35,8 +36,9 @@ class MetafieldsSocketRouter extends SocketBase {
 
   patchPrice() {
     const client = request.defaults({
-      baseUrl: 'https://vaithuhay.com'
-    })
+        baseUrl: 'https://vaithuhay.com'
+      }),
+      handler = startMeasureTime()
 
     return new Promise(async resolve => {
       cache.keys('vthproduct*', async (err, keys) => {
@@ -68,19 +70,25 @@ class MetafieldsSocketRouter extends SocketBase {
           patchJSON
         })
         console.info('Successfully update patch JSON content')
-        this.socket.emit(SOCKET_EV.Util.PatchPriceCompleted, {
-          status: 'ok',
-          data: {
-            size: patchJSON.length
-          }
+        endMeasureTime(handler, ts => {
+          this.emitLog(SOCKET_EV.Util.PatchPriceCompleted, {
+            status: 'ok',
+            data: {
+              size: patchJSON.length,
+              ts
+            }
+          })
+          resolve()
         })
-        resolve()
       })
     })
   }
 
   async syncSheet() {
-    this.socket.emit(SOCKET_EV.Util.SyncSheetProgress, 'run sync')
+    this.emitLog(
+      SOCKET_EV.Util.SyncSheetProgress,
+      'Start sync spreadsheet manually. Collect orders since 7 days ago...'
+    )
     const params = {
         created_at_min: moment()
           .subtract(7, 'days')
@@ -105,12 +113,30 @@ class MetafieldsSocketRouter extends SocketBase {
         )
       )
     )
-    this.socket.emit(
+    this.emitLog(
       SOCKET_EV.Util.SyncSheetProgress,
-      `process ${orders.length} orders`
+      `process ${orders.length} orders...`
     )
-    await spreadsheet.write(orders.reverse())
-    this.socket.emit(SOCKET_EV.Util.SyncSheetCompleted)
+
+    let retry = false
+    do {
+      try {
+        await spreadsheet.write(
+          orders.reverse(),
+          this.emitLog(SOCKET_EV.Util.SyncSheetProgress)
+        )
+        retry = false
+      } catch (e) {
+        console.error(e)
+        this.emitLog(
+          SOCKET_EV.Util.SyncSheetProgress,
+          'Unexpected error while writing to Spreadsheet. Try again...'
+        )
+        retry = true
+      }
+    } while (retry)
+    this.emitLog(SOCKET_EV.Util.SyncSheetProgress, `Successfully!`)
+    this.emit(SOCKET_EV.Util.SyncSheetCompleted)
   }
 }
 

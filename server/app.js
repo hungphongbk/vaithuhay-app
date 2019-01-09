@@ -2,6 +2,7 @@ require('@server/core/env')('web')
 
 import MetafieldsSocketRouter from '@server/socket-routes/Metafields'
 import UploadImages from '@server/socket-routes/UploadImages'
+import HaravanClientApi from '@server/utils/HaravanClientAPI'
 
 process
   .on('unhandledRejection', (reason, p) => {
@@ -128,5 +129,8 @@ app.use(function(err, req, res, next) {
 
 // attach models to server
 server.models = models
+server.utils = {
+  HaravanClientApi
+}
 
 module.exports = server

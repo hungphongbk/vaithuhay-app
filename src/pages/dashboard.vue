@@ -108,15 +108,39 @@ export default {
       )
     },
     syncSheet() {
-      this.sockets.subscribe(SOCKET_EV.Util.SyncSheetProgress, data => {})
-      this.pushCommand(
-        'syncSheet',
-        SOCKET_EV.Util.OnSyncSheet,
-        SOCKET_EV.Util.SyncSheetCompleted,
-        data => {
-          this.sockets.unsubscribe(SOCKET_EV.Util.SyncSheetProgress)
-        }
-      )
+      this.$store.dispatch('notifications/pushInfo', {
+        title: 'Sync spreadsheet manually',
+        metadata: { logs: [] },
+        message: {
+          functional: true,
+          render(h, { props }) {
+            return (
+              <div>
+                {props.metadata.logs.map(log => (
+                  <p class="mb-1">{log}</p>
+                ))}
+              </div>
+            )
+          }
+        },
+        callback: noti =>
+          new Promise(resolve => {
+            this.sockets.subscribe(SOCKET_EV.Util.SyncSheetProgress, log => {
+              noti.updateMeta({
+                logs: [...noti.metadata.logs, log]
+              })
+            })
+            this.pushCommand(
+              'syncSheet',
+              SOCKET_EV.Util.OnSyncSheet,
+              SOCKET_EV.Util.SyncSheetCompleted,
+              () => {
+                this.sockets.unsubscribe(SOCKET_EV.Util.SyncSheetProgress)
+                resolve()
+              }
+            )
+          })
+      })
     }
   },
   async mounted() {

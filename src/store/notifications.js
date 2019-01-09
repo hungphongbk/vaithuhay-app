@@ -7,25 +7,33 @@ class NotificationItem {
   message
   callback
   metadata
+  autoRemove
 
   constructor(context, obj) {
     this.context = context
     this.id = uuid()
-    Object.assign(this, obj)
+    Object.assign(
+      this,
+      {
+        autoRemove: true
+      },
+      obj
+    )
 
-    if (!this.callback) {
-      setTimeout(() => {
-        this.remove()
-      }, 3000)
-    } else {
-      Vue.nextTick(() => {
-        this.callback(this).then(() => {
-          setTimeout(() => {
-            this.remove()
-          }, 1500)
+    if (this.autoRemove)
+      if (!this.callback) {
+        setTimeout(() => {
+          this.remove()
+        }, 3000)
+      } else {
+        Vue.nextTick(() => {
+          this.callback(this).then(() => {
+            setTimeout(() => {
+              this.remove()
+            }, 1500)
+          })
         })
-      })
-    }
+      }
   }
 
   remove() {

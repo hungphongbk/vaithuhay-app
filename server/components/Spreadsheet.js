@@ -472,10 +472,11 @@ class Spreadsheet {
   }
 
   @logger()
-  async write(orders = []) {
-    const { updateBody, appendBody } = await this._makeBody(orders)
-    this.log(updateBody.length + ' row-blocks will be updated')
-    this.log(appendBody.length + ' rows will be appended')
+  async write(orders = [], logger = null) {
+    const { updateBody, appendBody } = await this._makeBody(orders),
+      log = logger || this.log
+    log(updateBody.length + ' row-blocks will be updated')
+    log(appendBody.length + ' rows will be appended')
     if (updateBody.length > 0)
       await this.spreadsheets.values.batchUpdate(
         await this._params({

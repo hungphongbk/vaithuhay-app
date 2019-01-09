@@ -3,7 +3,7 @@ global.APP_PATH = __dirname
 global.VERBOSE = true
 
 import program from 'commander'
-import * as tests from '@server/test'
+import * as tests from '@server/cli'
 
 process
   .on('unhandledRejection', (reason, p) => {

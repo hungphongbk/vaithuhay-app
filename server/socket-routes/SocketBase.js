@@ -1,3 +1,5 @@
+import debug from 'debug'
+
 class SocketBase {
   io = null
   socket = null
@@ -12,6 +14,20 @@ class SocketBase {
     this.channel = channel
 
     socket.join(channel)
+  }
+
+  emit(eventName, arg) {
+    this.socket.emit(eventName, arg)
+  }
+
+  emitLog(eventName, arg = null) {
+    const log = debug(`socket:${eventName}`),
+      fn = arg$1 => {
+        log(arg$1)
+        this.emit(eventName, arg$1)
+      }
+    if (arg) fn(arg)
+    else return fn
   }
 }
 
