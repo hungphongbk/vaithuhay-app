@@ -11,12 +11,17 @@
     canvas(ref="canvas" :height="image.size.height" :width="image.size.width" @mousedown="onDragStart($event)" @mousemove="onDragging($event)" @mouseup="drag = false")
 </template>
 <script>
+import JSZip from 'jszip'
 export default {
   name: 'ImageSphere',
   props: {
     image: {
       type: Object,
       required: true
+    },
+    type: {
+      type: String,
+      default: 'zip'
     }
   },
   data: () => ({
@@ -54,7 +59,7 @@ export default {
     }
   },
   methods: {
-    fetch() {
+    fetchNone() {
       let { image } = this,
         total = image.urls.length,
         proceeded = 0,
@@ -68,7 +73,34 @@ export default {
             console.log(this.progress)
             img.src = url
           })
-      Promise.all(image.urls.map(loadImage)).then(imgs => {
+      return Promise.all(image.urls.map(loadImage))
+    },
+    fetchZip() {
+      const { image } = this
+      return fetch(image.zipUrl, { mode: 'cors' })
+        .then(response => {
+          if (response.status === 200 || response.status === 0) {
+            return Promise.resolve(response.blob())
+          } else {
+            return Promise.reject(new Error(response.statusText))
+          }
+        })
+        .then(JSZip.loadAsync)
+        .then(zipFile => {
+          const blobs = []
+          zipFile.forEach(imgPath => {
+            blobs.push(zipFile.file(imgPath).async('blob'))
+          })
+          return Promise.all(blobs)
+        })
+        .then(blobs => Promise.all(blobs.map(blob => createImageBitmap(blob))))
+    },
+    fetch() {
+      const fn = {
+        none: this.fetchNone,
+        zip: this.fetchZip
+      }[this.type]
+      fn.call(this).then(imgs => {
         this.imgs = imgs
         this.initCanvas()
       })
