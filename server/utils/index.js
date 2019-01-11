@@ -7,6 +7,7 @@ import { fork } from 'child_process'
 import { HrvAPISelector } from '@server/core/haravan-api'
 import { randomHash } from '@universal/helpers'
 const loadEnv = require('@server/core/env')
+import { expect } from 'chai'
 // import 'colors'
 Bluebird.promisifyAll(Redis)
 
@@ -93,9 +94,29 @@ export async function apiDel(url) {
   await pushQueue(url, 'del')
 }
 
-export async function apiClear(url) {
+/**
+ * Delete cached URL from Redis
+ * @param url
+ * @param withPattern
+ * @returns {Promise<void>}
+ */
+export async function apiClear(url, withPattern = false) {
   if (typeof url === 'undefined') await cache.flushdb()
-  else await cache.del(url)
+  else if (!withPattern) await cache.del(url)
+  else {
+    //replace glob-pattern characters (? * [ ] - ^)
+    let globUrl = 'vth' + url.replace(/([?\*\-\[\]\-^])/g, '\\$1') + '*'
+    return cache.keys(globUrl, async (err, keys) => {
+      expect(err).to.be.null
+      expect(keys).to.have.lengthOf.above(0, `fuck ${url} doesn't exist in Redis cache\r\nglob: ${globUrl}`)
+
+      await cache.del(keys.join(' '))
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Completed remove keys:')
+        for (const key of keys) console.log('    ' + key.replace(/^vth/g, ''))
+      }
+    })
+  }
 }
 
 export const log = {

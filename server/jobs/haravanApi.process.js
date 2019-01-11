@@ -1,8 +1,8 @@
 import createQueue from '@server/jobs/classes/createQueue'
 import { HrvAPISelector } from '@server/core/haravan-api'
 
-const latency = 50,
-  concurrencySize = 8
+const latency = 5,
+  concurrencySize = 9
 
 const queue = createQueue(`api-${process.env.APP_RUNTIME_ENV}`)
 

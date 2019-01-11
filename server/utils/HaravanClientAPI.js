@@ -286,6 +286,11 @@ async function getCollection(handle) {
   return _getCollectionByHandle(handle).then(postProcessCollection)
 }
 
+async function invalidateMetafieldCache(productId) {}
+function invalidateProductCache(productId) {
+  return apiClear(`/admin/products/${productId}`, true)
+}
+
 const HaravanClientApi = {
   getMetafields,
   setMetafield,
@@ -293,7 +298,10 @@ const HaravanClientApi = {
   setMetafieldForProductVariant,
   deleteMetafield,
   getProduct,
-  getCollection
+  getCollection,
+  cache: {
+    invalidateProduct: invalidateProductCache
+  }
 }
 export default HaravanClientApi
 export { pickFields }
