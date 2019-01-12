@@ -10,7 +10,10 @@
 <template lang="pug">
   .wrapper
     .alert(v-for="alert in list", :key="alert.id", :class="[`alert-${alert.label}`]", role="alert")
-      h6(v-if="alert.title.length>0") {{alert.title}}
+      div
+        h6.d-inline-block(v-if="alert.title.length>0") {{alert.title}}
+        button.close(v-if="!alert.autoRemove" type="button" aria-label="Close" @click="()=>alert.remove()")
+          span(aria-hidden="true") &times;
       component(v-if="alert.message.render" :is="alert.message" :metadata="alert.metadata")
       p(v-else v-html="alert.message")
 </template>

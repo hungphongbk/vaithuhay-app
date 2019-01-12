@@ -5,13 +5,17 @@ class UtilCommands {
 
   constructor(context) {
     this.ctx = context
+    this.events = {}
   }
 
   subscribe(eventName, callback) {
+    if (this.events[eventName]) return
+    this.events[eventName] = true
     this.ctx.sockets.subscribe(eventName, callback)
   }
 
   unsubscribe(eventName) {
+    delete this.events[eventName]
     this.ctx.sockets.unsubscribe(eventName)
   }
   unsubscribes(eventNames) {
@@ -21,11 +25,12 @@ class UtilCommands {
 
   displayNotification(
     contextual = 'info',
-    { title, initialLogs = [], callback }
+    { title, initialLogs = [], callback, options = {} }
   ) {
     const capitalize = s => s.charAt(0).toUpperCase() + s.substring(1)
     this.ctx.$store.dispatch(`notifications/push${capitalize(contextual)}`, {
       title,
+      ...options,
       metadata: { logs: initialLogs },
       message: {
         functional: true,

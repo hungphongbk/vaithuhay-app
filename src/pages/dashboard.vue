@@ -111,6 +111,7 @@ export default {
       this.$store.dispatch('notifications/pushInfo', {
         title: 'Sync spreadsheet manually',
         metadata: { logs: [] },
+        autoRemove: false,
         message: {
           functional: true,
           render(h, { props }) {
@@ -135,6 +136,7 @@ export default {
               SOCKET_EV.Util.OnSyncSheet,
               SOCKET_EV.Util.SyncSheetCompleted,
               () => {
+                noti.changeContextual('success')
                 this.sockets.unsubscribe(SOCKET_EV.Util.SyncSheetProgress)
                 resolve()
               }

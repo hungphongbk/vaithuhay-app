@@ -12,6 +12,7 @@ class NotificationItem {
   constructor(context, obj) {
     this.context = context
     this.id = uuid()
+    console.log(obj)
     Object.assign(
       this,
       {
@@ -20,20 +21,21 @@ class NotificationItem {
       obj
     )
 
-    if (this.autoRemove)
-      if (!this.callback) {
+    if (!this.callback) {
+      if (this.autoRemove)
         setTimeout(() => {
           this.remove()
         }, 3000)
-      } else {
-        Vue.nextTick(() => {
-          this.callback(this).then(() => {
+    } else {
+      Vue.nextTick(() => {
+        this.callback(this).then(() => {
+          if (this.autoRemove)
             setTimeout(() => {
               this.remove()
             }, 1500)
-          })
         })
-      }
+      })
+    }
   }
 
   remove() {
@@ -53,6 +55,11 @@ class NotificationItem {
       id: this.id,
       metadata
     }
+    this.context.commit('update', obj)
+  }
+
+  changeContextual(label) {
+    const obj = { id: this.id, label }
     this.context.commit('update', obj)
   }
 }

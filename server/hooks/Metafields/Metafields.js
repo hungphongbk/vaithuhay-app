@@ -1,6 +1,9 @@
 import EventEmitter from 'events'
 import HaravanClientApi from '@server/utils/HaravanClientAPI'
 import { chunkMetafieldJsonString } from '@server/utils/helpers'
+import ServiceContainers from '@server/core/containers'
+import { SOCKET_EV } from '@universal/consts'
+import { bytesToSize } from '@universal/helpers'
 
 class MetafieldsEventHookClass extends EventEmitter {
   constructor() {
@@ -26,7 +29,22 @@ class MetafieldsEventHookClass extends EventEmitter {
   }
 
   async homepageMetafield(payload) {
-    console.log('Homepage metafield has changed. Execute hook')
+    const { Util } = SOCKET_EV,
+      log = (eventName, message = '') =>
+        ServiceContainers.call('io', io => {
+          io.emit(eventName, message)
+        })
+
+    /**
+     * 1. Clear collection caches in redis
+     */
+    await HaravanClientApi.cache.invalidateCollection()
+
+    await log(Util.UpdateIndexJson)
+    await log(
+      Util.UpdateIndexJsonProgress,
+      'Homepage metafield has changed. Execute hook...'
+    )
 
     const layoutJSON = []
     for (const item of payload.layout) {
@@ -61,10 +79,15 @@ class MetafieldsEventHookClass extends EventEmitter {
       JSON.stringify(layoutJSON),
       'layoutJSON'
     )
-    console.log(Object.keys(layoutJSONParts))
 
     await HaravanClientApi.setMetafield(null, null, null, null)(layoutJSONParts)
-    console.log('Successfully update index page')
+    await log(
+      Util.UpdateIndexJsonProgress,
+      `Successfully update index page (size = ${bytesToSize(
+        JSON.stringify(layoutJSON).length
+      )})`
+    )
+    await log(Util.UpdateIndexJsonCompleted)
   }
 }
 

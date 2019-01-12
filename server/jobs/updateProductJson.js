@@ -6,6 +6,7 @@ import ServiceContainers from '@server/core/containers'
 import { SOCKET_EV } from '@universal/consts'
 import { chunkMetafieldJsonString } from '@server/utils/helpers'
 import { cache } from '@server/utils'
+import { bytesToSize } from '@universal/helpers'
 
 const queue = createQueue(),
   log = (status, message = '') => {
@@ -41,9 +42,9 @@ queue.process('updateProduct', 1, async ({ data: { id: productId } }, done) => {
   await HaravanClientApi.setMetafieldForProduct(productId, jsonParts)
   await log(
     1,
-    `Update completed (length = ${
+    `Update completed (size = ${bytesToSize(
       JSON.stringify(json).length
-    }, distributed in ${Object.keys(jsonParts).length} keys)`
+    )}, distributed in ${Object.keys(jsonParts).length} keys)`
   )
   await log(2)
   done()

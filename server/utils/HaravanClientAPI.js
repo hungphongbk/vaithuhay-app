@@ -289,6 +289,9 @@ async function invalidateMetafieldCache(productId) {}
 function invalidateProductCache(productId) {
   return apiClear(`/admin/products/${productId}`, true)
 }
+function invalidateCollectionCache() {
+  return apiClear('/admin/collects.json', true)
+}
 
 const HaravanClientApi = {
   getMetafields,
@@ -299,7 +302,8 @@ const HaravanClientApi = {
   getProduct,
   getCollection,
   cache: {
-    invalidateProduct: invalidateProductCache
+    invalidateProduct: invalidateProductCache,
+    invalidateCollection: invalidateCollectionCache
   }
 }
 export default HaravanClientApi

@@ -13,6 +13,9 @@ export const SOCKET_EV = {
     SyncSheetCompleted: 'util:syncSheet:completed',
     UpdateProductJson: 'util:updateProductJson',
     UpdateProductJsonProgress: 'util:updateProductJson:progress',
-    UpdateProductJsonCompleted: 'util:updateProductJson:completed'
+    UpdateProductJsonCompleted: 'util:updateProductJson:completed',
+    UpdateIndexJson: 'util:updateIndexJson',
+    UpdateIndexJsonProgress: 'util:updateIndexJson:progress',
+    UpdateIndexJsonCompleted: 'util:updateIndexJson:completed'
   }
 }
