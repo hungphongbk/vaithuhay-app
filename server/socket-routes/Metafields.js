@@ -2,15 +2,14 @@ import SocketBase from '@server/socket-routes/SocketBase'
 import HaravanClientApi from '@server/utils/HaravanClientAPI'
 import { SOCKET_EV } from '@universal/consts'
 import { apiGet, cache } from '@server/utils'
-import YAML from 'yamljs'
 import keyBy from 'lodash/keyBy'
-import request from 'request-promise-native'
 import moment from 'moment-timezone'
 import qs from 'query-string'
 import flatten from 'lodash/flatten'
 import range from 'lodash/range'
 import spreadsheet from '@server/components/Spreadsheet'
 import { endMeasureTime, startMeasureTime } from '@universal/helpers'
+import yamlLoadAndParse from '@server/utils/yamlLoadAndParse'
 
 class MetafieldsSocketRouter extends SocketBase {
   constructor(io, socket) {
@@ -35,13 +34,10 @@ class MetafieldsSocketRouter extends SocketBase {
   }
 
   patchPrice() {
-    const client = request.defaults({
-        baseUrl: 'https://vaithuhay.com'
-      }),
-      handler = startMeasureTime()
+    const handler = startMeasureTime()
 
     return new Promise(async resolve => {
-      cache.keys('vthproduct*', async (err, keys) => {
+      cache.keys('vthproduct:*', async (err, keys) => {
         if (err) {
           console.error(err.message)
           return
@@ -52,10 +48,9 @@ class MetafieldsSocketRouter extends SocketBase {
                 const key = _key.replace('vthproduct:', '')
 
                 try {
-                  const yaml = await client.get(
+                  return await yamlLoadAndParse(
                     `/products/${key}?view=patch-yaml`
                   )
-                  return YAML.parse(yaml)
                 } catch (e) {
                   return null
                 }

@@ -40,11 +40,20 @@ function logOnce(arg) {
   }
 }
 
+function isPromise(object) {
+  if (Promise && Promise.resolve) {
+    return Promise.resolve(object) === object
+  } else {
+    throw 'Promise not supported in your environment'
+  }
+}
+
 export {
   bytesToSize,
   startMeasureTime,
   endMeasureTime,
   UploadPathIntoUrl,
   logOnce,
-  randomHash
+  randomHash,
+  isPromise
 }

@@ -10,6 +10,9 @@ export const SOCKET_EV = {
     PatchPriceCompleted: 'util:patchPrice:completed',
     OnSyncSheet: 'util:syncSheet',
     SyncSheetProgress: 'util:syncSheet:progress',
-    SyncSheetCompleted: 'util:syncSheet:completed'
+    SyncSheetCompleted: 'util:syncSheet:completed',
+    UpdateProductJson: 'util:updateProductJson',
+    UpdateProductJsonProgress: 'util:updateProductJson:progress',
+    UpdateProductJsonCompleted: 'util:updateProductJson:completed'
   }
 }

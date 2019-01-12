@@ -6,6 +6,7 @@ import requestStats from 'request-stats'
 import { FirebaseAdmin } from '@server/components'
 import omit from 'lodash/omit'
 import bootstrap from '@server/utils/bootstrap'
+import ServiceContainers from '@server/core/containers'
 
 const dev = process.env.NODE_ENV === 'development',
   port = global.APP_PORT
@@ -54,6 +55,10 @@ export default function(app, bootstrapCallbacks = []) {
     .then(() => {
       console.log('ready now')
       const httpServer = server.listen(port)
+
+      // begin register io service
+      ServiceContainers.set('io', io)
+
       server.on('vthAppClose', (cb = () => {}) => {
         console.log('Terminate vaithuhay.com server at next 500ms. Good bye :)')
         httpServer.close()

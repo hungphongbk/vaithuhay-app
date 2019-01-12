@@ -27,7 +27,10 @@ export const serverReload = () =>
         //   )
         // )
         // console.log('update metafield for variants in product ' + handle)
-        await cache.setAsync('product:' + handle, id)
+        await Promise.all([
+          cache.setAsync('product:' + handle, id),
+          cache.setAsync('product-id:' + id, handle)
+        ])
       })
     )
     await Promise.all(

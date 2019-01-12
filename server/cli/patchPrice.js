@@ -11,7 +11,7 @@ export default () => {
   })
 
   return new Promise(async resolve => {
-    cache.keys('vthproduct*', async (err, keys) => {
+    cache.keys('vthproduct:*', async (err, keys) => {
       if (err) {
         console.error(err.message)
         return
