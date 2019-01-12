@@ -110,7 +110,6 @@ const setMetafield = (
     const value = typeof _value === 'string' ? _value : JSON.stringify(_value)
     if (typeof _metafields[key] === 'undefined' || !_metafields[key]) {
       //POST request
-      console.log('post')
       await apiPost(url, {
         metafield: buildMetafieldForm({
           namespace: 'vaithuhay',

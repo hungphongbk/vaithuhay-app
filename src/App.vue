@@ -133,6 +133,7 @@ import faCheckCircle from '@fortawesome/fontawesome-free-solid/faCheckCircle'
 import chunk from 'lodash/chunk'
 import { retry } from '@client/helpers'
 import { endMeasureTime, startMeasureTime } from '@universal/helpers'
+import AppCommands from '@client/jobs/AppCommands'
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms)),
   preload = (label, percentage = 0) => ({ label, percentage }),
@@ -323,6 +324,9 @@ export default {
         $(document.body).removeClass('modal-open')
         $('.modal-backdrop').remove()
         await delay(100)
+
+        const cmd = AppCommands.register(this)
+
         // await this.autoSyncTopProduct()
         // await this.autoSyncRelatedProducts()
       }

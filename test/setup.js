@@ -12,6 +12,7 @@ let socket,
     rejectUnauthorized: false
   }
 before(function(done) {
+  this.timeout(0)
   server.on('vthAppReady', function() {
     socket = io('https://localhost:8089', ioOptions)
     socket.on('error', done)
@@ -19,6 +20,7 @@ before(function(done) {
   })
 })
 after(function(done) {
+  this.timeout(0)
   if (socket.connected) socket.disconnect()
   // receiver.disconnect()
   server.emit('vthAppClose', done)

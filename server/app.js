@@ -1,3 +1,5 @@
+import updateProductJson from '@server/jobs/updateProductJson'
+
 require('@server/core/env')('web')
 
 import MetafieldsSocketRouter from '@server/socket-routes/Metafields'
@@ -131,6 +133,9 @@ app.use(function(err, req, res, next) {
 server.models = models
 server.utils = {
   HaravanClientApi
+}
+server.jobs = {
+  updateProductJson
 }
 
 module.exports = server

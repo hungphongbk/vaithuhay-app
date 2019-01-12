@@ -1,5 +1,6 @@
 import EventEmitter from 'events'
 import HaravanClientApi from '@server/utils/HaravanClientAPI'
+import { chunkMetafieldJsonString } from '@server/utils/helpers'
 
 class MetafieldsEventHookClass extends EventEmitter {
   constructor() {
@@ -56,12 +57,10 @@ class MetafieldsEventHookClass extends EventEmitter {
     }
     if (process.env.NODE_ENV === 'development')
       console.log(JSON.stringify(layoutJSON).length)
-    const parts = JSON.stringify(layoutJSON).match(/.{1,79999}/g),
-      layoutJSONParts = {}
-    for (let i = 0; i < 4 - parts.length; i++) parts.push(';')
-    parts.forEach((part, index) => {
-      layoutJSONParts[`layoutJSON${index + 1}`] = part
-    })
+    const layoutJSONParts = chunkMetafieldJsonString(
+      JSON.stringify(layoutJSON),
+      'layoutJSON'
+    )
     console.log(Object.keys(layoutJSONParts))
 
     await HaravanClientApi.setMetafield(null, null, null, null)(layoutJSONParts)

@@ -10,6 +10,7 @@ import range from 'lodash/range'
 import spreadsheet from '@server/components/Spreadsheet'
 import { endMeasureTime, startMeasureTime } from '@universal/helpers'
 import yamlLoadAndParse from '@server/utils/yamlLoadAndParse'
+import updateProductJson from '@server/jobs/updateProductJson'
 
 class MetafieldsSocketRouter extends SocketBase {
   constructor(io, socket) {
@@ -18,6 +19,10 @@ class MetafieldsSocketRouter extends SocketBase {
     socket.on('deleteMetafield', this.deleteMetafield.bind(this))
     socket.on(SOCKET_EV.Util.OnPatchPrice, this.patchPrice.bind(this))
     socket.on(SOCKET_EV.Util.OnSyncSheet, this.syncSheet.bind(this))
+    socket.on(
+      SOCKET_EV.Util.UpdateProductJson,
+      this.updateProductJson.bind(this)
+    )
   }
 
   getMetafields() {
@@ -132,6 +137,10 @@ class MetafieldsSocketRouter extends SocketBase {
     } while (retry)
     this.emitLog(SOCKET_EV.Util.SyncSheetProgress, `Successfully!`)
     this.emit(SOCKET_EV.Util.SyncSheetCompleted)
+  }
+
+  updateProductJson({ id }) {
+    updateProductJson(id, 'high')
   }
 }
 

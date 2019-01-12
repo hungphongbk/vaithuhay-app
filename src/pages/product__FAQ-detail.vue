@@ -20,6 +20,7 @@ import ArticleSelector from '../components/article-selector.vue'
 import CircularJSON from 'circular-json'
 import SelectImg from '@client/components/select-img.vue'
 import ImageSphere from '@vth/ImageSphere.vue'
+import { SOCKET_EV } from '@universal/consts'
 
 const fetch = async id =>
   Promise.all([
@@ -122,6 +123,7 @@ export default {
         this.current.updateMeta('relatedArticles', relatedArticles),
         this.current.updateMeta('imageSphere', imageSphere)
       ])
+      this.$socket.emit(SOCKET_EV.Util.UpdateProductJson, { id })
     }
   }
 }

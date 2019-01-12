@@ -4,9 +4,11 @@ import yamlLoadAndParse from '@server/utils/yamlLoadAndParse'
 import { expect } from 'chai'
 import ServiceContainers from '@server/core/containers'
 import { SOCKET_EV } from '@universal/consts'
+import { chunkMetafieldJsonString } from '@server/utils/helpers'
+import { cache } from '@server/utils'
 
 const queue = createQueue(),
-  log = (status, message) => {
+  log = (status, message = '') => {
     const eventName = [
       SOCKET_EV.Util.UpdateProductJson,
       SOCKET_EV.Util.UpdateProductJsonProgress,
@@ -31,10 +33,19 @@ queue.process('updateProduct', 1, async ({ data: { id: productId } }, done) => {
   expect(handle, `key product-id:${productId} didn't exist in Redis!`).is.not
     .null
 
-  await log(0, `Begin update JSON HTML for "${handle}"`)
+  await log(1, `Begin update JSON HTML for "${handle}"`)
 
-  const json = await yamlLoadAndParse(`/products/${handle}?view=yaml`)
+  const json = await yamlLoadAndParse(`/products/${handle}?view=yaml`),
+    jsonParts = chunkMetafieldJsonString(JSON.stringify(json), 'json')
 
+  await HaravanClientApi.setMetafieldForProduct(productId, jsonParts)
+  await log(
+    1,
+    `Update completed (length = ${
+      JSON.stringify(json).length
+    }, distributed in ${Object.keys(jsonParts).length} keys)`
+  )
+  await log(2)
   done()
 })
 
@@ -47,7 +58,7 @@ function updateProductJson(id, priority = 'normal') {
       .removeOnComplete(true)
       .save(err => {
         if (err) reject(err)
-        else resolve()
+        else log(0).then(resolve)
       })
   })
 }

@@ -5,7 +5,8 @@ const createQueue = (prefix = 'q', redis = {}) => {
 
   queue
     .on('job enqueue', function(id, type) {
-      // console.log('Job %s got queued of type %s', id, type)
+      // process.env.NODE_ENV === 'development' &&
+      //   console.log('Job %s got queued of type %s', id, type)
     })
     .on('job complete', function(id, result) {
       kue.Job.get(id, function(err, job) {
