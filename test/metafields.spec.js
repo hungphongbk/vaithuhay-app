@@ -26,6 +26,10 @@ describe('Update resource JSON body', function() {
       console.log(message)
       logs.push({ status: 0, message })
     })
+    socket.on(SOCKET_EV.Util.UpdateProductJsonProgress, message => {
+      console.log(message)
+      logs.push({ status: 0, message })
+    })
     socket.on(SOCKET_EV.Util.UpdateProductJsonCompleted, message => {
       console.log(message)
       logs.push({ status: 2, message })

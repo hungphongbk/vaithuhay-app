@@ -6,6 +6,10 @@ const client = request.defaults({
 })
 
 export default async url => {
-  const yaml = await client.get(url)
-  return YAML.parse(yaml)
+  try {
+    const yaml = await client.get(url)
+    return YAML.parse(yaml)
+  } catch (e) {
+    return null
+  }
 }

@@ -8,6 +8,8 @@ class NotificationItem {
   callback
   metadata
   autoRemove
+  timeout
+  fade
 
   constructor(context, obj) {
     this.context = context
@@ -16,30 +18,34 @@ class NotificationItem {
     Object.assign(
       this,
       {
-        autoRemove: true
+        autoRemove: true,
+        timeout: 3000,
+        fade: false
       },
       obj
     )
 
     if (!this.callback) {
-      if (this.autoRemove)
-        setTimeout(() => {
-          this.remove()
-        }, 3000)
+      if (this.autoRemove) this.remove()
     } else {
       Vue.nextTick(() => {
         this.callback(this).then(() => {
-          if (this.autoRemove)
-            setTimeout(() => {
-              this.remove()
-            }, 1500)
+          if (this.autoRemove) this.remove()
         })
       })
     }
+    console.log(this)
   }
 
   remove() {
-    this.context.commit('removeNoti', this.id)
+    const fn = () => {
+      this.context.commit('fade', this.id)
+      setTimeout(() => {
+        this.context.commit('removeNoti', this.id)
+      }, this.timeout)
+    }
+    if (this.autoRemove) setTimeout(() => fn(), this.timeout)
+    else fn()
   }
 
   updateMessage(message) {
@@ -80,6 +86,10 @@ export default {
     update({ list }, obj) {
       const index = list.findIndex(item => item.id === obj.id)
       Object.assign(list[index], obj)
+    },
+    fade({ list }, id) {
+      const index = list.findIndex(item => item.id === id)
+      Object.assign(list[index], { fade: true })
     }
   },
   actions: {

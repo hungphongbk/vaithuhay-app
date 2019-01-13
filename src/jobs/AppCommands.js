@@ -12,7 +12,6 @@ class AppCommands extends UtilCommands {
     this.subscribe(SOCKET_EV.Util.UpdateProductJson, () => {
       this.displayNotification('info', {
         title: 'Update product JsonHTML',
-        options: { autoRemove: false },
         callback: noti =>
           new Promise(resolve => {
             this.subscribe(SOCKET_EV.Util.UpdateProductJsonProgress, log =>
@@ -37,7 +36,6 @@ class AppCommands extends UtilCommands {
     this.subscribe(SOCKET_EV.Util.UpdateIndexJson, () => {
       this.displayNotification('info', {
         title: 'Update index page JsonHTML',
-        options: { autoRemove: false },
         callback: noti =>
           new Promise(resolve => {
             this.subscribe(SOCKET_EV.Util.UpdateIndexJsonProgress, log =>

@@ -1,4 +1,4 @@
-<style lang="scss" scoped>
+<style lang="scss" module>
 .wrapper {
   position: fixed;
   bottom: 1rem;
@@ -6,10 +6,18 @@
   width: 300px;
   height: auto;
 }
+.alert {
+  opacity: 1;
+  transition: opacity 3s ease, background-color 0.3ms ease,
+    border-color 0.3ms ease;
+}
+.fade {
+  opacity: 0;
+}
 </style>
 <template lang="pug">
-  .wrapper
-    .alert(v-for="alert in list", :key="alert.id", :class="[`alert-${alert.label}`]", role="alert")
+  div(:class="$style.wrapper")
+    .alert(v-for="alert in list", :key="alert.id", :class="{[`alert-${alert.label}`]: true, [$style.alert]:true, [$style.fade]: alert.fade}", role="alert")
       div
         h6.d-inline-block(v-if="alert.title.length>0") {{alert.title}}
         button.close(v-if="!alert.autoRemove" type="button" aria-label="Close" @click="()=>alert.remove()")

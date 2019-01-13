@@ -36,8 +36,42 @@ queue.process('updateProduct', 1, async ({ data: { id: productId } }, done) => {
 
   await log(1, `Begin update JSON HTML for "${handle}"`)
 
-  const json = await yamlLoadAndParse(`/products/${handle}?view=yaml`),
-    jsonParts = chunkMetafieldJsonString(JSON.stringify(json), 'json')
+  const json = await yamlLoadAndParse(`/products/${handle}?view=yaml`)
+
+  /**
+   * BEGIN PROCESS
+   */
+
+  // RELATED PRODUCTS
+  const metafields = await HaravanClientApi.getMetafields(
+      'products',
+      productId
+    ),
+    relatedHandles = []
+
+  for (const key in metafields)
+    if (metafields.hasOwnProperty(key) && /^[0-9]+$/.test(key))
+      relatedHandles.push(metafields[key])
+  json.relateds = (await Promise.all(
+    relatedHandles.map(_handle =>
+      yamlLoadAndParse(`/products/${_handle}?view=yaml`).then(p => {
+        if (p !== null && typeof p === 'object') {
+          delete p.current.content
+          return p.current
+        }
+        return null
+      })
+    )
+  )).filter(p => p !== null)
+  await log(1, `${json.relateds.length} related products...`)
+
+  // FAQ
+  if (metafields['vaithuhay-faq']) json.faq = metafields['vaithuhay-faq']
+
+  /**
+   * END PROCESS
+   */
+  const jsonParts = chunkMetafieldJsonString(JSON.stringify(json), 'json')
 
   await HaravanClientApi.setMetafieldForProduct(productId, jsonParts)
   await log(
