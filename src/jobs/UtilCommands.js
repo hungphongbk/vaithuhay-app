@@ -59,7 +59,7 @@ class UtilCommands extends EventEmitter {
   }
 
   socketEmit(eventName, data = null) {
-    const sockets = this.ctx.sockets
+    const sockets = this.ctx.$socket
     if (data) sockets.emit(eventName, data)
     else sockets.emit(eventName)
   }
