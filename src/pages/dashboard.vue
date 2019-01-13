@@ -26,6 +26,7 @@ import uuid from 'uuid/v4'
 import { SOCKET_EV } from '@universal/consts'
 import faPlay from '@fortawesome/fontawesome-free-solid/faPlay'
 import faSpin from '@fortawesome/fontawesome-free-solid/faSpinner'
+import AppCommands from '@client/jobs/UtilCommands'
 
 export default {
   name: 'PageDashboard',
@@ -73,7 +74,8 @@ export default {
       runningCommands: {
         patchPrice: false,
         syncSheet: false
-      }
+      },
+      cmd: AppCommands.register(this)
     }
   },
   methods: {
@@ -93,12 +95,11 @@ export default {
     },
     pushCommand(label, commandName, completedEventName, onComplete = () => {}) {
       this.runningCommands[label] = true
-      this.sockets.subscribe(completedEventName, async data => {
+      this.cmd.on(completedEventName, async data => {
         await onComplete(data)
-        this.sockets.unsubscribe(completedEventName)
         this.runningCommands[label] = false
       })
-      this.$socket.emit(commandName)
+      this.cmd.socketEmit(commandName)
     },
     patchPrice() {
       this.pushCommand(
@@ -108,6 +109,7 @@ export default {
       )
     },
     syncSheet() {
+      // TODO: adapt this.cmd
       this.$store.dispatch('notifications/pushInfo', {
         title: 'Sync spreadsheet manually',
         metadata: { logs: [] },

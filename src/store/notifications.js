@@ -14,7 +14,6 @@ class NotificationItem {
   constructor(context, obj) {
     this.context = context
     this.id = uuid()
-    console.log(obj)
     Object.assign(
       this,
       {
@@ -34,7 +33,6 @@ class NotificationItem {
         })
       })
     }
-    console.log(this)
   }
 
   remove() {
@@ -85,7 +83,12 @@ export default {
     },
     update({ list }, obj) {
       const index = list.findIndex(item => item.id === obj.id)
-      Object.assign(list[index], obj)
+      try {
+        Object.assign(list[index], obj)
+      } catch (e) {
+        console.error(obj.id)
+        throw e
+      }
     },
     fade({ list }, id) {
       const index = list.findIndex(item => item.id === id)
@@ -94,6 +97,7 @@ export default {
   },
   actions: {
     pushNoti({ commit }, noti) {
+      console.log(noti.id)
       commit('pushNoti', noti)
     },
     pushDanger(context, obj) {

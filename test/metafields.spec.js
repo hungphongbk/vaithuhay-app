@@ -2,7 +2,7 @@ import { server, socket } from './setup'
 import { SOCKET_EV } from '../universal/consts'
 
 const ids = {
-  products: [1011808373, 1018295624]
+  products: [1011808373, 1018295624, 1011827837, 1007122439]
 }
 
 describe('Invalidate Haravan resource cache in Redis', function() {
