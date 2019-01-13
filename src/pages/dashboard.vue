@@ -95,11 +95,12 @@ export default {
     },
     pushCommand(label, commandName, completedEventName, onComplete = () => {}) {
       this.runningCommands[label] = true
-      this.cmd.on(completedEventName, async data => {
+      this.sockets.subscribe(completedEventName, async data => {
         await onComplete(data)
         this.runningCommands[label] = false
+        this.sockets.unsubscribe(completedEventName)
       })
-      this.cmd.socketEmit(commandName)
+      this.$socket.emit(commandName)
     },
     patchPrice() {
       this.pushCommand(
