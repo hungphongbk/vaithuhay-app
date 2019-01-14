@@ -19,7 +19,7 @@ export default {
     await Promise.all(products.map(queryProductFavorite))
     req.products = products
     req.findHandleFromId = id => products.find(p => p.id * 1 === id * 1).handle
-    next()
+    if (next) next()
   }
 }
 
