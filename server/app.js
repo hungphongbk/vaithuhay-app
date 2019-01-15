@@ -1,4 +1,4 @@
-import updateProductJson from '@server/jobs/updateProductJson'
+import url from 'url'
 
 require('@server/core/env')('web')
 
@@ -43,6 +43,8 @@ import { socketMiddleware } from './routes/middlewares'
 import { createServer } from './utils'
 //passport with social
 import './auth/facebook'
+import googleAnalyticsJob from '@server/jobs/GoogleAnalytics'
+import updateProductJson from '@server/jobs/updateProductJson'
 
 // mongoose
 connectMongoose()
@@ -108,6 +110,13 @@ app.use('/fb-callback', FacebookHooks)
 // app.use('/noti', pushNoti)
 app.use('/products', products)
 app.use('/ssr', ssr)
+if (process.env.NODE_ENV === 'development') {
+  app.get('/oauth2callback', (req, res) => {
+    const qs = new url.URL(req.url, 'https://localhost:8089').searchParams
+    res.end('Authentication successful! Please return to the console.')
+    server.emit('test_code', qs.get('code'))
+  })
+}
 app.use('/', index)
 
 app.use(function(req, res, next) {
@@ -130,12 +139,14 @@ app.use(function(err, req, res, next) {
 })
 
 // attach models to server
+server.app = app
 server.models = models
 server.utils = {
   HaravanClientApi
 }
 server.jobs = {
-  updateProductJson
+  updateProductJson,
+  googleAnalyticsJob
 }
 
 module.exports = server
