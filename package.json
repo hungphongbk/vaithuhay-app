@@ -10,7 +10,7 @@
     "dev:node": "NODE_ENV=development nodemon --trace-warnings $NODE_DEBUG_OPTION --watch server-dist bin/www",
     "dev:test": "NODE_ENV=development nodemon --trace-warnings $NODE_DEBUG_OPTION --watch server server/test.dev.js",
     "build:client": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "server:reload": "ssh root.myowngrave 'pm2 restart vaithuhay'",
+    "server:reload": "ssh root.myowngrave 'redis-cli flushall; pm2 restart vaithuhay'",
     "server:watch": "cross-env NODE_ENV=development webpack --config webpack.backend.config.js --hide-modules --color --watch",
     "server:compile": "cross-env NODE_ENV=production webpack --config webpack.backend.config.js",
     "sync": "NODE_ENV=development APP_RUNTIME_ENV=cli node server-dist/test.dev.js spreadsheet",
