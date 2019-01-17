@@ -40,14 +40,34 @@ class AppCommands extends UtilCommands {
       callback: noti =>
         new Promise(resolve => {
           this.on(SOCKET_EV.Util.UpdateIndexJsonProgress, log =>
-            noti.updateMeta(
-              {
-                logs: [...noti.metadata.logs, log]
-              },
-              noti.id
-            )
+            noti.updateMeta({
+              logs: [...noti.metadata.logs, log]
+            })
           )
           this.on(SOCKET_EV.Util.UpdateIndexJsonCompleted, () => {
+            noti.changeContextual('success')
+            resolve()
+          })
+        })
+    })
+  }
+
+  @UtilCommands.Command([
+    SOCKET_EV.GA.UpdateTopProducts,
+    SOCKET_EV.GA.UpdateTopProductsProgress,
+    SOCKET_EV.GA.UpdateTopProductsCompleted
+  ])
+  updateTopProducts() {
+    return this.displayNotification('info', {
+      title: 'Update top products',
+      callback: noti =>
+        new Promise(resolve => {
+          this.on(SOCKET_EV.GA.UpdateTopProductsProgress, log =>
+            noti.updateMeta({
+              logs: [...noti.metadata.logs, log]
+            })
+          )
+          this.on(SOCKET_EV.GA.UpdateTopProductsCompleted, () => {
             noti.changeContextual('success')
             resolve()
           })

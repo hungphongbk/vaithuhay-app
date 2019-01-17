@@ -34,7 +34,8 @@ class Context {
       try {
         //copy only
         // await auth.getTokenInfo(token)
-        auth.setCredentials(token)
+        if (typeof token === 'object') auth.setCredentials(token)
+        else auth.setCredentials({ access_token: token })
         return this
       } catch (e) {
         console.error(e)
@@ -89,7 +90,7 @@ class GoogleAnalyticsJob extends EventEmitter {
   constructor() {
     super()
     this.queue = createQueue()
-    this.authFn = this.setupAuth(
+    this.setupAuth(
       key.web.client_id,
       key.web.client_secret,
       (process.env.NODE_ENV === 'production'

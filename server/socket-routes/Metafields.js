@@ -11,6 +11,7 @@ import spreadsheet from '@server/components/Spreadsheet'
 import { endMeasureTime, startMeasureTime } from '@universal/helpers'
 import yamlLoadAndParse from '@server/utils/yamlLoadAndParse'
 import updateProductJson from '@server/jobs/updateProductJson'
+import googleAnalyticsJob from '@server/jobs/GoogleAnalytics'
 
 class MetafieldsSocketRouter extends SocketBase {
   constructor(io, socket) {
@@ -23,6 +24,7 @@ class MetafieldsSocketRouter extends SocketBase {
       SOCKET_EV.Util.UpdateProductJson,
       this.updateProductJson.bind(this)
     )
+    socket.on(SOCKET_EV.GA.UpdateTopProducts, this.updateTopProducts.bind(this))
   }
 
   getMetafields() {
@@ -141,6 +143,10 @@ class MetafieldsSocketRouter extends SocketBase {
 
   updateProductJson({ id }) {
     updateProductJson(id, 'high')
+  }
+
+  updateTopProducts({ token }) {
+    googleAnalyticsJob.updateTopProducts(token)
   }
 }
 

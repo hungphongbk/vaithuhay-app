@@ -157,7 +157,8 @@ export default {
         metafields: preload('Metafields')
       },
       fetchingRelated: false,
-      once: false
+      once: false,
+      cmd: null
     }
   },
   computed: {
@@ -181,6 +182,14 @@ export default {
       })
       return perm
     }
+  },
+  provide() {
+    const socketCmd = {}
+    Object.defineProperty(socketCmd, 'cmd', {
+      enumerable: true,
+      get: () => this.cmd
+    })
+    return { socketCmd }
   },
   methods: {
     ...mapActions({
@@ -325,7 +334,7 @@ export default {
         $('.modal-backdrop').remove()
         await delay(100)
 
-        const cmd = AppCommands.register(this)
+        this.cmd = AppCommands.register(this)
 
         // await this.autoSyncTopProduct()
         // await this.autoSyncRelatedProducts()

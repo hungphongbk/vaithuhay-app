@@ -19,6 +19,7 @@
       dashboard-section(title="Chạy lệnh")
         command(watch='patchPrice' @click="patchPrice") Đồng bộ lại giá sản phẩm
         command(watch='syncSheet' @click="syncSheet") Đồng bộ đơn hàng (7 ngày gần nhất)
+        command(watch='updateTop' @click="updateTopProducts") Fetch sản phẩm hàng đầu
 </template>
 <script>
 import { get, post } from '../plugins/jquery-ajax'
@@ -30,6 +31,7 @@ import AppCommands from '@client/jobs/UtilCommands'
 
 export default {
   name: 'PageDashboard',
+  inject: ['socketCmd'],
   components: {
     DashboardSection: {
       functional: true,
@@ -73,7 +75,8 @@ export default {
       },
       runningCommands: {
         patchPrice: false,
-        syncSheet: false
+        syncSheet: false,
+        updateTop: false
       },
       cmd: AppCommands.register(this)
     }
@@ -145,6 +148,16 @@ export default {
               }
             )
           })
+      })
+    },
+    updateTopProducts() {
+      console.log(this)
+      this.runningCommands.updateTop = true
+      this.socketCmd.cmd.once(SOCKET_EV.GA.UpdateTopProductsCompleted, () => {
+        this.runningCommands.updateTop = false
+      })
+      this.$socket.emit(SOCKET_EV.GA.UpdateTopProducts, {
+        token: this.$store.state.auth.token
       })
     }
   },
