@@ -3,8 +3,12 @@ import { google } from 'googleapis'
 import key from '@server/creds/gcloud/client_secret_764771183033-i9qmsuhhb4vsqh8gcd97o3f21fpm6034.apps.googleusercontent.com'
 import middlewares from '@server/routes/middlewares'
 import { SettingsWrapper } from '@server/components'
+import ServiceContainers from '@server/core/containers'
+import { SOCKET_EV } from '@universal/consts'
+import EventEmitter from 'events'
 
-const memoize = require('async-decorators').memoize
+const memoize = require('async-decorators').memoize,
+  GA_EV = SOCKET_EV.GA
 
 class Context {
   job: GoogleAnalyticsJob
@@ -23,18 +27,17 @@ class Context {
   }
 
   async _createAuth(token) {
-    console.log('create ga auth')
-    const auth = this.job.authFn
+    const auth = this.job.authFn()
     this.auth = auth
+    console.log('create ga auth')
     if (token)
       try {
         //copy only
-        await auth.getTokenInfo(token)
-        auth.setCredentials({
-          access_token: token
-        })
+        // await auth.getTokenInfo(token)
+        auth.setCredentials(token)
         return this
       } catch (e) {
+        console.error(e)
         throw e.toString()
       }
     else {
@@ -80,12 +83,15 @@ const _GoogleAnalyticsJob = {
   processUpdateTop: Symbol('processUpdateTop'),
   processUpdateRelated: Symbol('processUpdateRelated')
 }
-class GoogleAnalyticsJob {
+class GoogleAnalyticsJob extends EventEmitter {
   queue
   authFn
   constructor() {
+    super()
     this.queue = createQueue()
     this.authFn = this.setupAuth(
+      key.web.client_id,
+      key.web.client_secret,
       (process.env.NODE_ENV === 'production'
         ? 'https://server.vaithuhay.com/b/'
         : 'https://localhost:8089/') + 'g/login/callback'
@@ -102,13 +108,21 @@ class GoogleAnalyticsJob {
     )
   }
 
-  setupAuth(redirectUri) {
+  setupAuth(clientId, clientSecret, redirectUri) {
     this.authFn = () =>
-      new google.auth.OAuth2(
-        key.web.client_id,
-        key.web.client_secret,
-        redirectUri
-      )
+      new google.auth.OAuth2(clientId, clientSecret, redirectUri)
+  }
+
+  async _log(eventName, message) {
+    await ServiceContainers.call('io', io => {
+      io.emit(eventName, message)
+    })
+    return this
+  }
+
+  jobDone(callback, err = null) {
+    this.emit('done', err)
+    callback(err)
   }
 
   [_GoogleAnalyticsJob.initJob]({ token }): Promise<Context> {
@@ -119,15 +133,22 @@ class GoogleAnalyticsJob {
       .then(ctx => ctx.fetchProducts())
   }
 
-  async [_GoogleAnalyticsJob.processUpdateTop]({
-    data: { token, range = 10 },
+  async [_GoogleAnalyticsJob.processUpdateTop](
+    {
+      data: { token, range = 10 }
+    },
     done
-  }) {
-    const context = await this[_GoogleAnalyticsJob.initJob](token),
-      yesterday = (d => new Date(d.setDate(d.getDate() - 1)))(new Date()),
+  ) {
+    const context = await this[_GoogleAnalyticsJob.initJob]({ token })
+    await this._log(
+      GA_EV.UpdateTopProductsProgress,
+      'Successfully authenticated with Google APIs. Fetch GA data...'
+    )
+
+    const yesterday = (d => new Date(d.setDate(d.getDate() - 1)))(new Date()),
       beforeDays = (d => new Date(d.setDate(d.getDate() - range)))(new Date()),
       fm = d => d.toISOString().slice(0, 10)
-
+    console.log('successfully set credentials')
     await context.gaGet(
       {
         'start-date': fm(beforeDays),
@@ -153,24 +174,36 @@ class GoogleAnalyticsJob {
             })
             .filter(r => r !== null)
 
+        console.log('set ga top')
         await SettingsWrapper.set('ga', 'top', rs)
+        await this._log(GA_EV.UpdateTopProductsProgress, 'Update completed!')
+        await this._log(GA_EV.UpdateTopProductsCompleted)
       }
     )
-    done()
+    this.jobDone(done)
   }
 
-  async [_GoogleAnalyticsJob.processUpdateRelated]({ data, done }) {}
+  async [_GoogleAnalyticsJob.processUpdateRelated]({ data }, done) {}
 
-  updateTopProducts() {
+  updateTopProducts(token) {
     return new Promise((resolve, reject) => {
       this.queue
-        .create('updateTop')
+        .create('updateTop', { token })
         .priority('normal')
         .attempts(3)
         .removeOnComplete(true)
         .save(err => {
           if (err) reject(err)
-          else resolve()
+          else {
+            this._log(GA_EV.UpdateTopProducts)
+              .then(() =>
+                this._log(
+                  GA_EV.UpdateTopProductsProgress,
+                  'Task has been enqueued. Waiting...'
+                )
+              )
+              .then(resolve)
+          }
         })
     })
   }

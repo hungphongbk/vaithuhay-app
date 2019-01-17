@@ -17,5 +17,10 @@ export const SOCKET_EV = {
     UpdateIndexJson: 'util:updateIndexJson',
     UpdateIndexJsonProgress: 'util:updateIndexJson:progress',
     UpdateIndexJsonCompleted: 'util:updateIndexJson:completed'
+  },
+  GA: {
+    UpdateTopProducts: 'ga:updateTopProducts',
+    UpdateTopProductsProgress: 'ga:updateTopProducts:progress',
+    UpdateTopProductsCompleted: 'ga:updateTopProducts:completed'
   }
 }

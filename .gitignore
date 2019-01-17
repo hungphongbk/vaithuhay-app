@@ -56,3 +56,4 @@ fabric.properties
 /server-dist
 /config/*
 !/config/.env.example
+/test/tmp/

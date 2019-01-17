@@ -5,6 +5,7 @@ require('@server/core/env')('web')
 import MetafieldsSocketRouter from '@server/socket-routes/Metafields'
 import UploadImages from '@server/socket-routes/UploadImages'
 import HaravanClientApi from '@server/utils/HaravanClientAPI'
+import Settings from '@server/components/Settings'
 
 process
   .on('unhandledRejection', (reason, p) => {
@@ -142,7 +143,8 @@ app.use(function(err, req, res, next) {
 server.app = app
 server.models = models
 server.utils = {
-  HaravanClientApi
+  HaravanClientApi,
+  Settings
 }
 server.jobs = {
   updateProductJson,
