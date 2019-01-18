@@ -7,6 +7,15 @@ import { SOCKET_EV } from '@universal/consts'
 import { chunkMetafieldJsonString } from '@server/utils/helpers'
 import { cache } from '@server/utils'
 import { bytesToSize } from '@universal/helpers'
+import googleAnalyticsJob from '@server/jobs/GoogleAnalytics'
+import middlewares from '@server/routes/middlewares'
+
+/**
+ * Ensure there is no 2 distinct job exists on real-time
+ * @type {Map<any, any>}
+ * @private
+ */
+const _queueIdentity = new Map()
 
 const queue = createQueue(),
   log = (status, message = '') => {
@@ -86,16 +95,48 @@ queue.process('updateProduct', 1, async ({ data: { id: productId } }, done) => {
 
 function updateProductJson(id, priority = 'normal') {
   return new Promise((resolve, reject) => {
+    if (_queueIdentity.has(id)) {
+      resolve()
+      return
+    }
     queue
       .create('updateProduct', { id })
       .priority(priority)
       .attempts(3)
       .removeOnComplete(true)
+      .on('complete', rs => {
+        _queueIdentity.delete(id)
+      })
       .save(err => {
         if (err) reject(err)
-        else log(0).then(resolve)
+        else
+          log(0).then(() => {
+            _queueIdentity.set(id, true)
+            resolve()
+          })
       })
   })
 }
+
+/**
+ * Register job with another GA events callback
+ */
+const gaInject = async data => {
+  if (data.err) {
+    console.error(err)
+    return
+  }
+
+  if (!data.id) {
+    // TODO: well process all products
+    const obj = { products: [] }
+    await middlewares.allProducts(obj)
+    obj.products.forEach(product => updateProductJson(product.id))
+  }
+
+  //finally re-attach again
+  googleAnalyticsJob.once('done', gaInject)
+}
+googleAnalyticsJob.once('done', gaInject)
 
 export default updateProductJson

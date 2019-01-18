@@ -121,8 +121,8 @@ class GoogleAnalyticsJob extends EventEmitter {
     return this
   }
 
-  jobDone(callback, err = null) {
-    this.emit('done', err)
+  jobDone(callback, err = null, payload = {}) {
+    this.emit('done', { err, ...payload })
     callback(err)
   }
 
