@@ -26,7 +26,7 @@ const queue = createQueue(),
 
 queue.process(
   'updateProduct',
-  3,
+  4,
   async ({ data: { id: productId, options } }, done) => {
     const beginEvName =
       options && options.total
@@ -143,12 +143,16 @@ const gaInject = async data => {
     // TODO: well process all products
     const obj = { products: [] }
     await middlewares.allProducts(obj)
+    const willSync =
+      process.env.NODE_ENV === 'development'
+        ? obj.products.slice(0, 32)
+        : obj.products
     await ServiceContainers.call('io', io => {
-      io.emit(SOCKET_EV.Util.UpdateProductJsonAll, obj.products.length)
+      io.emit(SOCKET_EV.Util.UpdateProductJsonAll, willSync.length)
     })
-    obj.products.forEach(product =>
+    willSync.forEach(product =>
       updateProductJson(product.id, 'normal', {
-        total: obj.products.length
+        total: willSync.length
       })
     )
   }

@@ -33,7 +33,7 @@ class AppCommands extends UtilCommands {
   @UtilCommands.Command([
     SOCKET_EV.Util.UpdateProductJsonAll,
     SOCKET_EV.Util.UpdateProductJsonPart,
-    SOCKET_EV.Util.UpdateProductJsonProgress,
+    // SOCKET_EV.Util.UpdateProductJsonProgress,
     SOCKET_EV.Util.UpdateProductJsonCompleted
   ])
   batchUpdateProductJson(total) {
@@ -57,11 +57,11 @@ class AppCommands extends UtilCommands {
               logs: last
             })
           })
-          this.on(SOCKET_EV.Util.UpdateProductJsonProgress, log =>
-            noti.updateMeta({
-              logs: [...noti.metadata.logs, log]
-            })
-          )
+          // this.on(SOCKET_EV.Util.UpdateProductJsonProgress, log =>
+          //   noti.updateMeta({
+          //     logs: [...noti.metadata.logs, log]
+          //   })
+          // )
           this.on(SOCKET_EV.Util.UpdateProductJsonCompleted, () => {
             if (++counter === total) {
               noti.changeContextual('success')
