@@ -231,4 +231,56 @@ if (process.env.NODE_ENV === 'development') {
   })
 }
 
+router.post('/updateTheme', async (req, res) => {
+  const replace = (tag, content, replacement) =>
+    content.replace(
+      new RegExp(`(<!--vth:${tag}-->)(.*?)(<!--vth:${tag}:end-->)`, 'gs'),
+      `$1${replacement}$3`
+    )
+
+  // update mobile theme
+  let { body } = req,
+    {
+      asset: { key, value }
+    } = await apiGet(
+      `/admin/themes/${
+        process.env.HRV_THEME_M_ID
+      }/assets.json?asset[key]=layout/theme.liquid&theme_id=${
+        process.env.HRV_THEME_M_ID
+      }`,
+      false
+    )
+
+  // Replace asset js
+  const generatedHtml = Object.entries(body)
+    .filter(([resource]) => /^(frontend|inline|vendor|mobile)/.test(resource))
+    .map(
+      ([resource, hash]) =>
+        `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
+    )
+    .join('')
+  value = replace('jsSnippet', value, generatedHtml)
+
+  // Replace preload js
+  const generatedPreloads = Object.entries(body)
+    .filter(([resource]) => /^(frontend|inline|vendor|mobile)/.test(resource))
+    .map(
+      ([resource, hash]) =>
+        `<link rel="preload" as="script" href="https://static.vaithuhay.com/${resource}?${hash}" crossorigin>`
+    )
+    .join('')
+  value = replace('preload', value, generatedPreloads)
+
+  // console.log(value)
+  console.log(
+    await apiPut(`/admin/themes/${process.env.HRV_THEME_M_ID}/assets.json`, {
+      asset: {
+        key,
+        value
+      }
+    })
+  )
+  res.json({ status: 'ok' })
+})
+
 export default router
