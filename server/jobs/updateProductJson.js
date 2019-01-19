@@ -18,12 +18,7 @@ import middlewares from '@server/routes/middlewares'
 const _queueIdentity = new Map()
 
 const queue = createQueue(),
-  log = (status, message = '') => {
-    const eventName = [
-      SOCKET_EV.Util.UpdateProductJson,
-      SOCKET_EV.Util.UpdateProductJsonProgress,
-      SOCKET_EV.Util.UpdateProductJsonCompleted
-    ][status]
+  log = (eventName, message = '') => {
     return ServiceContainers.call('io', io => {
       io.emit(eventName, message)
     })
@@ -31,8 +26,12 @@ const queue = createQueue(),
 
 queue.process(
   'updateProduct',
-  1,
+  3,
   async ({ data: { id: productId, options } }, done) => {
+    const beginEvName =
+      options && options.total
+        ? SOCKET_EV.Util.UpdateProductJsonPart
+        : SOCKET_EV.Util.UpdateProductJson
     /**
      * 1. Invalidate product cache in Redis
      * 2. Get base JSON from vaithuhay (view=yaml)
@@ -46,9 +45,15 @@ queue.process(
     expect(handle, `key product-id:${productId} didn't exist in Redis!`).is.not
       .null
 
-    await log(1, `Begin update JSON HTML for "${handle}"`)
+    await log(beginEvName, `Begin update JSON HTML for "${handle}"`)
 
     const json = await yamlLoadAndParse(`/products/${handle}?view=yaml`)
+    if (json === null) {
+      await log(SOCKET_EV.Util.UpdateProductJsonProgress, `Skip this product`)
+      await log(SOCKET_EV.Util.UpdateProductJsonCompleted)
+      done()
+      return
+    }
 
     /**
      * BEGIN PROCESS
@@ -75,7 +80,10 @@ queue.process(
         })
       )
     )).filter(p => p !== null)
-    await log(1, `${json.relateds.length} related products...`)
+    await log(
+      SOCKET_EV.Util.UpdateProductJsonProgress,
+      `${json.relateds.length} related products...`
+    )
 
     // FAQ
     if (metafields['vaithuhay-faq']) json.faq = metafields['vaithuhay-faq']
@@ -87,12 +95,12 @@ queue.process(
 
     await HaravanClientApi.setMetafieldForProduct(productId, jsonParts)
     await log(
-      1,
+      SOCKET_EV.Util.UpdateProductJsonProgress,
       `Update completed (size = ${bytesToSize(
         JSON.stringify(json).length
       )}, distributed in ${Object.keys(jsonParts).length} keys)`
     )
-    await log(2)
+    await log(SOCKET_EV.Util.UpdateProductJsonCompleted)
     done()
   }
 )

@@ -1,4 +1,5 @@
 import EventEmitter from 'events'
+import { NotificationItem } from '@client/store/notifications'
 
 let _resolve
 
@@ -23,10 +24,8 @@ class UtilCommands extends EventEmitter {
       self.ctxPromise.then(ctx => {
         const value = descriptor.value,
           callback = args => {
-            // console.log(args)
             rest.forEach(ev => ctx.subscribe(ev, data => ctx.emit(ev, data)))
-            const promise = value.apply(ctx)
-            // console.log(promise)
+            const promise = value.call(ctx, args)
             return promise.then(() => ctx.unsubscribes(rest))
           }
 
@@ -66,7 +65,17 @@ class UtilCommands extends EventEmitter {
 
   displayNotification(
     contextual = 'info',
-    { title, initialLogs = [], callback, options = {} }
+    {
+      title,
+      initialLogs = [],
+      callback,
+      options = {}
+    }: {
+      title: string,
+      initialLogs: Array<string>,
+      callback: NotificationItem => Promise<void>,
+      options: any
+    }
   ) {
     const capitalize = s => s.charAt(0).toUpperCase() + s.substring(1)
     return new Promise((resolve, reject) => {

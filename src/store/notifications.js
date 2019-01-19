@@ -145,3 +145,5 @@ export default {
     }
   }
 }
+
+export { NotificationItem }

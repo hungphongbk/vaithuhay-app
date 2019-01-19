@@ -7,7 +7,11 @@ module.exports = {
   parserOptions: {
     parser: 'babel-eslint'
   },
-  extends: ['plugin:vue/recommended', 'plugin:prettier/recommended'],
+  extends: [
+    'plugin:vue/recommended',
+    'plugin:prettier/recommended',
+    'prettier/flowtype'
+  ],
   // required to lint *.vue files
   plugins: ['promise', 'vue', 'prettier'],
   // add your custom rules here
