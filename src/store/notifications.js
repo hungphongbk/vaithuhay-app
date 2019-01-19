@@ -10,6 +10,7 @@ class NotificationItem {
   autoRemove
   timeout
   fade
+  withProgress = false
 
   constructor(context, obj) {
     this.context = context
@@ -23,6 +24,8 @@ class NotificationItem {
       },
       obj
     )
+
+    if (this.withProgress) this.metadata.percentage = 0
 
     if (!this.callback) {
       if (this.autoRemove) this.remove()
@@ -58,6 +61,16 @@ class NotificationItem {
     const obj = {
       id: this.id,
       metadata
+    }
+    this.context.commit('update', obj)
+  }
+
+  updateProgress(percentage) {
+    const obj = {
+      id: this.id,
+      metadata: Object.assign({}, this.metadata, {
+        percentage
+      })
     }
     this.context.commit('update', obj)
   }

@@ -24,9 +24,12 @@
           span(aria-hidden="true") &times;
       component(v-if="alert.message.render" :is="alert.message" :metadata="alert.metadata")
       p(v-else v-html="alert.message")
+      progress-bar(v-if="alert.withProgress" :value="alert.metadata.percentage")
 </template>
 <script>
+import ProgressBar from '@client/components/UI/ProgressBar.vue'
 export default {
+  components: { ProgressBar },
   computed: {
     list() {
       return this.$store.state.notifications.list

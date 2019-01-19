@@ -12,6 +12,7 @@ export const SOCKET_EV = {
     SyncSheetProgress: 'util:syncSheet:progress',
     SyncSheetCompleted: 'util:syncSheet:completed',
     UpdateProductJson: 'util:updateProductJson',
+    UpdateProductJsonAll: 'util:updateProductJsonAll',
     UpdateProductJsonProgress: 'util:updateProductJson:progress',
     UpdateProductJsonCompleted: 'util:updateProductJson:completed',
     UpdateIndexJson: 'util:updateIndexJson',

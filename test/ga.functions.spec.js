@@ -70,7 +70,7 @@ describe('GA tasks', function() {
   })
 
   it('top products', function(done) {
-    googleAnalyticsJob.once('done', done)
+    googleAnalyticsJob.once('done', ({ err }) => done(err))
     googleAnalyticsJob.updateTopProducts(token)
   })
 })

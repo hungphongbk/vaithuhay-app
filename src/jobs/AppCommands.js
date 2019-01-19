@@ -30,6 +30,22 @@ class AppCommands extends UtilCommands {
   }
 
   @UtilCommands.Command([
+    SOCKET_EV.Util.UpdateProductJsonAll,
+    SOCKET_EV.Util.UpdateProductJson,
+    SOCKET_EV.Util.UpdateProductJsonProgress,
+    SOCKET_EV.Util.UpdateProductJsonCompleted
+  ])
+  batchUpdateProductJson() {
+    return this.displayNotification('info', {
+      title: 'Update product JsonHTML',
+      options: {
+        withProgress: true
+      },
+      callback: noti => new Promise(resolve => {})
+    })
+  }
+
+  @UtilCommands.Command([
     SOCKET_EV.Util.UpdateIndexJson,
     SOCKET_EV.Util.UpdateIndexJsonProgress,
     SOCKET_EV.Util.UpdateIndexJsonCompleted

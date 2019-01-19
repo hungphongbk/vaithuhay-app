@@ -123,7 +123,8 @@ class GoogleAnalyticsJob extends EventEmitter {
 
   jobDone(callback, err = null, payload = {}) {
     this.emit('done', { err, ...payload })
-    callback(err)
+    if (err) callback(err)
+    else callback()
   }
 
   [_GoogleAnalyticsJob.initJob]({ token }): Promise<Context> {
@@ -138,7 +139,7 @@ class GoogleAnalyticsJob extends EventEmitter {
     {
       data: { token, range = 10 }
     },
-    done
+    taskDone
   ) {
     const context = await this[_GoogleAnalyticsJob.initJob]({ token })
     await this._log(
@@ -181,7 +182,7 @@ class GoogleAnalyticsJob extends EventEmitter {
         await this._log(GA_EV.UpdateTopProductsCompleted)
       }
     )
-    this.jobDone(done)
+    this.jobDone(taskDone)
   }
 
   async [_GoogleAnalyticsJob.processUpdateRelated]({ data }, done) {}
