@@ -14,6 +14,7 @@ function loadEnv(_environment) {
     }
   })
   console.log('Load env from env.yaml, env = ' + `${environment}-${stage}`)
+  console.log(process.env.HRV_THEME_M_ID)
 
   const merges = ['APP_HOST', 'APP_RUNTIME_ENV']
   merges.forEach(envVar => {

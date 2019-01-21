@@ -4,6 +4,7 @@ import Bluebird from 'bluebird'
 import './polyfill'
 import logUpdate from 'log-update'
 import { fork } from 'child_process'
+import Cluster from 'cluster'
 import { HrvAPISelector } from '@server/core/haravan-api'
 import { randomHash } from '@universal/helpers'
 const loadEnv = require('@server/core/env')
@@ -13,21 +14,40 @@ const expect = chai.expect
 // import 'colors'
 Bluebird.promisifyAll(Redis)
 
-export const newProcess = entry => {
-  console.log(`start new fork (${entry}) ...`)
-  const entryFullPath = `./server-dist/${entry}.${
-    process.env.NODE_ENV === 'development' ? 'dev' : 'prod'
-  }.js`
-  const childProc = fork(entryFullPath, {
-    env: loadEnv(process.env.APP_RUNTIME_ENV)
-  })
-  process.on('exit', () => {
-    console.log(`process [${entry}] will be terminated soon.`)
-    childProc.kill()
-  })
+//region Process management
+let newDevProcess, newProdProcess
+if (process.env.NODE_ENV === 'development') {
+  newDevProcess = entry => {
+    console.log(`start new fork (${entry}) ...`)
+    const entryFullPath = `./server-dist/${entry}.dev.js`
+    Cluster.setupMaster({
+      exec: entryFullPath
+    })
+    const childProc = Cluster.fork(loadEnv(process.env.APP_RUNTIME_ENV))
+    process.on('exit', () => {
+      console.log(`process [${entry}] will be terminated soon.`)
+      childProc.kill()
+    })
 
-  return childProc
-}
+    return childProc
+  }
+} else
+  newProdProcess = entry => {
+    console.log(`start new fork (${entry}) ...`)
+    const entryFullPath = `./server-dist/${entry}.prod.js`
+    const childProc = fork(entryFullPath, {
+      env: loadEnv(process.env.APP_RUNTIME_ENV)
+    })
+    process.on('exit', () => {
+      console.log(`process [${entry}] will be terminated soon.`)
+      childProc.kill()
+    })
+
+    return childProc
+  }
+export const newProcess =
+  process.env.NODE_ENV === 'development' ? newDevProcess : newProdProcess
+//endregion
 
 const flex = obj => {
   let rs

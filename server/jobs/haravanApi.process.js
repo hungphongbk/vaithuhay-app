@@ -6,25 +6,26 @@ const latency = 5,
 
 const queue = createQueue(`api-${process.env.APP_RUNTIME_ENV}`)
 
-queue.process('request', concurrencySize, async (job, done) => {
+queue.process('request', concurrencySize, (job, done) => {
   function processDone(err, payload) {
     function delayDone(err) {
       setTimeout(() => done(err), latency)
     }
+
     if (err) {
       process.send({ err })
       delayDone(err)
     } else {
       process.send(payload)
-      process.env.APP_RUNTIME_ENV === 'cli' &&
-        console.log(`[haravan-api] #${job.data.timestamp} has done`)
+      // process.env.APP_RUNTIME_ENV === 'cli' &&
+      //   console.log(`[haravan-api] #${job.data.timestamp} has done`)
       delayDone()
     }
   }
 
   const { url, type, data, timestamp } = job.data
-  process.env.APP_RUNTIME_ENV === 'cli' &&
-    console.log(`[haravan-api] #${timestamp} is processed now`)
+  // process.env.APP_RUNTIME_ENV === 'cli' &&
+  //   console.log(`[haravan-api] #${timestamp} is processed now`)
   let promise
   switch (type) {
     case 'get':
@@ -47,32 +48,31 @@ queue.process('request', concurrencySize, async (job, done) => {
       break
   }
 
-  try {
-    const payload = await promise()
-    processDone(null, { timestamp, payload })
-  } catch (e) {
-    if (/^429/.test(e.message)) {
-      console.log('Retry due to "too many request"')
-      // opts.delay = opts.delayDefaultInterval += 100
-      processDone(new Error('Retry due to "too many request"'))
-    } else {
-      console.log(
-        `${
-          e.message
-        }\n Ignore due to unhandled error\n URL: [${type.toUpperCase()}] ${url}`
-      )
-      processDone(null, {})
-    }
-  }
+  promise()
+    .then(payload => processDone(null, { timestamp, payload }))
+    .catch(e => {
+      if (/^429/.test(e.message)) {
+        console.log('Retry due to "too many request"')
+        // opts.delay = opts.delayDefaultInterval += 100
+        processDone(new Error('Retry due to "too many request"'))
+      } else {
+        console.log(
+          `${
+            e.message
+          }\n Ignore due to unhandled error\n URL: [${type.toUpperCase()}] ${url}`
+        )
+        processDone(null, {})
+      }
+    })
 })
 
 process.on('message', payload => {
-  process.env.APP_RUNTIME_ENV === 'cli' &&
-    console.log(
-      `[haravan-api] #${payload.timestamp} being queued: ${payload.type} ${
-        payload.url
-      }`
-    )
+  // process.env.APP_RUNTIME_ENV === 'cli' &&
+  //   console.log(
+  //     `[haravan-api] #${payload.timestamp} being queued: ${payload.type} ${
+  //       payload.url
+  //     }`
+  //   )
   queue
     .create('request', payload)
     .removeOnComplete(true)
