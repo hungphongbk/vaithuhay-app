@@ -4,13 +4,12 @@ import key from '../creds/gcloud/client_secret_764771183033-i9qmsuhhb4vsqh8gcd97
 import path from 'path'
 import { apiDel, apiGet, apiPost, diffArray } from '../utils'
 import middlewares from './middlewares'
-import Logging from '@server/jobs/Logging'
-import { FirebaseAdmin } from '@server/components'
+// import Logging from '@server/jobs/Logging'
 
 const VTH_TOP_PRODUCTS = 'vaithuhayTopProducts'
 
-const timeout = ms => new Promise(res => setTimeout(res, ms))
-const log = (tag, message) => console.log(`[google/${tag}] ` + message)
+// const timeout = ms => new Promise(res => setTimeout(res, ms))
+// const log = (tag, message) => console.log(`[google/${tag}] ` + message)
 
 const router = Router(),
   authFn = () =>
@@ -47,7 +46,7 @@ const googleAuth = async (req, res, next) => {
       })
       next()
     } catch (e) {
-      await Logging.log(Logging.TYPES.ERROR, ['analytics'], e.toString())
+      // await Logging.log(Logging.TYPES.ERROR, ['analytics'], e.toString())
       res.status(500).json({ message: e.message })
     }
   } else
@@ -180,11 +179,11 @@ router.post(
       },
       async (err, body) => {
         if (err) {
-          await Logging.log(
-            Logging.TYPES.ERROR,
-            ['analytics', 'top-products'],
-            err.toString()
-          )
+          // await Logging.log(
+          //   Logging.TYPES.ERROR,
+          //   ['analytics', 'top-products'],
+          //   err.toString()
+          // )
           console.error(err)
           res.status(500).send(err.message)
         } else {
@@ -243,11 +242,11 @@ router.post(
       },
       async (err, body) => {
         if (err) {
-          await Logging.log(
-            Logging.TYPES.ERROR,
-            ['analytics', 'related-products'],
-            err.toString()
-          )
+          // await Logging.log(
+          //   Logging.TYPES.ERROR,
+          //   ['analytics', 'related-products'],
+          //   err.toString()
+          // )
           res.status(500).send(err.message)
         } else {
           try {
@@ -275,11 +274,11 @@ router.post(
             )
             res.json(rows)
           } catch (e) {
-            await Logging.log(
-              Logging.TYPES.ERROR,
-              ['analytics', 'related-products'],
-              err.toString()
-            )
+            // await Logging.log(
+            //   Logging.TYPES.ERROR,
+            //   ['analytics', 'related-products'],
+            //   err.toString()
+            // )
             res.status(500).send(e.message)
           }
         }

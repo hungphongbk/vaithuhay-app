@@ -140,15 +140,16 @@ app.use(function(err, req, res, next) {
 })
 
 // attach models to server
-server.app = app
-server.models = models
-server.utils = {
-  HaravanClientApi,
-  Settings
+if (process.env.NODE_ENV === 'development') {
+  server.app = app
+  server.models = models
+  server.utils = {
+    HaravanClientApi,
+    Settings
+  }
+  server.jobs = {
+    updateProductJson,
+    googleAnalyticsJob
+  }
 }
-server.jobs = {
-  updateProductJson,
-  googleAnalyticsJob
-}
-
 module.exports = server

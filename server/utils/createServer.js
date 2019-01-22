@@ -2,9 +2,9 @@ import http from 'http'
 import https from 'https'
 import fs from 'fs'
 import socketIO from 'socket.io'
-import requestStats from 'request-stats'
-import { FirebaseAdmin } from '@server/components'
-import omit from 'lodash/omit'
+// import requestStats from 'request-stats'
+
+// import omit from 'lodash/omit'
 import bootstrap from '@server/utils/bootstrap'
 import ServiceContainers from '@server/core/containers'
 
@@ -13,7 +13,7 @@ const dev = process.env.NODE_ENV === 'development',
 
 export default function(app, bootstrapCallbacks = []) {
   //firebase db ref to 'requestLogging/[dev/prod]'
-  const dbRef = FirebaseAdmin.database().ref('server')
+  // const dbRef = FirebaseAdmin.database().ref('server')
 
   global.APP_INSTANCE = app
   app.set('port', port)
@@ -33,22 +33,6 @@ export default function(app, bootstrapCallbacks = []) {
 
   const server = dev ? createDev() : createProd(),
     io = socketIO(server)
-
-  requestStats(server, requestInfo => {
-    const env = dev ? 'dev' : 'prod'
-    if (requestInfo.req.method.toLowerCase() === 'options')
-      return Promise.resolve()
-
-    const obj = omit(requestInfo, ['req.raw', 'res.raw'])
-    obj.timestamp = Date.now()
-
-    return dbRef
-      .child(`requestLogging/${env}`)
-      .push()
-      .set(obj, err => {
-        if (err) console.error(err)
-      })
-  })
 
   bootstrap()
     .then(() => Promise.all(bootstrapCallbacks.map(f => f())))

@@ -4,15 +4,17 @@ import Bluebird from 'bluebird'
 import './polyfill'
 import logUpdate from 'log-update'
 import { fork } from 'child_process'
-import Cluster from 'cluster'
 import { HrvAPISelector } from '@server/core/haravan-api'
 import { randomHash } from '@universal/helpers'
 const loadEnv = require('@server/core/env')
 import chai from 'chai'
+const Cluster = require('cluster')
 
 const expect = chai.expect
 // import 'colors'
 Bluebird.promisifyAll(Redis)
+
+// console.log(Object.getOwnPropertyNames(Cluster).join(', '))
 
 //region Process management
 let newDevProcess, newProdProcess
