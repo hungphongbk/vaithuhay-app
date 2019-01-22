@@ -172,6 +172,7 @@
     "typescript": "^2.8.3",
     "util.promisify": "^1.0.0",
     "uuid": "^3.3.0",
+    "v8-profiler-node8": "^6.0.1",
     "vue": "2.5.17",
     "vue-async-computed": "^3.3.1",
     "vue-async-data-2": "0.0.2",

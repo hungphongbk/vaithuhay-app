@@ -80,12 +80,17 @@ router.post('/createCart', (req, res) => {
 })
 
 const orderMiddleware = (req, res, next) => {
+  const { headers } = req
+  if (!(headers['x-haravan-order-id'] && headers['x-haravan-topic'])) {
+    res.status(403).send('fuck you :)')
+    return
+  }
   try {
     req.order = Object.assign(
       {},
       {
-        _id: req.headers['x-haravan-order-id'],
-        status: req.headers['x-haravan-topic'],
+        _id: headers['x-haravan-order-id'],
+        status: headers['x-haravan-topic'],
         ...req.body
       }
     )
