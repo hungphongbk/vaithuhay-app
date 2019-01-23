@@ -113,9 +113,9 @@ const randomlyFn = (fn, probability = 0.4) => {
       const self = this,
         newThis = create(self, {
           log(msg, ...args2) {
-            if (self.hasOwnProperty('logs')) self.logs.push(`{${key}}: ${msg}`)
-            if (isEnable)
-              console.log.apply(null, [`{${key}}: ${msg}`, ...args2])
+            // if (self.hasOwnProperty('logs')) self.logs.push(`{${key}}: ${msg}`)
+            // if (isEnable)
+            //   console.log.apply(null, [`{${key}}: ${msg}`, ...args2])
           }
         })
       return original.apply(newThis, args)
@@ -184,7 +184,7 @@ class Spreadsheet {
 
     this.spreadsheetId = '1n3H8FNUmAHEtoViNqGevOuESHAwitGdBOuf92YkjuDI' //for production
     //this.spreadsheetId = '14rY5RLRjDNYKl2WSHten0sIA5xNGNdb6uJcpaHeHXYE'; //for testing
-    this.rowOffset = 4000
+    this.rowOffset = 16000
     this.columnLastIndex = 'AT'
     this.spreadsheets = {
       values: {
@@ -367,10 +367,12 @@ class Spreadsheet {
    * 2. Split rows into 2 types: update/append
    *
    * @param orders
+   * @param logger
    * @returns {Promise<{updateBody: any[], appendBody: Array}>}
    */
   @logger(false)
-  async _makeBody(orders) {
+  async _makeBody(orders, logger = () => {}) {
+    const log = logger || this.log
     //generate matched rows
     const generate = (async () => {
       const rows = []
@@ -458,7 +460,7 @@ class Spreadsheet {
         fromRow = min(rowIndexes),
         toRow = max(rowIndexes),
         range = `A${fromRow}:${this.columnLastIndex}${toRow}`
-      this.log(`\tWill be updated in range ${range}`)
+      log(`\tWill be updated in range ${range}`)
       return {
         range,
         values: group.map(r => r.row)
@@ -473,8 +475,8 @@ class Spreadsheet {
 
   @logger()
   async write(orders = [], logger = null) {
-    const { updateBody, appendBody } = await this._makeBody(orders),
-      log = logger || this.log
+    const log = logger || this.log,
+      { updateBody, appendBody } = await this._makeBody(orders, log)
     log(updateBody.length + ' row-blocks will be updated')
     log(appendBody.length + ' rows will be appended')
     if (updateBody.length > 0)

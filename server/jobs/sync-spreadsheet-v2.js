@@ -15,24 +15,25 @@ process.once('SIGTERM', function(sig) {
   })
 })
 
-syncQueue.process('sync', 1, async ({ data: order }, done) => {
+const printOrdersFn = orders => orders.map(o => o.order_number).join(', ')
+
+syncQueue.process('sync', 1, async ({ data: { orders, timestamp } }, done) => {
   // const id = Date.now() + '.profile'
   // start profiling
   // Profiler.startProfiling(id)
+  const printOrders = printOrdersFn(orders)
 
   try {
-    console.log(`[SYNC] Order ${order.order_number} being proceeded now`)
-    const handler = order.__timestamp
-    await spreadsheet.write([order])
+    console.log(`[SYNC] Orders ${printOrders} are being proceeded now`)
+    const handler = timestamp
+    await spreadsheet.write(orders)
     if (handler)
       endMeasureTime(handler, sec => {
         console.log(
-          `[SYNC] Order ${
-            order.order_number
-          } has been updated, time elapsed: ${sec} seconds`
+          `[SYNC] Orders ${printOrders} has been updated, time elapsed: ${sec} seconds`
         )
       })
-    else console.log(`[SYNC] Order ${order.order_number} has been updated`)
+    else console.log(`[SYNC] Orders ${printOrders} has been updated`)
     // await logging.logOrderInfo(order, spreadsheet.emitLog());
     // const profile = JSON.stringify(Profiler.stopProfiling(id))
     // fs.writeFile(

@@ -25,6 +25,7 @@ function startMeasureTime() {
 function endMeasureTime(handler, callback) {
   const before = wm.get(handler),
     diff = Date.now() - before
+  wm.delete(handler)
   callback(diff / 1000)
 }
 

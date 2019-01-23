@@ -101,7 +101,8 @@ const orderMiddleware = (req, res, next) => {
     res.status(500).send(e.message)
   }
 }
-if (process.env.NODE_ENV === 'production')
+if (process.env.NODE_ENV === 'production') {
+  const tmpQueue = []
   router.post('/processOrder', orderMiddleware, (req, res) => {
     if (
       req.order.status === 'orders/cancelled' &&
@@ -109,25 +110,35 @@ if (process.env.NODE_ENV === 'production')
     ) {
       req.order.financial_status = 'voided'
     }
+    tmpQueue.push(req.order)
 
-    // add timestamp to req.order to measure timing
-    req.order.__timestamp = startMeasureTime()
+    if (tmpQueue.length >= 2)
+      try {
+        const orders = []
+        do {
+          orders.push(tmpQueue.shift())
+        } while (tmpQueue.length > 0)
+        if (orders[0].order_number === orders[1].order_number) orders.shift()
 
-    try {
-      syncQueue
-        .create('sync', req.order)
-        .priority('normal')
-        .attempts(3)
-        .removeOnComplete(true)
-        .save(err => {
-          if (err) throw err
-        })
-      res.json({})
-    } catch (e) {
-      console.log(e.message)
-      res.json({})
-    }
+        syncQueue
+          .create('sync', {
+            orders,
+            timestamp: startMeasureTime()
+          })
+          .priority('normal')
+          .attempts(3)
+          .removeOnComplete(true)
+          .save(err => {
+            if (err) throw err
+            else res.json({})
+          })
+      } catch (e) {
+        console.log(e.message)
+        res.json({})
+      }
+    else res.json({})
   })
+}
 
 router.post('/manual', async (req, res) => {
   const params = {
