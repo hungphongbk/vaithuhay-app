@@ -21,7 +21,6 @@ queue.process(
       isPng = /\.png/g.test(url)
 
     if (isPng) buffer = await pngToJpeg({ quality: 90 })(buffer)
-    console.log(process.env.APP_PATH)
     const newFilenameWithoutExt = md5(url),
       newFilePath = ext =>
         path.join(
@@ -47,6 +46,7 @@ queue.process(
 )
 
 process.on('message', ({ type, uid, payload }) => {
+  console.log(`${type}: ${payload}`)
   queue
     .create(type, { uid, payload })
     .removeOnComplete(true)

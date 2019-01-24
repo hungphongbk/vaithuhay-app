@@ -20,5 +20,6 @@ describe('Optimize image', function() {
         urls.map(url => server.jobs.ImageOptim.compressImageToWebp(url))
       )
     console.log(optimizedUrls)
+    console.log(server.jobs.ImageOptim.cachedStorage)
   })
 })

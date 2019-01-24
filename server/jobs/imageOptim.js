@@ -27,10 +27,13 @@ function pushQueue(type, payload) {
 }
 
 export function compressImageToWebp(url) {
-  console.log(url)
+  // console.log(url)
   return cachedStorage.has(url)
     ? Promise.resolve(cachedStorage.get(url))
-    : pushQueue(PROC_EV.ConvertImageToWebp, url).then(cached =>
+    : pushQueue(PROC_EV.ConvertImageToWebp, url).then(cached => {
         cachedStorage.set(url, cached)
-      )
+        return cached
+      })
 }
+
+export { cachedStorage }
