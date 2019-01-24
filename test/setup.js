@@ -2,7 +2,8 @@ import io from 'socket.io-client'
 import fs from 'fs'
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-process.on('uncaughtException', (err) => {
+global.APP_PATH = __dirname
+process.on('uncaughtException', err => {
   console.log(`Error: ${err.message}`)
 })
 

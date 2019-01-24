@@ -20,6 +20,7 @@ function loadEnv(_environment) {
   merges.forEach(envVar => {
     global[envVar] = process.env[envVar]
   })
+  envs.APP_PATH = path.join(process.cwd(), 'bin')
 
   return envs
 }

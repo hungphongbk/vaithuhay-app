@@ -26,3 +26,7 @@ export const SOCKET_EV = {
     UpdateTopProductsCompleted: 'ga:updateTopProducts:completed'
   }
 }
+
+export const PROC_EV = {
+  ConvertImageToWebp: 'convertImageToWebp'
+}

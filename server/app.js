@@ -6,6 +6,7 @@ import MetafieldsSocketRouter from '@server/socket-routes/Metafields'
 import UploadImages from '@server/socket-routes/UploadImages'
 import HaravanClientApi from '@server/utils/HaravanClientAPI'
 import Settings from '@server/components/Settings'
+import * as ImageOptim from '@server/jobs/imageOptim'
 
 process
   .on('unhandledRejection', (reason, p) => {
@@ -149,7 +150,8 @@ if (process.env.NODE_ENV === 'development') {
   }
   server.jobs = {
     updateProductJson,
-    googleAnalyticsJob
+    googleAnalyticsJob,
+    ImageOptim
   }
 }
 module.exports = server
