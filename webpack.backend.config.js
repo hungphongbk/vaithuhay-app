@@ -10,7 +10,12 @@ const _envs = yenv(path.resolve(process.cwd(), 'config/env.yaml'), {
     env: 'web-production'
   }),
   envs = {}
-for (const env of ['APP_HOST', 'NODE_ENV', 'HRV_THEME_M_ID']) {
+for (const env of [
+  'APP_HOST',
+  'NODE_ENV',
+  'HRV_THEME_M_ID',
+  'HRV_THEME_D_ID'
+]) {
   envs[env] = JSON.stringify(_envs[env])
 }
 const isProd = process.env.NODE_ENV === 'production'

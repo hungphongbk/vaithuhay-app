@@ -5,6 +5,7 @@ import range from 'lodash/range'
 import flatten from 'lodash/flatten'
 import moment from 'moment-timezone'
 import qs from 'query-string'
+import fs from 'fs'
 import chunk from 'lodash/chunk'
 import spreadsheet from '@server/components/Spreadsheet'
 import { HaravanAPI } from '@server/core/haravan-api'
@@ -247,56 +248,79 @@ if (process.env.NODE_ENV === 'development') {
   })
 }
 
-router.post('/updateTheme', async (req, res) => {
-  const replace = (tag, content, replacement) =>
-    content.replace(
-      new RegExp(`(<!--vth:${tag}-->)(.*?)(<!--vth:${tag}:end-->)`, 'gs'),
-      `$1${replacement}$3`
-    )
-
-  // update mobile theme
-  let { body } = req,
-    {
-      asset: { key, value }
-    } = await apiGet(
-      `/admin/themes/${
-        process.env.HRV_THEME_M_ID
-      }/assets.json?asset[key]=layout/theme.liquid&theme_id=${
-        process.env.HRV_THEME_M_ID
-      }`,
-      false
-    )
-
-  // Replace asset js
-  const generatedHtml = Object.entries(body)
-    .filter(([resource]) => /^(frontend|inline|vendor|mobile)/.test(resource))
-    .map(
-      ([resource, hash]) =>
-        `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
-    )
-    .join('')
-  value = replace('jsSnippet', value, generatedHtml)
+const replaceThemeString = (tag, content, replacement) =>
+  content.replace(
+    new RegExp(`(<!--vth:${tag}-->)(.*?)(<!--vth:${tag}:end-->)`, 'gs'),
+    `$1${replacement}$3`
+  )
+function updateTheme(themeId, file, body) {
+  return apiPut(`/admin/themes/${themeId}/assets.json`, {
+    asset: {
+      key: file,
+      value: body
+    }
+  })
+}
+// TODO
+import desktopThemeLiquid from 'raw-loader!@server/templates/desktop-theme.liquid'
+import mobileThemeLiquid from 'raw-loader!@server/templates/mobile-theme.liquid'
+function updateDesktopTheme(assets) {
+  // replace assets js
+  let generatedHtml = Object.entries(assets)
+      .filter(([resource]) =>
+        /^(frontend|inline|vendor|desktop)/.test(resource)
+      )
+      .map(
+        ([resource, hash]) =>
+          `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
+      )
+      .join(''),
+    value = replaceThemeString('jsSnippet', desktopThemeLiquid, generatedHtml)
 
   // Replace preload js
-  const generatedPreloads = Object.entries(body)
+  const generatedPreloads = Object.entries(assets)
+    .filter(([resource]) => /^(frontend|inline|vendor|desktop)/.test(resource))
+    .map(
+      ([resource, hash]) =>
+        `<link rel="preload" as="script" href="https://static.vaithuhay.com/${resource}?${hash}" crossorigin>`
+    )
+    .join('')
+  value = replaceThemeString('preload', value, generatedPreloads)
+
+  return updateTheme(process.env.HRV_THEME_D_ID, 'layout/theme.liquid', value)
+}
+function updateMobileTheme(assets) {
+  // replace assets js
+  let generatedHtml = Object.entries(assets)
+      .filter(([resource]) => /^(frontend|inline|vendor|mobile)/.test(resource))
+      .map(
+        ([resource, hash]) =>
+          `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
+      )
+      .join(''),
+    value = replaceThemeString('jsSnippet', mobileThemeLiquid, generatedHtml)
+
+  // Replace preload js
+  const generatedPreloads = Object.entries(assets)
     .filter(([resource]) => /^(frontend|inline|vendor|mobile)/.test(resource))
     .map(
       ([resource, hash]) =>
         `<link rel="preload" as="script" href="https://static.vaithuhay.com/${resource}?${hash}" crossorigin>`
     )
     .join('')
-  value = replace('preload', value, generatedPreloads)
+  value = replaceThemeString('preload', value, generatedPreloads)
 
-  // console.log(value)
-  console.log(
-    await apiPut(`/admin/themes/${process.env.HRV_THEME_M_ID}/assets.json`, {
-      asset: {
-        key,
-        value
-      }
-    })
-  )
-  res.json({ status: 'ok' })
+  return updateTheme(process.env.HRV_THEME_M_ID, 'layout/theme.liquid', value)
+}
+function updateThemeAll(assets) {
+  return Promise.all([updateDesktopTheme(assets), updateMobileTheme(assets)])
+}
+// console.log(desktopThemeLiquid)
+// console.log(mobileThemeLiquid)
+router.post('/updateTheme', (req, res) => {
+  // update mobile theme
+  console.log(req.body)
+  updateThemeAll(req.body).then(() => res.json({ status: 'ok' }))
 })
 
 export default router

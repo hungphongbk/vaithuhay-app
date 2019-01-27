@@ -14,7 +14,9 @@ describe('Optimize image', function() {
         'http://file.hstatic.net/1000069970/collection/screen_shot_2017-07-23_at_6.41.40_pm.png',
         'http://product.hstatic.net/1000069970/product/untitled-1_1000x.png',
         'http://product.hstatic.net/1000069970/product/k3.jpg',
-        'http://product.hstatic.net/1000069970/product/3843298892_154883748.400x400.jpg'
+        'http://product.hstatic.net/1000069970/product/3843298892_154883748.400x400.jpg',
+        'https://product.hstatic.net/1000069970/product/6_e90f781e2716421f8ee703fca621794f.jpg',
+        'https://product.hstatic.net/1000069970/product/screen_shot_2018-07-04_at_6.32.40_pm.png'
       ],
       optimizedUrls = await Promise.all(
         urls.map(url => server.jobs.ImageOptim.compressImageToWebp(url))

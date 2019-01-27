@@ -10,3 +10,20 @@ export function chunkMetafieldJsonString(str, metafieldKey) {
 
   return obj
 }
+
+export const retryPromise = (fn, ms = 1000, maxRetries = 5) =>
+  new Promise((resolve, reject) => {
+    let retries = 0
+    fn()
+      .then(resolve)
+      .catch(() => {
+        setTimeout(() => {
+          console.error('retrying failed promise...')
+          ++retries
+          if (retries === maxRetries) {
+            return reject('maximum retries exceeded')
+          }
+          retryPromise(fn, ms).then(resolve)
+        }, ms)
+      })
+  })

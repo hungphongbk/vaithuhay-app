@@ -1,0 +1,211 @@
+{% assign vthVer = 'v=201809' %}
+{% assign isDev = cart.attributes.dev %}
+<!doctype html>
+<!--[if lt IE 7]>
+<html class="no-js ie6 oldie" lang="en"><![endif]-->
+<!--[if IE 7]>
+<html class="no-js ie7 oldie" lang="en"><![endif]-->
+<!--[if IE 8]>
+<html class="no-js ie8 oldie" lang="en"><![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <link rel="shortcut icon" href="{{ 'favicon.png' | asset_url }}" type="image/png" {{isDev}} />
+  <meta charset="utf-8"/>
+  <meta name="theme-color" content="#D6AB00"/>
+  <link rel="manifest" href="https://vaithuhay.com/manifest.json" crossOrigin="anonymous">
+  <!--[if IE]>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'/><![endif]-->
+
+  <title>
+    {{ page_title }}{% if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif %}{% if current_page != 1 %} &ndash; Page {{ current_page }}{% endif %}{% unless page_title contains shop.name %}
+      &ndash; {{ shop.name }}{% endunless %}
+  </title>
+  <!-- {% unless customer %}{% endunless %} -->
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | strip_html | strip_newlines }}"/>
+  {% endif %}
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=0' name='viewport'/>
+  <link rel="canonical" href="{{ canonical_url }}"/>
+  <link href="https://static.vaithuhay.com" rel="preconnect" crossorigin>
+  <!--vth:preload--><!--vth:preload:end-->
+  {% include 'master-include' %}
+  {{ content_for_header }}
+
+  {% include 'fb-meta-tags' %}
+  {% include 'google-ldjson' %}
+  <div id="fb-root"></div>
+  <script>(function (d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "//connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v2.10";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+  {% comment %}
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+      (function (d, w, c) {
+        (w[c] = w[c] || []).push(function () {
+          try {
+            w.yaCounter45306597 = new Ya.Metrika({
+              id: 45306597,
+              clickmap: true,
+              trackLinks: true,
+              accurateTrackBounce: true
+            });
+          } catch (e) {
+          }
+        });
+
+        var n = d.getElementsByTagName("script")[0],
+          s = d.createElement("script"),
+          f = function () {
+            n.parentNode.insertBefore(s, n);
+          };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f, false);
+        } else {
+          f();
+        }
+      })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript>
+      <div><img src="https://mc.yandex.ru/watch/45306597" style="position:absolute; left:-9999px;" alt=""/></div>
+    </noscript>
+    <!-- /Yandex.Metrika counter -->
+  {% endcomment %}
+  {% include 'fb-pixel-codes' %}
+  <!-- Compiled theme assets (both dev & production mode)-->
+  <script>(function(t,e,n){function o(e){n.updateCartAttributes({dev:e},function(){t.location.reload(true)})}t.enterDevMode=function(){o(true)};t.exitDevMode=function(){o(false)}})(window,jQuery,Haravan);</script>
+  {% if isDev == 'true' %}
+	{% else %}
+{{ "https://static.vaithuhay.com/frontend.css?" | append: vthVer | stylesheet_tag }}
+	{% endif %}
+	<!-- Global site tag (gtag.js) - Google Ads: 846851119 -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=AW-846851119"></script>
+	<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-846851119');
+</script>
+<script>
+  gtag('event', 'page_view', {'send_to': 'AW-846851119',
+   'ecomm_prodid': 'REPLACE_WITH_STRING_VALUE',
+   'ecomm_pagetype': 'REPLACE_WITH_STRING_VALUE',
+   'ecomm_totalvalue': 'REPLACE_WITH_STRING_VALUE'
+  });
+</script>
+<!-- Event snippet for Số lần mua hàng conversion page
+In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
+<script>
+function gtag_report_conversion(url) {
+  var callback = function () {
+    if (typeof(url) != 'undefined') {
+      window.location = url;
+    }
+  };
+  gtag('event', 'conversion', {
+      'send_to': 'AW-846851119/umqyCLr64pEBEK_Y55MD',
+      'transaction_id': '',
+      'event_callback': callback
+  });
+  return false;
+}
+</script>
+</head>
+<body>
+
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function () {
+    FB.init({
+      appId: '246837025841849',
+      cookie: true,
+      xfbml: true,
+      version: 'v2.10'
+    });
+    FB.AppEvents.logPageView();
+  };
+  (function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "//connect.facebook.net/vi_VN/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+</script>
+<script>
+  var vth = {
+    showCat: false,
+    homepage: {{ shop.metafields.vaithuhay.homepage }},
+    promo: {{ shop.metafields.vaithuhay.promotions }},
+		settings: {{ shop.metafields.vaithuhay.generalSettings }}
+  };
+</script>
+{{ content_for_layout }}
+	<script>var patchJSON={{ shop.metafields.vaithuhay.patchJSON }}</script>
+<script>
+  {% assign homeUrl = 'https://vaithuhay.com' %}
+  vth.categories = {
+    list: {% include 'categories-json' %}
+  };
+  {% capture tmpl %}
+  {{ template }}
+  {% if template == 'page' %}
+  {{ page.handle | prepend: '-' }}
+  {% endif %}
+  {% endcapture %}
+  vth.template = {{ tmpl | remove:' ' | strip_newlines | json }};
+  vth.links = {
+    {% if settings.devEnv %}
+    {% else %}
+    assets: {{ '' | asset_url | json }},
+    {% endif %}
+    home: {{ homeUrl | json }},
+    contact: {{ homeUrl | append: '/contact' | json }},
+    cart: {
+      add: {{ homeUrl | append: '/cart/add.js' | json }},
+      list: {{ homeUrl | append: '/cart.js' | json }},
+      change: {{ homeUrl| append: '/cart/change.js' | json }},
+      checkout: {{ homeUrl | append: '/cart' | json }}
+    }
+  };
+  vth.cart = {
+    items: [],
+    count: 0,
+    price: 0
+  };
+  vth.footer = {
+    about: {{ settings.noidung_about | json }},
+    address: {{ settings.address_about | json }},
+    hotline: {{ settings.hotline_about | json }},
+    email: {{ settings.email_about | json }},
+    links: {{ shop.metafields.vaithuhay.footer }}
+  };
+</script>
+
+<script type="text/javascript">
+  var google_tag_params = {
+    dynx_itemid: 'REPLACE_WITH_VALUE',
+    dynx_itemid2: 'REPLACE_WITH_VALUE',
+    dynx_pagetype: 'REPLACE_WITH_VALUE',
+    dynx_totalvalue: 'REPLACE_WITH_VALUE'
+  };
+</script>
+{% if isDev == 'true' %}
+<script src="https://localhost:8080/frontend.js"></script>
+{% else %}<!--vth:jsSnippet--><!--vth:jsSnippet:end-->{% endif %}
+{% include 'facebook-inbox' %}
+{% include 'hrvloyalty-widgets' %}
+<script type="text/javascript" src="https://cdn.ywxi.net/js/1.js" async></script>
+</body></html>

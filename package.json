@@ -33,6 +33,7 @@
     "apicache": "^1.2.1",
     "async-decorators": "^0.1.5",
     "aws-sdk": "^2.229.1",
+    "axios": "latest",
     "babel-core": "^6.26.0",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
     "babel-loader": "^7.1.4",
@@ -146,7 +147,7 @@
     "pug": "^2.0.3",
     "pug-loader": "^2.4.0",
     "query-string": "^6.0.0",
-    "raw-loader": "^0.5.1",
+    "raw-loader": "^1.0.0",
     "redis": "^2.8.0",
     "redis-lru": "^0.5.0",
     "regenerator-runtime": "^0.11.1",
@@ -197,8 +198,7 @@
     "websocket": "^1.0.25",
     "when": "latest",
     "yamljs": "^0.3.0",
-    "yenv": "^2.1.0",
-    "axios": "latest"
+    "yenv": "^2.1.0"
   },
   "devDependencies": {
     "@types/request": "^2.48.1",
