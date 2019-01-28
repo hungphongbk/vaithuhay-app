@@ -268,7 +268,7 @@ function updateDesktopTheme(assets) {
   // replace assets js
   let generatedHtml = Object.entries(assets)
       .filter(([resource]) =>
-        /^(frontend|inline|vendor|desktop)/.test(resource)
+        /^(frontend|inline|vendor|desktop).*?\.js$/.test(resource)
       )
       .map(
         ([resource, hash]) =>
@@ -279,7 +279,7 @@ function updateDesktopTheme(assets) {
 
   // Replace preload js
   const generatedPreloads = Object.entries(assets)
-    .filter(([resource]) => /^(frontend|inline|vendor|desktop)/.test(resource))
+    .filter(([resource]) => /^(frontend|inline|vendor|desktop).*?\.js$/.test(resource))
     .map(
       ([resource, hash]) =>
         `<link rel="preload" as="script" href="https://static.vaithuhay.com/${resource}?${hash}" crossorigin>`
@@ -292,7 +292,7 @@ function updateDesktopTheme(assets) {
 function updateMobileTheme(assets) {
   // replace assets js
   let generatedHtml = Object.entries(assets)
-      .filter(([resource]) => /^(frontend|inline|vendor|mobile)/.test(resource))
+      .filter(([resource]) => /^(frontend|inline|vendor|mobile).*?\.js$/.test(resource))
       .map(
         ([resource, hash]) =>
           `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
@@ -302,7 +302,7 @@ function updateMobileTheme(assets) {
 
   // Replace preload js
   const generatedPreloads = Object.entries(assets)
-    .filter(([resource]) => /^(frontend|inline|vendor|mobile)/.test(resource))
+    .filter(([resource]) => /^(frontend|inline|vendor|mobile).*?\.js$/.test(resource))
     .map(
       ([resource, hash]) =>
         `<link rel="preload" as="script" href="https://static.vaithuhay.com/${resource}?${hash}" crossorigin>`
