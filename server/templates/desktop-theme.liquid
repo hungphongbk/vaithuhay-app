@@ -85,9 +85,7 @@
   <!-- Compiled theme assets (both dev & production mode)-->
   <script>(function(t,e,n){function o(e){n.updateCartAttributes({dev:e},function(){t.location.reload(true)})}t.enterDevMode=function(){o(true)};t.exitDevMode=function(){o(false)}})(window,jQuery,Haravan);</script>
   {% if isDev == 'true' %}
-	{% else %}
-{{ "https://static.vaithuhay.com/frontend.css?" | append: vthVer | stylesheet_tag }}
-	{% endif %}
+	{% else %}<!--vth:cssSnippet--><!--vth:cssSnippet:end-->{% endif %}
 	<!-- Global site tag (gtag.js) - Google Ads: 846851119 -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=AW-846851119"></script>
 	<script>

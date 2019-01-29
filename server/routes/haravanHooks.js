@@ -264,22 +264,40 @@ function updateTheme(themeId, file, body) {
 // TODO
 import desktopThemeLiquid from 'raw-loader!@server/templates/desktop-theme.liquid'
 import mobileThemeLiquid from 'raw-loader!@server/templates/mobile-theme.liquid'
-function updateDesktopTheme(assets) {
-  // replace assets js
-  let generatedHtml = Object.entries(assets)
-      .filter(([resource]) =>
-        /^(frontend|inline|vendor|desktop).*?\.js$/.test(resource)
-      )
+function updateDesktopTheme(entries) {
+  let value = desktopThemeLiquid
+  // replace asset css
+  value = replaceThemeString(
+    'cssSnippet',
+    value,
+    entries
+      .filter(([resource]) => /\.css$/.test(resource))
       .map(
         ([resource, hash]) =>
-          `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
+          `<link rel="stylesheet" type="text/css" href="https://static.vaithuhay.com/${resource}?${hash}">`
       )
-      .join(''),
-    value = replaceThemeString('jsSnippet', desktopThemeLiquid, generatedHtml)
+      .join('')
+  )
+
+  // replace assets js
+  let generatedHtml = entries
+    .reverse()
+    .filter(([resource]) =>
+      /^(frontend|inline|vendor|desktop).*?\.js$/.test(resource)
+    )
+    .map(
+      ([resource, hash]) =>
+        `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
+    )
+    .join('')
+  value = replaceThemeString('jsSnippet', value, generatedHtml)
 
   // Replace preload js
-  const generatedPreloads = Object.entries(assets)
-    .filter(([resource]) => /^(frontend|inline|vendor|desktop).*?\.js$/.test(resource))
+  const generatedPreloads = entries
+    .reverse()
+    .filter(([resource]) =>
+      /^(frontend|inline|vendor|desktop).*?\.js$/.test(resource)
+    )
     .map(
       ([resource, hash]) =>
         `<link rel="preload" as="script" href="https://static.vaithuhay.com/${resource}?${hash}" crossorigin>`
@@ -289,20 +307,39 @@ function updateDesktopTheme(assets) {
 
   return updateTheme(process.env.HRV_THEME_D_ID, 'layout/theme.liquid', value)
 }
-function updateMobileTheme(assets) {
-  // replace assets js
-  let generatedHtml = Object.entries(assets)
-      .filter(([resource]) => /^(frontend|inline|vendor|mobile).*?\.js$/.test(resource))
+function updateMobileTheme(entries) {
+  let value = mobileThemeLiquid
+  // replace asset css
+  value = replaceThemeString(
+    'cssSnippet',
+    value,
+    entries
+      .filter(([resource]) => /\.css$/.test(resource))
       .map(
         ([resource, hash]) =>
-          `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
+          `<link rel="stylesheet" type="text/css" href="https://static.vaithuhay.com/${resource}?${hash}">`
       )
-      .join(''),
-    value = replaceThemeString('jsSnippet', mobileThemeLiquid, generatedHtml)
+      .join('')
+  )
+  // replace assets js
+  let generatedHtml = entries
+    .reverse()
+    .filter(([resource]) =>
+      /^(frontend|inline|vendor|mobile).*?\.js$/.test(resource)
+    )
+    .map(
+      ([resource, hash]) =>
+        `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
+    )
+    .join('')
+  value = replaceThemeString('jsSnippet', value, generatedHtml)
 
   // Replace preload js
-  const generatedPreloads = Object.entries(assets)
-    .filter(([resource]) => /^(frontend|inline|vendor|mobile).*?\.js$/.test(resource))
+  const generatedPreloads = entries
+    .reverse()
+    .filter(([resource]) =>
+      /^(frontend|inline|vendor|mobile).*?\.js$/.test(resource)
+    )
     .map(
       ([resource, hash]) =>
         `<link rel="preload" as="script" href="https://static.vaithuhay.com/${resource}?${hash}" crossorigin>`
@@ -313,7 +350,8 @@ function updateMobileTheme(assets) {
   return updateTheme(process.env.HRV_THEME_M_ID, 'layout/theme.liquid', value)
 }
 function updateThemeAll(assets) {
-  return Promise.all([updateDesktopTheme(assets), updateMobileTheme(assets)])
+  const entries = Object.entries(assets)
+  return Promise.all([updateDesktopTheme(entries), updateMobileTheme(entries)])
 }
 // console.log(desktopThemeLiquid)
 // console.log(mobileThemeLiquid)

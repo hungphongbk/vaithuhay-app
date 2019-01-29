@@ -29,7 +29,7 @@
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=0' name='viewport'/>
   <link rel="canonical" href="{{ canonical_url }}"/>
 	<link href="https://static.vaithuhay.com" rel="preconnect" crossorigin>
-	<!--vth:preload--><link rel="preload" as="script" href="https://static.vaithuhay.com/inline.js?10e1186d3b33a63f981f" crossorigin><link rel="preload" as="script" href="https://static.vaithuhay.com/vendor.js?576d5df77cf338a508ed" crossorigin><link rel="preload" as="script" href="https://static.vaithuhay.com/frontend.js?b5f149b27e503a167880" crossorigin><link rel="preload" as="script" href="https://static.vaithuhay.com/mobile.bundle.js?5d2ad1e571ac752d4b3e" crossorigin><!--vth:preload:end-->
+	<!--vth:preload--><!--vth:preload:end-->
   {% include 'master-include' %}
   {{ content_for_header }}
 
@@ -85,9 +85,7 @@
   <!-- Compiled theme assets (both dev & production mode)-->
   <script>(function(t,e,n){function o(e){n.updateCartAttributes({dev:e},function(){t.location.reload(true)})}t.enterDevMode=function(){o(true)};t.exitDevMode=function(){o(false)}})(window,jQuery,Haravan);</script>
   {% if isDev == 'true' %}
-	{% else %}
-{{ "https://static.vaithuhay.com/frontend.css?" | append: vthVer | stylesheet_tag }}
-	{% endif %}
+	{% else %}<!--vth:cssSnippet--><!--vth:cssSnippet:end-->{% endif %}
 	<!-- Global site tag (gtag.js) - Google Ads: 846851119 -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=AW-846851119"></script>
 	<script>
