@@ -21,8 +21,8 @@ export default function(app, bootstrapCallbacks = []) {
 
   function createDev() {
     console.log('SERVER will be initialized on development mode')
-    const key = fs.readFileSync('/Users/myowngrave/server.key'),
-      cert = fs.readFileSync('/Users/myowngrave/server.crt'),
+    const key = fs.readFileSync('/Users/phong.truong/server.key'),
+      cert = fs.readFileSync('/Users/phong.truong/server.crt'),
       credentials = { key, cert }
     return https.createServer(credentials, app)
   }

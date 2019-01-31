@@ -8,7 +8,7 @@ const fn = async args => {
 
   if (args.create) {
     const image3d = await Images3D.upload(
-      fs.readFileSync('/Users/myowngrave/video2.mp4'),
+      fs.readFileSync('/Users/phong.truong/video2.mp4'),
       'video-demo.mp4'
     )
     // console.log(image3d.toJSON())

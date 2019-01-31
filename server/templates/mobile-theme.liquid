@@ -87,14 +87,12 @@
   {% if isDev == 'true' %}
 	{% else %}<!--vth:cssSnippet--><!--vth:cssSnippet:end-->{% endif %}
 	<!-- Global site tag (gtag.js) - Google Ads: 846851119 -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=AW-846851119"></script>
 	<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-846851119');
-</script>
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-846851119');
+  </script>
 <script>
   gtag('event', 'page_view', {'send_to': 'AW-846851119',
    'ecomm_prodid': 'REPLACE_WITH_STRING_VALUE',

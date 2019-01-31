@@ -4,7 +4,8 @@ const webpack = require('webpack'),
   base = require('./webpack/base.config.js'),
   nodeExternals = require('webpack-node-externals'),
   glob = require('glob'),
-  yenv = require('yenv')
+  yenv = require('yenv'),
+  postServer = require('./build/post-server')
 
 const _envs = yenv(path.resolve(process.cwd(), 'config/env.yaml'), {
     env: 'web-production'
@@ -145,7 +146,8 @@ module.exports.plugins = [
           compress: {
             warnings: false
           }
-        })
+        }),
+        postServer
         // require('./webpack/completed')
       ]
     : [])

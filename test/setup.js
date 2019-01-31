@@ -11,8 +11,8 @@ const server = require('../bin/www')
 let socket,
   ioOptions = {
     forceNew: true,
-    key: fs.readFileSync('/Users/myowngrave/server.key'),
-    cert: fs.readFileSync('/Users/myowngrave/server.crt'),
+    key: fs.readFileSync('/Users/phong.truong/server.key'),
+    cert: fs.readFileSync('/Users/phong.truong/server.crt'),
     rejectUnauthorized: false
   }
 before(function(done) {
