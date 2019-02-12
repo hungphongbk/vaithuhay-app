@@ -10,6 +10,7 @@ import chunk from 'lodash/chunk'
 import spreadsheet from '@server/components/Spreadsheet'
 import { HaravanAPI } from '@server/core/haravan-api'
 import { startMeasureTime } from '@universal/helpers'
+import Mustache from 'mustache'
 
 const router = new Router(),
   CARTS_CREATE_ADDRESS = 'https://server.vaithuhay.com/b/callback/createCart',
@@ -264,23 +265,21 @@ function updateTheme(themeId, file, body) {
 // TODO
 import desktopThemeLiquid from 'raw-loader!@server/templates/desktop-theme.liquid'
 import mobileThemeLiquid from 'raw-loader!@server/templates/mobile-theme.liquid'
+const mustacheTags = ['<%', '%>']
+Mustache.parse(desktopThemeLiquid, mustacheTags)
+Mustache.parse(mobileThemeLiquid, mustacheTags)
 function updateDesktopTheme(entries) {
-  let value = desktopThemeLiquid
   // replace asset css
-  value = replaceThemeString(
-    'cssSnippet',
-    value,
-    entries
-      .filter(([resource]) => /\.css$/.test(resource))
-      .map(
-        ([resource, hash]) =>
-          `<link rel="stylesheet" type="text/css" href="https://static.vaithuhay.com/${resource}?${hash}">`
-      )
-      .join('')
-  )
+  const snippetCss = entries
+    .filter(([resource]) => /\.css$/.test(resource))
+    .map(
+      ([resource, hash]) =>
+        `<link rel="stylesheet" type="text/css" href="https://static.vaithuhay.com/${resource}?${hash}">`
+    )
+    .join('')
 
   // replace assets js
-  let generatedHtml = entries
+  const snippetJs = entries
     .reverse()
     .filter(([resource]) =>
       /^(frontend|inline|vendor|desktop).*?\.js$/.test(resource)
@@ -290,10 +289,9 @@ function updateDesktopTheme(entries) {
         `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
     )
     .join('')
-  value = replaceThemeString('jsSnippet', value, generatedHtml)
 
   // Replace preload js
-  const generatedPreloads = entries
+  const preload = entries
     .reverse()
     .filter(([resource]) =>
       /^(frontend|inline|vendor|desktop).*?\.js$/.test(resource)
@@ -303,26 +301,30 @@ function updateDesktopTheme(entries) {
         `<link rel="preload" as="script" href="https://static.vaithuhay.com/${resource}?${hash}" crossorigin>`
     )
     .join('')
-  value = replaceThemeString('preload', value, generatedPreloads)
 
-  return updateTheme(process.env.HRV_THEME_D_ID, 'layout/theme.liquid', value)
+  return updateTheme(
+    process.env.HRV_THEME_D_ID,
+    'layout/theme.liquid',
+    Mustache.render(
+      desktopThemeLiquid,
+      { snippetCss, snippetJs, preload },
+      {},
+      mustacheTags
+    )
+  )
 }
 function updateMobileTheme(entries) {
-  let value = mobileThemeLiquid
   // replace asset css
-  value = replaceThemeString(
-    'cssSnippet',
-    value,
-    entries
-      .filter(([resource]) => /\.css$/.test(resource))
-      .map(
-        ([resource, hash]) =>
-          `<link rel="stylesheet" type="text/css" href="https://static.vaithuhay.com/${resource}?${hash}">`
-      )
-      .join('')
-  )
+  const snippetCss = entries
+    .filter(([resource]) => /\.css$/.test(resource))
+    .map(
+      ([resource, hash]) =>
+        `<link rel="stylesheet" type="text/css" href="https://static.vaithuhay.com/${resource}?${hash}">`
+    )
+    .join('')
+
   // replace assets js
-  let generatedHtml = entries
+  const snippetJs = entries
     .reverse()
     .filter(([resource]) =>
       /^(frontend|inline|vendor|mobile).*?\.js$/.test(resource)
@@ -332,10 +334,9 @@ function updateMobileTheme(entries) {
         `<script type="text/javascript" src="https://static.vaithuhay.com/${resource}?${hash}"></script>`
     )
     .join('')
-  value = replaceThemeString('jsSnippet', value, generatedHtml)
 
   // Replace preload js
-  const generatedPreloads = entries
+  const preload = entries
     .reverse()
     .filter(([resource]) =>
       /^(frontend|inline|vendor|mobile).*?\.js$/.test(resource)
@@ -345,9 +346,17 @@ function updateMobileTheme(entries) {
         `<link rel="preload" as="script" href="https://static.vaithuhay.com/${resource}?${hash}" crossorigin>`
     )
     .join('')
-  value = replaceThemeString('preload', value, generatedPreloads)
 
-  return updateTheme(process.env.HRV_THEME_M_ID, 'layout/theme.liquid', value)
+  return updateTheme(
+    process.env.HRV_THEME_M_ID,
+    'layout/theme.liquid',
+    Mustache.render(
+      mobileThemeLiquid,
+      { snippetCss, snippetJs, preload },
+      {},
+      mustacheTags
+    )
+  )
 }
 function updateThemeAll(assets) {
   const entries = Object.entries(assets)
