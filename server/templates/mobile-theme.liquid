@@ -28,7 +28,7 @@
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=0' name='viewport'/>
   <link rel="canonical" href="{{ canonical_url }}"/>
 	<link href="https://static.vaithuhay.com" rel="preconnect" crossorigin>
-	<% preload %>
+	<%& preload %>
   {% include 'master-include' %}
   {{ content_for_header }}
 
@@ -84,7 +84,7 @@
   <!-- Compiled theme assets (both dev & production mode)-->
   <script>(function(t,e,n){function o(e){n.updateCartAttributes({dev:e},function(){t.location.reload(true)})}t.enterDevMode=function(){o(true)};t.exitDevMode=function(){o(false)}})(window,jQuery,Haravan);</script>
   {% if isDev == 'true' %}
-	{% else %}<% snippetCss %>{% endif %}
+	{% else %}<%& snippetCss %>{% endif %}
 	<!-- Global site tag (gtag.js) - Google Ads: 846851119 -->
 	<script>
     window.dataLayer = window.dataLayer || [];
@@ -199,7 +199,7 @@ function gtag_report_conversion(url) {
 </script>
 {% if isDev == 'true' %}
 <script src="https://localhost:8080/frontend.js"></script>
-{% else %}<% snippetJs %>{% endif %}
+{% else %}<%& snippetJs %>{% endif %}
 {% include 'facebook-inbox' %}
 {% include 'hrvloyalty-widgets' %}
 <script type="text/javascript" src="https://cdn.ywxi.net/js/1.js" async></script>
