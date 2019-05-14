@@ -16,7 +16,8 @@
     "server:watch": "cross-env NODE_ENV=development webpack --config webpack.backend.config.js --hide-modules --color --watch",
     "server:compile": "cross-env NODE_ENV=production webpack --config webpack.backend.config.js",
     "sync": "NODE_ENV=development APP_RUNTIME_ENV=cli node server-dist/test.dev.js spreadsheet",
-    "cli-dev": "NODE_ENV=development APP_RUNTIME_ENV=cli node server-dist/test.dev.js"
+    "cli-dev": "NODE_ENV=development APP_RUNTIME_ENV=cli node server-dist/test.dev.js",
+    "start-newserver": "PORT=8090 pm2 restart bin/www"
   },
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.5",

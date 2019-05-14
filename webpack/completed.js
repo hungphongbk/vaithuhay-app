@@ -33,7 +33,7 @@ function apply(compiler) {
     var host = {
       user: 'root',
       host: 'hungphongbk.com',
-      port: 2234,
+      port: 22,
       key: _fs2.default.readFileSync('/Users/hungphongbk/.ssh/id_rsa'),
       password: 'hungPhong1*!@'
     },
@@ -47,7 +47,7 @@ function apply(compiler) {
     host: 'hungphongbk.com',
     username: 'root',
     passphrase: 'hungPhong1*!@',
-    port: 2234,
+    port: 22,
     privateKey: _fs2.default.readFileSync('/Users/hungphongbk/.ssh/id_rsa')
   }).then(function (session) {
     console.log('connected to hungphongbk server');

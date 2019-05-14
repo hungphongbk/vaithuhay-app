@@ -12,8 +12,8 @@ module.exports = {
   apply(compiler) {
     const ssh = new NodeSSH(),
       config = {
-        host: '188.166.177.127',
-        port: '2234',
+        host: '139.162.32.127',
+        port: '22',
         user: 'root',
         privateKey: getFilePath('.ssh/id_rsa')
       },

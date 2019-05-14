@@ -13,7 +13,7 @@ export function apply(compiler) {
     const host = {
         user: 'root',
         host: 'hungphongbk.com',
-        port: 2234,
+        port: 22,
         key: fs.readFileSync('/Users/hungphongbk/.ssh/id_rsa'),
         password: 'hungPhong1*!@'
       },
@@ -32,7 +32,7 @@ export function apply(compiler) {
     host: 'hungphongbk.com',
     username: 'root',
     passphrase: 'hungPhong1*!@',
-    port: 2234,
+    port: 22,
     privateKey: fs.readFileSync('/Users/hungphongbk/.ssh/id_rsa')
   }).then(session => {
     console.log('connected to hungphongbk server')
