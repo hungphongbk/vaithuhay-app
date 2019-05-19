@@ -8,6 +8,8 @@ import HaravanClientApi from '@server/utils/HaravanClientAPI'
 import Settings from '@server/components/Settings'
 import * as ImageOptim from '@server/jobs/imageOptim'
 
+const isDev = process.env.NODE_ENV === 'development'
+
 process
   .on('unhandledRejection', (reason, p) => {
     console.error(reason.message, 'Unhandled Rejection at Promise')
@@ -112,13 +114,14 @@ app.use('/fb-callback', FacebookHooks)
 // app.use('/noti', pushNoti)
 app.use('/products', products)
 app.use('/ssr', ssr)
-if (process.env.NODE_ENV === 'development') {
-  app.get('/oauth2callback', (req, res) => {
-    const qs = new url.URL(req.url, 'https://localhost:8089').searchParams
-    res.end('Authentication successful! Please return to the console.')
-    server.emit('test_code', qs.get('code'))
-  })
-}
+app.get('/oauth2callback', (req, res) => {
+  const qs = new url.URL(
+    req.url,
+    isDev ? 'https://localhost:8089' : 'http://localhost:8090'
+  ).searchParams
+  res.end('Authentication successful! Please return to the console.')
+  server.emit('test_code', qs.get('code'))
+})
 app.use('/', index)
 
 app.use(function(req, res, next) {
@@ -141,17 +144,17 @@ app.use(function(err, req, res, next) {
 })
 
 // attach models to server
-if (process.env.NODE_ENV === 'development') {
-  server.app = app
-  server.models = models
-  server.utils = {
-    HaravanClientApi,
-    Settings
-  }
-  server.jobs = {
-    updateProductJson,
-    googleAnalyticsJob,
-    ImageOptim
-  }
+// if (process.env.NODE_ENV === 'development') {
+server.app = app
+server.models = models
+server.utils = {
+  HaravanClientApi,
+  Settings
 }
+server.jobs = {
+  updateProductJson,
+  googleAnalyticsJob,
+  ImageOptim
+}
+// }
 module.exports = server
