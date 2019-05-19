@@ -1,6 +1,8 @@
 import io from 'socket.io-client'
 import fs from 'fs'
 
+const isDev = process.env.NODE_ENV === 'development'
+
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 global.APP_PATH = __dirname
 process.on('uncaughtException', err => {
@@ -9,16 +11,21 @@ process.on('uncaughtException', err => {
 
 const server = require('../bin/www')
 let socket,
-  ioOptions = {
-    forceNew: true,
-    key: fs.readFileSync('/Users/phong.truong/server.key'),
-    cert: fs.readFileSync('/Users/phong.truong/server.crt'),
-    rejectUnauthorized: false
-  }
+  ioOptions = isDev
+    ? {
+        forceNew: true,
+        key: fs.readFileSync('/Users/phong.truong/server.key'),
+        cert: fs.readFileSync('/Users/phong.truong/server.crt'),
+        rejectUnauthorized: false
+      }
+    : {}
 before(function(done) {
   this.timeout(0)
   server.on('vthAppReady', function() {
-    socket = io('https://localhost:8089', ioOptions)
+    socket = io(
+      isDev ? 'https://localhost:8089' : 'http://localhost:8090',
+      ioOptions
+    )
     socket.on('error', done)
     socket.on('connect', done)
   })
