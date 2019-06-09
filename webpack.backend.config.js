@@ -146,7 +146,8 @@ module.exports.plugins = [
           compress: {
             warnings: false
           }
-        })
+        }),
+        postServer
         // require('./webpack/completed')
       ]
     : [])

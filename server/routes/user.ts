@@ -14,14 +14,15 @@ declare global {
 const router = Router()
 
 const UserMiddleware = async (req: Request, res: Response, next) => {
-    if (!req.headers[CLIENT_USER_COOKIE_KEY]) {
+    const userCookieKey =
+      req.headers[CLIENT_USER_COOKIE_KEY] ||
+      req.headers[CLIENT_USER_COOKIE_KEY.toLowerCase()]
+    if (!userCookieKey) {
       res
         .status(403)
         .json({ status: 'err', message: 'Authentication required' })
     }
-    const { customer } = await apiGet(
-      `/admin/customers/${req.headers[CLIENT_USER_COOKIE_KEY]}.json`
-    )
+    const { customer } = await apiGet(`/admin/customers/${userCookieKey}.json`)
     // console.log(customer);
     req.customer = customer
     next()

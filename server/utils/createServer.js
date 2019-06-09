@@ -2,6 +2,7 @@ import http from 'http'
 import https from 'https'
 import fs from 'fs'
 import socketIO from 'socket.io'
+import path from 'path'
 // import requestStats from 'request-stats'
 
 // import omit from 'lodash/omit'
@@ -21,8 +22,12 @@ export default function(app, bootstrapCallbacks = []) {
 
   function createDev() {
     console.log('SERVER will be initialized on development mode')
-    const key = fs.readFileSync('/Users/phong.truong/server.key'),
-      cert = fs.readFileSync('/Users/phong.truong/server.crt'),
+    const key = fs.readFileSync(
+        path.join(global.APP_PATH, '../.private/server.vaithuhay.com.key')
+      ),
+      cert = fs.readFileSync(
+        path.join(global.APP_PATH, '../.private/server.vaithuhay.com.crt')
+      ),
       credentials = { key, cert }
     return https.createServer(credentials, app)
   }
