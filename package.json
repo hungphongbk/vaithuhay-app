@@ -105,7 +105,7 @@
     "imagemin-jpegtran": "^5.0.2",
     "imagemin-pngquant": "^5.1.0",
     "imagemin-webp": "^4.1.0",
-    "jpeg-js": "^0.3.4",
+    "jpeg-js": "^0.4.0",
     "jpegtran-bin": "^4.0.0",
     "jquery": "^3.3.1",
     "jquery-ui": "^1.12.1",
