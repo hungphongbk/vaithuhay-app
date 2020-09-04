@@ -183,7 +183,7 @@
     "vue-async-computed": "^3.3.1",
     "vue-async-data-2": "0.0.2",
     "vue-loader": "^14.2.2",
-    "vue-moment": "^3.2.0",
+    "vue-moment": "^4.1.0",
     "vue-native-websocket": "^2.0.7",
     "vue-router": "latest",
     "vue-socket.io": "^3.0.4",
